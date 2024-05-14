@@ -1,8 +1,10 @@
 package ru.skypro.homework.dto.user;
 
 
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import ru.skypro.homework.dto.RegisterDto;
+import ru.skypro.homework.dto.Register;
+import ru.skypro.homework.dto.Role;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -18,18 +20,68 @@ class RegisterDtoTest {
 
     @Test
     public void whenAllAcceptable() {
-        RegisterDto registerDto = RegisterDto.builder()
+        Register registerDto = Register.builder()
                 .username("login")
                 .password("Password")
                 .firstName("Иван")
                 .lastName("Иванов")
                 .phone("+7 (123) 456-78-90")
-                .role("ADMIN")
+                .role(Role.USER)
                 .build();
 
-        Set<ConstraintViolation<RegisterDto>> violations = validator.validate(registerDto);
+        Set<ConstraintViolation<Register>> violations = validator.validate(registerDto);
 
         assertThat(violations).isEmpty();
+    }
+
+    @Nested
+    class Invalid {
+
+        @Test
+        public void allNull() {
+            Register registerDto = new Register();
+
+            Set<ConstraintViolation<Register>> violations = validator.validate(registerDto);
+
+            assertThat(violations.size()).isEqualTo(6);
+            assertThat(violations).anyMatch(
+                    testObjectConstraintViolation ->
+                            testObjectConstraintViolation.getPropertyPath().toString().equals("username") &&
+                                    testObjectConstraintViolation.getMessage().contains("пуст") &&
+                                    testObjectConstraintViolation.getMessage().toLowerCase().contains("логин")
+            );
+            assertThat(violations).anyMatch(
+                    testObjectConstraintViolation ->
+                            testObjectConstraintViolation.getPropertyPath().toString().equals("password") &&
+                                    testObjectConstraintViolation.getMessage().contains("пуст") &&
+                                    testObjectConstraintViolation.getMessage().toLowerCase().contains("пароль")
+            );
+            assertThat(violations).anyMatch(
+                    testObjectConstraintViolation ->
+                            testObjectConstraintViolation.getPropertyPath().toString().equals("firstName") &&
+                                    testObjectConstraintViolation.getMessage().contains("пуст") &&
+                                    testObjectConstraintViolation.getMessage().toLowerCase().contains("имя")
+            );
+            assertThat(violations).anyMatch(
+                    testObjectConstraintViolation ->
+                            testObjectConstraintViolation.getPropertyPath().toString().equals("lastName") &&
+                                    testObjectConstraintViolation.getMessage().contains("пуст") &&
+                                    testObjectConstraintViolation.getMessage().toLowerCase().contains("фамилия")
+            );
+            assertThat(violations).anyMatch(
+                    testObjectConstraintViolation ->
+                            testObjectConstraintViolation.getPropertyPath().toString().equals("phone") &&
+                                    testObjectConstraintViolation.getMessage().toLowerCase().contains("телефон") &&
+                                    testObjectConstraintViolation.getMessage().contains("+7 (999) 999-99-99")
+            );
+            assertThat(violations).anyMatch(
+                    testObjectConstraintViolation ->
+                            testObjectConstraintViolation.getPropertyPath().toString().equals("role") &&
+                                    testObjectConstraintViolation.getMessage().contains("Неверная роль")
+            );
+        }
+
+        //todo проверить другие ограничения
     }
 
 }

@@ -11,8 +11,7 @@ import ru.skypro.homework.annotation.validation.Password;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PasswordDto {
-
+public class NewPassword {
     /**
      * текущий пароль
      */
@@ -23,5 +22,4 @@ public class PasswordDto {
      */
     @Password
     private String newPassword;
-
 }

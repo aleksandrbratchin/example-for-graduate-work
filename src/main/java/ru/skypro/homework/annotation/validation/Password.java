@@ -12,8 +12,8 @@ import java.lang.annotation.Target;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @NotBlank(message = "Пароль не может быть пустым")
-@Size(min = 8, message = "Пароль должен быть длиннее 8ми символов")
-@Size(max = 16, message = "Пароль должен быть короче 16ти символов")
+@Size(min = 8, message = "Пароль должен содержать минимум 8 символов")
+@Size(max = 16, message = "Пароль должен содержать максимум 16 символов")
 @Constraint(validatedBy = {})
 @Documented
 @Target({ElementType.FIELD})

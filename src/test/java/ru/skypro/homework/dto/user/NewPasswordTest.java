@@ -3,7 +3,7 @@ package ru.skypro.homework.dto.user;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import ru.skypro.homework.dto.PasswordDto;
+import ru.skypro.homework.dto.NewPassword;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -12,19 +12,19 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class PasswordDtoTest {
+class NewPasswordTest {
 
     private final Validator validator = Validation.buildDefaultValidatorFactory()
             .getValidator();
 
     @Test
     public void whenAllAcceptable() {
-        PasswordDto passwordDto = PasswordDto.builder()
+        NewPassword newPassword = NewPassword.builder()
                 .currentPassword("01234567")
                 .newPassword("0123456789123456")
                 .build();
 
-        Set<ConstraintViolation<PasswordDto>> violations = validator.validate(passwordDto);
+        Set<ConstraintViolation<NewPassword>> violations = validator.validate(newPassword);
 
         assertThat(violations).isEmpty();
     }
@@ -35,10 +35,10 @@ class PasswordDtoTest {
 
         @Test
         public void allNull() {
-            PasswordDto passwordDto = PasswordDto.builder()
+            NewPassword newPassword = NewPassword.builder()
                     .build();
 
-            Set<ConstraintViolation<PasswordDto>> violations = validator.validate(passwordDto);
+            Set<ConstraintViolation<NewPassword>> violations = validator.validate(newPassword);
 
             assertThat(violations.size()).isEqualTo(2);
             assertThat(violations).anyMatch(
@@ -53,12 +53,12 @@ class PasswordDtoTest {
 
         @Test
         public void allLess() {
-            PasswordDto passwordDto = PasswordDto.builder()
+            NewPassword newPassword = NewPassword.builder()
                     .currentPassword("123456")
                     .newPassword("123456")
                     .build();
 
-            Set<ConstraintViolation<PasswordDto>> violations = validator.validate(passwordDto);
+            Set<ConstraintViolation<NewPassword>> violations = validator.validate(newPassword);
 
             assertThat(violations.size()).isEqualTo(2);
             assertThat(violations).anyMatch(
@@ -73,12 +73,12 @@ class PasswordDtoTest {
 
         @Test
         public void allMore() {
-            PasswordDto passwordDto = PasswordDto.builder()
+            NewPassword newPassword = NewPassword.builder()
                     .currentPassword("01234567891234567")
                     .newPassword("01234567891234567")
                     .build();
 
-            Set<ConstraintViolation<PasswordDto>> violations = validator.validate(passwordDto);
+            Set<ConstraintViolation<NewPassword>> violations = validator.validate(newPassword);
 
             assertThat(violations.size()).isEqualTo(2);
             assertThat(violations).anyMatch(

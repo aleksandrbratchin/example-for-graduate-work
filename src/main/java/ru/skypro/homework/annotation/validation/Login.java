@@ -12,8 +12,8 @@ import java.lang.annotation.Target;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @NotBlank(message = "Логин не может быть пуст")
-@Size(min = 4, message = "Логин должен быть длиннее 4х символов")
-@Size(max = 32, message = "Логин должен быть короче 32х символов")
+@Size(min = 4, message = "Логин должен содержать минимум 4 символа")
+@Size(max = 32, message = "Логин должен содержать максимум 32 символа")
 @Constraint(validatedBy = {})
 @Documented
 @Target({ElementType.FIELD})

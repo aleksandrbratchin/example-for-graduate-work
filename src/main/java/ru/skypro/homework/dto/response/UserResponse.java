@@ -1,46 +1,40 @@
-package ru.skypro.homework.dto;
+package ru.skypro.homework.dto.response;
 
-import lombok.*;
-import ru.skypro.homework.annotation.validation.Login;
-import ru.skypro.homework.annotation.validation.*;
+import lombok.Data;
+import ru.skypro.homework.dto.Role;
 
-/**
- * DTO для регистрации нового пользователя
- */
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class Register {
+@Data
+public class UserResponse {
+    /**
+     * id пользователя
+     */
+    private Integer id;
     /**
      * логин пользователя
      */
-    @Login
     private String username;
     /**
      * пароль пользователя
      */
-    @Password
     private String password;
     /**
      * имя пользователя
      */
-    @FirstName
     private String firstName;
     /**
      * фамилия пользователя
      */
-    @LastName
     private String lastName;
     /**
      * телефон пользователя
      */
-    @MobilePhone
     private String phone;
     /**
      * роль пользователя
      */
-    @RoleUser
     private Role role;
+    /**
+     * ссылка на аватар пользователя
+     */
+    private String image;
 }

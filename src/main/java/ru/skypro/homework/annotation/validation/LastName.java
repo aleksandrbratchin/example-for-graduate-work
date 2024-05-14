@@ -12,8 +12,8 @@ import java.lang.annotation.Target;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @NotBlank(message = "Фамилия не может быть пустой")
-@Size(min = 2, message = "Фамилия должна быть длиннее 2х символов")
-@Size(max = 16, message = "Фамилия должна быть короче 16ти символов")
+@Size(min = 2, message = "Фамилия должна содержать минимум 2 символа")
+@Size(max = 16, message = "Фамилия должна содержать максимум 16 символов")
 @Constraint(validatedBy = {})
 @Documented
 @Target({ElementType.FIELD})
