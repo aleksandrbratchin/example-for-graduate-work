@@ -1,10 +1,10 @@
 package ru.skypro.homework.annotation.validation;
 
 
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 import ru.skypro.homework.dto.Role;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
 
 public class RoleUserValidator implements ConstraintValidator<RoleUser, Role> {
 

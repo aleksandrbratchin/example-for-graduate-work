@@ -1,8 +1,8 @@
 package ru.skypro.homework.dto;
 
+import jakarta.validation.constraints.*;
 import lombok.*;
 
-import javax.validation.constraints.*;
 
 /**
  * DTO для создания и обновления объявления

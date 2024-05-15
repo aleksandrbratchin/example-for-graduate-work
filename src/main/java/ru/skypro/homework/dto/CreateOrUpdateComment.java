@@ -1,9 +1,8 @@
 package ru.skypro.homework.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.*;
-
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
 
 /**
  * DTO для создания и обновления комментариев
