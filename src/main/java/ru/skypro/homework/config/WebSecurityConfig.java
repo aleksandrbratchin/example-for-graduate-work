@@ -25,6 +25,12 @@ public class WebSecurityConfig {
             "/register"
     };
 
+    /**
+     * InMemoryUserDetailsManagerреализует UserDetailsService для обеспечения поддержки аутентификации на основе имени пользователя и пароля, которая хранится в памяти.
+     *
+     * @param passwordEncoder
+     * @return
+     */
     @Bean
     public InMemoryUserDetailsManager userDetailsService(PasswordEncoder passwordEncoder) {
         UserDetails user =
