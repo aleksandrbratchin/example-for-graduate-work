@@ -1,6 +1,7 @@
 package ru.skypro.homework.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -113,6 +114,14 @@ public class UserController {
 
     @Operation(
             summary = "Обновление аватара авторизованного пользователя",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "Файл изображения",
+                    required = true,
+                    content = @Content(
+                            mediaType = "multipart/form-data",
+                            schema = @Schema(type = "string", format = "binary")
+                    )
+            ),
             responses = {
                     @ApiResponse(
                             responseCode = "200",
@@ -127,7 +136,7 @@ public class UserController {
     )
     @PatchMapping(path = "me/image")
     public ResponseEntity<?> updateUserImage(
-            @RequestBody MultipartFile data
+            @RequestBody MultipartFile image
     ) {
         return ResponseEntity.status(HttpStatus.OK).body(new UpdateUser());
     }
