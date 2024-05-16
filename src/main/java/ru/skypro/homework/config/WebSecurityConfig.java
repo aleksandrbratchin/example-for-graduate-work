@@ -11,9 +11,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import ru.skypro.homework.dto.Role;
 
 import static org.springframework.security.config.Customizer.withDefaults;
@@ -59,13 +56,13 @@ public class WebSecurityConfig {
                                         .requestMatchers("/ads/**", "/users/**")
                                         .authenticated())
                 .httpBasic(withDefaults())
-                //.cors(withDefaults());
-                .cors(httpSecurityCorsConfigurer -> corsConfigurationSource());
+                .cors(withDefaults());
+        //.cors(httpSecurityCorsConfigurer -> corsConfigurationSource());
         return http.build();
     }
 
     // Настройка бина CorsConfigurationSource
-    @Bean
+/*    @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.addAllowedOrigin("*"); // Разрешаем запросы от любого источника
@@ -75,7 +72,7 @@ public class WebSecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration); // Применяем конфигурацию к всем URL
         return source;
-    }
+    }*/
 
     @Bean
     public PasswordEncoder passwordEncoder() {
