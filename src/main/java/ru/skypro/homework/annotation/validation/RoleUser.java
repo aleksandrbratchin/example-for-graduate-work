@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
 
 @NotNull
 @ReportAsSingleViolation
-@Constraint(validatedBy = RoleUserValidator.class)
+@Constraint(validatedBy = {})
 @Target({ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface RoleUser {

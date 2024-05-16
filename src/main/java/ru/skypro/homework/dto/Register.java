@@ -1,8 +1,10 @@
 package ru.skypro.homework.dto;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.*;
 import ru.skypro.homework.annotation.validation.Login;
 import ru.skypro.homework.annotation.validation.*;
+import ru.skypro.homework.jackson.deserializer.RoleUserDeserializer;
 
 /**
  * DTO для регистрации нового пользователя
@@ -41,6 +43,7 @@ public class Register {
     /**
      * роль пользователя
      */
+    @JsonDeserialize(using = RoleUserDeserializer.class)
     @RoleUser
     private Role role;
 }

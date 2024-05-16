@@ -1,13 +1,13 @@
 package ru.skypro.homework.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -19,6 +19,7 @@ import ru.skypro.homework.dto.NewPassword;
 import ru.skypro.homework.dto.UpdateUser;
 import ru.skypro.homework.dto.response.UserResponse;
 
+import java.util.stream.Collectors;
 
 @Slf4j
 @CrossOrigin(value = "http://localhost:3000")
@@ -41,6 +42,10 @@ public class UserController {
                     @ApiResponse(
                             responseCode = "403",
                             description = "Forbidden"
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "BAD_REQUEST"
                     )
             },
             tags = "Пользователи"
@@ -48,12 +53,13 @@ public class UserController {
     //@PreAuthorize("hasAnyRole('USER')") //401?
     @PostMapping(path = "set_password", consumes = "application/json")
     public ResponseEntity<?> setPassword(
-            @Valid @RequestBody NewPassword password,
+            @RequestBody @Valid NewPassword password,
             //@AuthenticationPrincipal UserDetails user,
             BindingResult bindingResult
     ) {
         if (bindingResult.hasErrors()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            String errorMessage = bindingResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.joining(", "));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
         }
         return ResponseEntity.status(HttpStatus.OK).build();
     }
@@ -97,17 +103,22 @@ public class UserController {
                     @ApiResponse(
                             responseCode = "401",
                             description = "Unauthorized"
+                    ),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "BAD_REQUEST"
                     )
             },
             tags = "Пользователи"
     )
     @PatchMapping(path = "me", consumes = "application/json")
     public ResponseEntity<?> updateUser(
-            @Valid @RequestBody UpdateUser updateUser,
+            @RequestBody @Valid UpdateUser updateUser,
             BindingResult bindingResult
     ) {
         if (bindingResult.hasErrors()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            String errorMessage = bindingResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.joining(", "));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
         }
         return ResponseEntity.status(HttpStatus.OK).body(new UpdateUser());
     }

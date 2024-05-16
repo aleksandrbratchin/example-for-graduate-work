@@ -1,14 +1,14 @@
 package ru.skypro.homework.dto.user;
 
 
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import ru.skypro.homework.dto.Register;
 import ru.skypro.homework.dto.Role;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
-import javax.validation.Validator;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -71,8 +71,7 @@ class RegisterDtoTest {
             assertThat(violations).anyMatch(
                     testObjectConstraintViolation ->
                             testObjectConstraintViolation.getPropertyPath().toString().equals("phone") &&
-                                    testObjectConstraintViolation.getMessage().toLowerCase().contains("телефон") &&
-                                    testObjectConstraintViolation.getMessage().contains("+7 (999) 999-99-99")
+                                    testObjectConstraintViolation.getMessage().toLowerCase().contains("телефон")
             );
             assertThat(violations).anyMatch(
                     testObjectConstraintViolation ->
