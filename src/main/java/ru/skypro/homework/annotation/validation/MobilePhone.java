@@ -23,7 +23,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target({ElementType.FIELD})
 @Retention(RUNTIME)
 public @interface MobilePhone {
-    String message() default "Номер телефона не соответствует формату '+7 (999) 999-99-99'";
+    String message() default "Номер телефона не соответствует формату";
 
     Class<?>[] groups() default {};
 

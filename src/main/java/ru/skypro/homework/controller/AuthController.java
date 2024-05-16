@@ -2,10 +2,13 @@ package ru.skypro.homework.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,6 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.skypro.homework.dto.Login;
 import ru.skypro.homework.dto.Register;
 import ru.skypro.homework.service.AuthService;
+
+import java.util.stream.Collectors;
 
 @Slf4j
 @CrossOrigin(value = "http://localhost:3000")
@@ -36,8 +41,15 @@ public class AuthController {
             },
             tags = "Авторизация"
     )
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Login login) {
+    @PostMapping("login")
+    public ResponseEntity<?> login(
+            @RequestBody @Valid Login login,
+            BindingResult bindingResult
+    ) {
+        if (bindingResult.hasErrors()) {
+            String errorMessage = bindingResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.joining(", "));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorMessage);
+        }
         if (authService.login(login.getUsername(), login.getPassword())) {
             return ResponseEntity.ok().build();
         } else {
@@ -46,7 +58,7 @@ public class AuthController {
     }
 
     @Operation(
-            summary = "Регистрация нового пользователя",
+            summary = "Регистрация пользователя",
             responses = {
                     @ApiResponse(
                             responseCode = "201",
@@ -57,10 +69,17 @@ public class AuthController {
                             description = "BAD_REQUEST"
                     )
             },
-            tags = "Авторизация"
+            tags = "Регистрация"
     )
-    @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody Register register) {
+    @PostMapping("register")
+    public ResponseEntity<?> register(
+            @RequestBody @Valid Register register,
+            BindingResult bindingResult
+    ) {
+        if (bindingResult.hasErrors()) {
+            String errorMessage = bindingResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.joining(", "));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
+        }
         if (authService.register(register)) {
             return ResponseEntity.status(HttpStatus.CREATED).build();
         } else {
