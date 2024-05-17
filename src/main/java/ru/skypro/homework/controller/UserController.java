@@ -60,11 +60,9 @@ public class UserController {
             },
             tags = "Пользователи"
     )
-    //@PreAuthorize("hasAnyRole('USER')") //401?
     @PostMapping(path = "set_password", consumes = "application/json")
     public ResponseEntity<?> setPassword(
             @RequestBody @Valid NewPassword password,
-            //@AuthenticationPrincipal UserDetails user,
             BindingResult bindingResult
     ) {
         if (bindingResult.hasErrors()) {
@@ -153,17 +151,6 @@ public class UserController {
                     content = @Content(
                             mediaType = "multipart/form-data",
                             schema = @Schema(implementation = MultipartFile.class)
-/*                            schema = @Schema(
-                                    implementation = Object.class,
-                                    properties = {
-                                            @SchemaProperty(
-                                                    schema = @Schema(
-                                                            type = "string",
-                                                            format = "binary"
-                                                    )
-                                            )
-                                    }
-                            )*/
                     )
             ),
             responses = {
@@ -186,5 +173,36 @@ public class UserController {
     ) {
         return ResponseEntity.status(HttpStatus.OK).body(new UpdateUser());
     }
+
+/*    @Operation(
+            summary = "Обновление аватара авторизованного пользователя",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "Файл изображения",
+                    required = true,
+                    content = @Content(
+                            mediaType = "multipart/form-data",
+                            schema = @Schema(implementation = MultipartFile.class)
+                    )
+            ),
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "OK",
+                            content = @Content(schema = @Schema(hidden = true))
+                    ),
+                    @ApiResponse(
+                            responseCode = "401",
+                            description = "Unauthorized",
+                            content = @Content(schema = @Schema(hidden = true))
+                    )
+            },
+            tags = "Пользователи"
+    )
+    @PatchMapping(path = "me/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> updateUserImage(
+            @RequestParam("image") MultipartFile image
+    ) {
+        return ResponseEntity.status(HttpStatus.OK).body(new UpdateUser());
+    }*/
 
 }
