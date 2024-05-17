@@ -1,5 +1,6 @@
 package ru.skypro.homework.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import ru.skypro.homework.annotation.validation.FirstName;
 import ru.skypro.homework.annotation.validation.LastName;
@@ -18,15 +19,18 @@ public class UpdateUser {
      * имя пользователя
      */
     @FirstName //todo почему в тз другие ограничения?
+    @Schema(description = "имя пользователя")
     private String firstName;
     /**
      * фамилия пользователя
      */
     @LastName //todo почему в тз другие ограничения?
+    @Schema(description = "фамилия пользователя")
     private String lastName;
     /**
      * телефон пользователя
      */
+    @Schema(description = "телефон пользователя")
     @MobilePhone
     private String phone;
 }

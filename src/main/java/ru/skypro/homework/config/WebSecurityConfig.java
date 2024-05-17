@@ -57,22 +57,8 @@ public class WebSecurityConfig {
                                         .authenticated())
                 .httpBasic(withDefaults())
                 .cors(withDefaults());
-        //.cors(httpSecurityCorsConfigurer -> corsConfigurationSource());
         return http.build();
     }
-
-    // Настройка бина CorsConfigurationSource
-/*    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.addAllowedOrigin("*"); // Разрешаем запросы от любого источника
-        configuration.addAllowedMethod("*"); // Разрешаем использование любых HTTP-методов
-        configuration.addAllowedHeader("*"); // Разрешаем использование любых заголовков
-        configuration.setAllowCredentials(true); // Разрешаем отправку аутентификационных данных (например, cookies) с запросом
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration); // Применяем конфигурацию к всем URL
-        return source;
-    }*/
 
     @Bean
     public PasswordEncoder passwordEncoder() {

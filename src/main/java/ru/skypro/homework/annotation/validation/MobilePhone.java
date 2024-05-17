@@ -15,9 +15,9 @@ import java.lang.annotation.Target;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @NotNull
-@Pattern(regexp = "\\+7\\s?\\(?\\d{3}\\)?\\s?\\d{3}-?\\d{2}-?\\d{2}")
+//@Pattern(regexp = "\\+7\\s?\\(?\\d{3}\\)?\\s?\\d{3}-?\\d{2}-?\\d{2}")
+@Pattern(regexp = "\\+7\\s?(\\(\\d{3}\\)|\\d{3})\\s?(\\d{3}\\d{2}\\d{2}|\\d{3}-\\d{2}-\\d{2})")
 @Constraint(validatedBy = {})
-//@ReportAsSingleViolation меняет поведение на следующее: проверка выполняется до нарушения первого констрейна, после нарушения будет отдана ошибка (поле message()) из кастомной аннотации.
 @ReportAsSingleViolation
 @Documented
 @Target({ElementType.FIELD})
