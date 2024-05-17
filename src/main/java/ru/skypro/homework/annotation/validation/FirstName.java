@@ -16,7 +16,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @NotBlank(message = "Имя не может быть пустым")
 @Size(min = 2, message = "Имя должно содержать минимум 2 символа")
 @Size(max = 16, message = "Имя должно содержать максимум 16 символов")
-
 @Constraint(validatedBy = {})
 @Documented
 @Target({ElementType.FIELD})

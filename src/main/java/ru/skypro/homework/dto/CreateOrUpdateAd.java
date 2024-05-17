@@ -1,5 +1,6 @@
 package ru.skypro.homework.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
@@ -16,6 +17,7 @@ public class CreateOrUpdateAd {
     /**
      * заголовок объявления
      */
+    @Schema(description = "заголовок объявления")
     @NotBlank(message = "Заголовок не может быть пуст")
     @Size(min = 4, message = "Заголовок должен содержать минимум 4 символа")
     @Size(max = 32, message = "Заголовок должен содержать максимум 32 символа")
@@ -23,6 +25,7 @@ public class CreateOrUpdateAd {
     /**
      * цена объявления
      */
+    @Schema(description = "цена объявления")
     @NotNull
     @Min(value = 0)
     @Max(value = 10000000)
@@ -30,6 +33,7 @@ public class CreateOrUpdateAd {
     /**
      * описание объявления
      */
+    @Schema(description = "описание объявления")
     @NotBlank(message = "Необходимо заполнить описание")
     @Size(min = 8, message = "Описание должно содержать минимум 8 символов")
     @Size(max = 64, message = "Описание должно содержать максимум 64 символа")

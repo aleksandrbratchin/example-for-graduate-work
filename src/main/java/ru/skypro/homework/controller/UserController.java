@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -33,19 +34,28 @@ public class UserController {
             responses = {
                     @ApiResponse(
                             responseCode = "200",
-                            description = "OK"
+                            description = "OK",
+                            content = @Content(schema = @Schema(hidden = true))
                     ),
                     @ApiResponse(
                             responseCode = "401",
-                            description = "Unauthorized"
+                            description = "Unauthorized",
+                            content = @Content(schema = @Schema(hidden = true))
                     ),
                     @ApiResponse(
                             responseCode = "403",
-                            description = "Forbidden"
+                            description = "Forbidden",
+                            content = @Content(schema = @Schema(hidden = true))
                     ),
                     @ApiResponse(
                             responseCode = "400",
-                            description = "BAD_REQUEST"
+                            description = "BAD_REQUEST",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(
+                                            type = "string"
+                                    )
+                            )
                     )
             },
             tags = "Пользователи"
@@ -71,13 +81,16 @@ public class UserController {
                             responseCode = "200",
                             description = "OK",
                             content = {
-                                    @Content(mediaType = "application/json",
-                                            schema = @Schema(implementation = UserResponse.class))
+                                    @Content(
+                                            mediaType = "application/json",
+                                            schema = @Schema(implementation = UserResponse.class)
+                                    )
                             }
                     ),
                     @ApiResponse(
                             responseCode = "401",
-                            description = "Unauthorized"
+                            description = "Unauthorized",
+                            content = @Content(schema = @Schema(hidden = true))
                     )
             },
             tags = "Пользователи"
@@ -86,7 +99,7 @@ public class UserController {
     public ResponseEntity<?> getUser(
             @AuthenticationPrincipal UserDetails user
     ) {
-        return ResponseEntity.status(HttpStatus.OK).body(new UserResponse());
+        return ResponseEntity.status(HttpStatus.OK).body(user);
     }
 
     @Operation(
@@ -96,17 +109,26 @@ public class UserController {
                             responseCode = "200",
                             description = "OK",
                             content = {
-                                    @Content(mediaType = "application/json",
-                                            schema = @Schema(implementation = UserResponse.class))
+                                    @Content(
+                                            mediaType = "application/json",
+                                            schema = @Schema(implementation = UserResponse.class)
+                                    )
                             }
                     ),
                     @ApiResponse(
                             responseCode = "401",
-                            description = "Unauthorized"
+                            description = "Unauthorized",
+                            content = @Content(schema = @Schema(hidden = true))
                     ),
                     @ApiResponse(
                             responseCode = "400",
-                            description = "BAD_REQUEST"
+                            description = "BAD_REQUEST",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(
+                                            type = "string"
+                                    )
+                            )
                     )
             },
             tags = "Пользователи"
@@ -130,22 +152,35 @@ public class UserController {
                     required = true,
                     content = @Content(
                             mediaType = "multipart/form-data",
-                            schema = @Schema(type = "string", format = "binary")
+                            schema = @Schema(implementation = MultipartFile.class)
+/*                            schema = @Schema(
+                                    implementation = Object.class,
+                                    properties = {
+                                            @SchemaProperty(
+                                                    schema = @Schema(
+                                                            type = "string",
+                                                            format = "binary"
+                                                    )
+                                            )
+                                    }
+                            )*/
                     )
             ),
             responses = {
                     @ApiResponse(
                             responseCode = "200",
-                            description = "OK"
+                            description = "OK",
+                            content = @Content(schema = @Schema(hidden = true))
                     ),
                     @ApiResponse(
                             responseCode = "401",
-                            description = "Unauthorized"
+                            description = "Unauthorized",
+                            content = @Content(schema = @Schema(hidden = true))
                     )
             },
             tags = "Пользователи"
     )
-    @PatchMapping(path = "me/image")
+    @PatchMapping(path = "me/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> updateUserImage(
             @RequestBody MultipartFile image
     ) {
