@@ -3,6 +3,7 @@ package ru.skypro.homework.service.impl;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.skypro.homework.dto.Register;
@@ -18,10 +19,10 @@ public class AuthServiceImpl implements AuthService {
     private final UserMapper userMapper;
     private final PasswordEncoder encoder;
 
-
     public AuthServiceImpl(
             @Qualifier("customUserDetailsService") UserDetailsService userDetailsService,
-            UserService userService, UserMapper userMapper,
+            UserService userService,
+            UserMapper userMapper,
             PasswordEncoder passwordEncoder
     ) {
         this.userDetailsService = userDetailsService;
@@ -32,8 +33,10 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public boolean login(String userName, String password) {
-        UserDetails userDetails = userDetailsService.loadUserByUsername(userName);
-        if (userDetails == null) {
+        UserDetails userDetails;
+        try {
+            userDetails = userDetailsService.loadUserByUsername(userName);
+        } catch (UsernameNotFoundException e) {
             return false;
         }
         return encoder.matches(password, userDetails.getPassword());
@@ -41,12 +44,15 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public boolean register(Register register) {
-        if (userDetailsService.loadUserByUsername(register.getUsername()) != null) {
-            return false;
+        try {
+            userDetailsService.loadUserByUsername(register.getUsername());
+        } catch (UsernameNotFoundException e) {
+            User user = userMapper.fromRegister(register);
+            user.setPassword(encoder.encode(register.getPassword()));
+            userService.save(user);
+            return true;
         }
-        User user = userMapper.fromRegister(register);
-        userService.save(user);
-        return true;
+        return false;
     }
 
 }
