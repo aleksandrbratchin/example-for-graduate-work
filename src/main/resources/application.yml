@@ -17,3 +17,6 @@ springdoc:
   swagger-ui:
     path: /swagger
     tryItOutEnabled: true
+path:
+  to:
+    image: images
