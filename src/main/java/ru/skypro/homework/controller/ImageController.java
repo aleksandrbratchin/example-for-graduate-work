@@ -19,9 +19,17 @@ public class ImageController {
 
     private final ImageService imageService;
 
-    @GetMapping(value = "download/{id}")
-    public ResponseEntity<?> download(
-            @PathVariable(name = "id") Long id
+    @GetMapping(
+            value = "{id}",
+            produces = {
+                    MediaType.IMAGE_PNG_VALUE,
+                    MediaType.IMAGE_JPEG_VALUE,
+                    MediaType.IMAGE_GIF_VALUE,
+                    "image/*"
+            }
+    )
+    public ResponseEntity<byte[]> download(
+            @PathVariable Long id
     ) {
         Image image = imageService.findById(id);
         HttpHeaders headers = new HttpHeaders();

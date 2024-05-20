@@ -79,6 +79,11 @@ public class UserController {
             String errorMessage = bindingResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.joining(", "));
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorMessage);
         }
+        try {
+            userService.updatePassword(userPrincipal, password);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
 
         return ResponseEntity.status(HttpStatus.OK).build();
     }
@@ -108,7 +113,9 @@ public class UserController {
     public ResponseEntity<?> getUser(
             @AuthenticationPrincipal UserPrincipal user
     ) {
-        return ResponseEntity.status(HttpStatus.OK).body(userMapper.toUserResponse(user.getUser()));
+        return ResponseEntity.status(HttpStatus.OK).body(
+                userMapper.toUserResponse(user.getUser())
+        );
     }
 
     @Operation(

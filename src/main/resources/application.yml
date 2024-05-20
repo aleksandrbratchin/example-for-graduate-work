@@ -18,4 +18,4 @@ springdoc:
     path: /swagger
     tryItOutEnabled: true
 download:
-  url: http://localhost:8080/image/download/
+  url: /image/

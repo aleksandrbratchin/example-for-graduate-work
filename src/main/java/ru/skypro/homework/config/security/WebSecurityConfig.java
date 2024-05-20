@@ -23,6 +23,7 @@ public class WebSecurityConfig {
             "/api-docs/**",
             "/webjars/**",
             "/login",
+            //"/image/**",
             "/register"
     };
 
@@ -34,7 +35,7 @@ public class WebSecurityConfig {
                                 authorization
                                         .requestMatchers(AUTH_WHITELIST)
                                         .permitAll()
-                                        .requestMatchers("/ads/**", "/users/**", "/image/download/**")
+                                        .requestMatchers("/ads/**", "/users/**", "/image/**")
                                         .authenticated())
                 .httpBasic(withDefaults())
                 .cors(withDefaults());
@@ -43,7 +44,8 @@ public class WebSecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+        return new BCryptPasswordEncoder(); //картинка не грузится
+        //todo return NoOpPasswordEncoder.getInstance(); //картинка грузится
     }
 
 }

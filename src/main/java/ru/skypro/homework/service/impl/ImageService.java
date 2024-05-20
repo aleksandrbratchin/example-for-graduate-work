@@ -19,4 +19,5 @@ public class ImageService {
     public Image findById(Long id) {
         return imageRepository.findById(id).orElseThrow(() -> new RuntimeException()); //todo exception
     }
+
 }

@@ -16,7 +16,7 @@ public abstract class UserMapper {
     @Mapping(target = "avatar", ignore = true)
     public abstract User fromRegister(Register register);
 
-    @Mapping(target = "image", expression = "java(user.getAvatar() == null ? null : downloadUrl + user.getAvatar().getId())")
+    @Mapping(target = "image", expression = "java(user.getAvatar() == null ? \"\" : downloadUrl + user.getAvatar().getId())")
     public abstract UserResponse toUserResponse(User user);
 
 }
