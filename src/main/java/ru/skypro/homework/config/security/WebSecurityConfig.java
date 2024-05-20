@@ -23,22 +23,9 @@ public class WebSecurityConfig {
             "/api-docs/**",
             "/webjars/**",
             "/login",
+            //"/image/**",
             "/register"
     };
-
-    /**
-     * InMemoryUserDetailsManager реализует UserDetailsService для обеспечения поддержки аутентификации на основе имени пользователя и пароля, которая хранится в памяти.
-     */
-/*    @Bean
-    public InMemoryUserDetailsManager userDetailsService(PasswordEncoder passwordEncoder) {
-                UserDetails user = User.builder()
-                        .username("user@gmail.com")
-                        .password("password")
-                        .passwordEncoder(passwordEncoder::encode)
-                        .roles(Role.USER.name())
-                        .build();
-        return new InMemoryUserDetailsManager(user);
-    }*/
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -48,7 +35,7 @@ public class WebSecurityConfig {
                                 authorization
                                         .requestMatchers(AUTH_WHITELIST)
                                         .permitAll()
-                                        .requestMatchers("/ads/**", "/users/**")
+                                        .requestMatchers("/ads/**", "/users/**", "/image/**")
                                         .authenticated())
                 .httpBasic(withDefaults())
                 .cors(withDefaults());
@@ -57,7 +44,8 @@ public class WebSecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+        return new BCryptPasswordEncoder(); //картинка не грузится
+        //todo return NoOpPasswordEncoder.getInstance(); //картинка грузится
     }
 
 }

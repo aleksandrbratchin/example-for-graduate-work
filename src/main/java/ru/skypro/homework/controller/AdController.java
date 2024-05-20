@@ -18,8 +18,6 @@ import ru.skypro.homework.dto.response.AdResponse;
 import ru.skypro.homework.dto.response.AdsResponse;
 import ru.skypro.homework.dto.response.ExtendedAdResponse;
 
-import java.util.Collection;
-
 @Slf4j
 @CrossOrigin(value = "http://localhost:3000")
 @RestController
@@ -33,17 +31,18 @@ public class AdController {
                     @ApiResponse(
                             responseCode = "200",
                             description = "OK",
-                            content = {
-                                    @Content(
-                                            mediaType = "application/json",
-                                            schema = @Schema(implementation = AdsResponse.class))
-                            }
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(
+                                            implementation = AdsResponse.class
+                                    )
+                            )
                     )
             }
     )
     @GetMapping()
-    public ResponseEntity<Collection<?>> getAllAds() {
-        return ResponseEntity.ok().build();
+    public ResponseEntity<?> getAllAds() {
+        return ResponseEntity.ok().body(new AdsResponse());
     }
 
     @Operation(
@@ -66,6 +65,7 @@ public class AdController {
                             responseCode = "200",
                             description = "OK",
                             content = @Content(
+                                    mediaType = "application/json",
                                     schema = @Schema(
                                             implementation = AdResponse.class
                                     )
@@ -203,7 +203,7 @@ public class AdController {
     )
     @GetMapping("/me")
     public ResponseEntity<?> getAdsByAuthUser() {
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok().body(new AdsResponse());
     }
 
     @Operation(

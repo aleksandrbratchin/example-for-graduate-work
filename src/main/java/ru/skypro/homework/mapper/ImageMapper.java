@@ -10,6 +10,8 @@ import java.io.IOException;
 public abstract class ImageMapper {
 
     @Mapping(target = "data", expression = "java(mapMultipartFileToByteArray(file))")
+    @Mapping(target = "fileSize", expression = "java(getFileSize(file))")
+    @Mapping(target = "mediaType", expression = "java(getMediaType(file))")
     @Mapping(target = "id", ignore = true)
     public abstract Image toImage(MultipartFile file);
 
@@ -17,8 +19,15 @@ public abstract class ImageMapper {
         try {
             return file != null ? file.getBytes() : null;
         } catch (IOException e) {
-            // Handle the exception as per your requirement
-            throw new RuntimeException("Error converting MultipartFile to byte array", e);
+            throw new RuntimeException("Ошибка преобразования MultipartFile в массив байтов", e);
         }
+    }
+
+    protected Long getFileSize(MultipartFile file) {
+        return file != null ? file.getSize() : null;
+    }
+
+    protected String getMediaType(MultipartFile file) {
+        return file != null ? file.getContentType() : null;
     }
 }
