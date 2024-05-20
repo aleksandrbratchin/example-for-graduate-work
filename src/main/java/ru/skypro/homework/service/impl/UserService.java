@@ -3,7 +3,7 @@ package ru.skypro.homework.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
+import ru.skypro.homework.dto.UpdateUser;
 import ru.skypro.homework.model.Image;
 import ru.skypro.homework.model.User;
 import ru.skypro.homework.repository.UserRepository;
@@ -37,6 +37,19 @@ public class UserService {
     public void setAvatar(User user, Image image) {
         user.setAvatar(image);
         userRepository.save(user);
+    }
+
+    /**
+     * Обновить данные о пользователе
+     *
+     * @param user пользователь которого надо сохранить {@link UpdateUser}
+     * @return {@link User}
+     */
+    public User update(User user, UpdateUser updateUser) {
+        user.setPhone(updateUser.getPhone());
+        user.setFirstName(updateUser.getFirstName());
+        user.setLastName(updateUser.getLastName());
+        return userRepository.save(user);
     }
 
 }

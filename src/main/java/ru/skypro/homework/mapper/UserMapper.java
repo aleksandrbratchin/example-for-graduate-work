@@ -2,13 +2,21 @@ package ru.skypro.homework.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.springframework.beans.factory.annotation.Value;
 import ru.skypro.homework.dto.Register;
+import ru.skypro.homework.dto.response.UserResponse;
 import ru.skypro.homework.model.User;
 
 @Mapper(componentModel = "spring")
-public interface UserMapper {
+public abstract class UserMapper {
+
+    @Value("${download.url}")
+    protected String downloadUrl;
 
     @Mapping(target = "avatar", ignore = true)
-    User fromRegister(Register register);
+    public abstract User fromRegister(Register register);
+
+    @Mapping(target = "image", expression = "java(user.getAvatar() == null ? null : downloadUrl + user.getAvatar().getId())")
+    public abstract UserResponse toUserResponse(User user);
 
 }

@@ -26,20 +26,6 @@ public class WebSecurityConfig {
             "/register"
     };
 
-    /**
-     * InMemoryUserDetailsManager реализует UserDetailsService для обеспечения поддержки аутентификации на основе имени пользователя и пароля, которая хранится в памяти.
-     */
-/*    @Bean
-    public InMemoryUserDetailsManager userDetailsService(PasswordEncoder passwordEncoder) {
-                UserDetails user = User.builder()
-                        .username("user@gmail.com")
-                        .password("password")
-                        .passwordEncoder(passwordEncoder::encode)
-                        .roles(Role.USER.name())
-                        .build();
-        return new InMemoryUserDetailsManager(user);
-    }*/
-
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
@@ -48,7 +34,7 @@ public class WebSecurityConfig {
                                 authorization
                                         .requestMatchers(AUTH_WHITELIST)
                                         .permitAll()
-                                        .requestMatchers("/ads/**", "/users/**")
+                                        .requestMatchers("/ads/**", "/users/**", "/image/download/**")
                                         .authenticated())
                 .httpBasic(withDefaults())
                 .cors(withDefaults());

@@ -17,6 +17,5 @@ springdoc:
   swagger-ui:
     path: /swagger
     tryItOutEnabled: true
-path:
-  to:
-    image: images
+download:
+  url: http://localhost:8080/image/download/
