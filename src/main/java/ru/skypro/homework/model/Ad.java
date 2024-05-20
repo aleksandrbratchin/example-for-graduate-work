@@ -5,28 +5,22 @@ import lombok.*;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
-@Builder
 @Entity
 @Table(name = "ads")
 public class Ad extends ParentIDEntity {
 
-    /**
-     * id объявления
-     */
-    @Column(name = "pk")
-    private Integer pk;
-    /**
-     * имя автора объявления
-     */
-    @Column(name = "authorFirstName")
-    private String authorFirstName;
-    /**
-     * фамилия автора объявления
-     */
-    @Column(name = "authorLastName")
-    private String authorLastName;
+
+//    /**
+//     * имя автора объявления
+//     */
+//    @Column(name = "authorFirstName")
+//    private String authorFirstName;
+//    /**
+//     * фамилия автора объявления
+//     */
+//    @Column(name = "authorLastName")
+//    private String authorLastName;
     /**
      * описание объявления
      */
@@ -57,4 +51,17 @@ public class Ad extends ParentIDEntity {
      */
     @Column(name = "title")
     private String title;
+
+    @Builder
+    public Ad(Long id, String authorFirstName, String authorLastName, String name, String email, String image, String phone, Integer price, String title) {
+        super(id);
+        this.authorFirstName = authorFirstName;
+        this.authorLastName = authorLastName;
+        this.name = name;
+        this.email = email;
+        this.image = image;
+        this.phone = phone;
+        this.price = price;
+        this.title = title;
+    }
 }

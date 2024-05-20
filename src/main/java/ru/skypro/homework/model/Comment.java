@@ -34,11 +34,7 @@ public class Comment extends ParentIDEntity {
      */
     @Column(name= "createdAt")
     private Integer createdAt;
-    /**
-     * id комментария
-     */
-    @Column(name= "comment_id")
-    private Integer pk;
+
     /**
      * текст комментария
      */
