@@ -1,0 +1,47 @@
+package ru.skypro.homework.model;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import lombok.*;
+
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@Entity
+@Table(name = "comment")
+public class Comment extends ParentIDEntity {
+    /**
+     * id автора комментария
+     */
+    @Column(name= "author_id")
+    private Integer author;
+    /**
+     * ссылка на аватар автора комментария
+     */
+    @Column(name= "authorImage")
+    private String authorImage;
+    /**
+     * имя создателя комментария
+     */
+    @Column(name= "authorFirstName")
+    private String authorFirstName;
+    /**
+     * дата и время создания комментария в миллисекундах с 00:00:00 01.01.1970
+     */
+    @Column(name= "createdAt")
+    private Integer createdAt;
+    /**
+     * id комментария
+     */
+    @Column(name= "comment_id")
+    private Integer pk;
+    /**
+     * текст комментария
+     */
+    @Column(name= "text")
+    private String text;
+}

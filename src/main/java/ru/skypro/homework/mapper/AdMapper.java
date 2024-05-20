@@ -1,6 +1,5 @@
 package ru.skypro.homework.mapper;
 
-import jakarta.persistence.Column;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
