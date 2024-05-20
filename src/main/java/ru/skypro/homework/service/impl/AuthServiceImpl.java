@@ -1,47 +1,58 @@
 package ru.skypro.homework.service.impl;
 
-import org.springframework.security.core.userdetails.User;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Service;
 import ru.skypro.homework.dto.Register;
+import ru.skypro.homework.mapper.UserMapper;
+import ru.skypro.homework.model.User;
 import ru.skypro.homework.service.AuthService;
 
 @Service
 public class AuthServiceImpl implements AuthService {
 
-    private final UserDetailsManager manager;
+    private final UserDetailsService userDetailsService;
+    private final UserService userService;
+    private final UserMapper userMapper;
     private final PasswordEncoder encoder;
 
-    public AuthServiceImpl(UserDetailsManager manager,
-                           PasswordEncoder passwordEncoder) {
-        this.manager = manager;
+    public AuthServiceImpl(
+            @Qualifier("customUserDetailsService") UserDetailsService userDetailsService,
+            UserService userService,
+            UserMapper userMapper,
+            PasswordEncoder passwordEncoder
+    ) {
+        this.userDetailsService = userDetailsService;
+        this.userService = userService;
+        this.userMapper = userMapper;
         this.encoder = passwordEncoder;
     }
 
     @Override
     public boolean login(String userName, String password) {
-        if (!manager.userExists(userName)) {
+        UserDetails userDetails;
+        try {
+            userDetails = userDetailsService.loadUserByUsername(userName);
+        } catch (UsernameNotFoundException e) {
             return false;
         }
-        UserDetails userDetails = manager.loadUserByUsername(userName);
         return encoder.matches(password, userDetails.getPassword());
     }
 
     @Override
     public boolean register(Register register) {
-        if (manager.userExists(register.getUsername())) {
-            return false;
+        try {
+            userDetailsService.loadUserByUsername(register.getUsername());
+        } catch (UsernameNotFoundException e) {
+            User user = userMapper.fromRegister(register);
+            user.setPassword(encoder.encode(register.getPassword()));
+            userService.save(user);
+            return true;
         }
-        manager.createUser(
-                User.builder()
-                        .passwordEncoder(this.encoder::encode)
-                        .password(register.getPassword())
-                        .username(register.getUsername())
-                        .roles(register.getRole().name())
-                        .build());
-        return true;
+        return false;
     }
 
 }

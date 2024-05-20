@@ -16,9 +16,14 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import ru.skypro.homework.config.security.UserPrincipal;
 import ru.skypro.homework.dto.NewPassword;
 import ru.skypro.homework.dto.UpdateUser;
 import ru.skypro.homework.dto.response.UserResponse;
+import ru.skypro.homework.mapper.ImageMapper;
+import ru.skypro.homework.model.Image;
+import ru.skypro.homework.model.User;
+import ru.skypro.homework.service.impl.UserService;
 
 import java.util.stream.Collectors;
 
@@ -29,6 +34,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserController {
 
+    private final UserService userService;
+    private final ImageMapper imageMapper;
     @Operation(
             summary = "Обновление пароля",
             responses = {
@@ -40,36 +47,29 @@ public class UserController {
                     @ApiResponse(
                             responseCode = "401",
                             description = "Unauthorized",
-                            content = @Content(schema = @Schema(hidden = true))
-                    ),
-                    @ApiResponse(
-                            responseCode = "403",
-                            description = "Forbidden",
-                            content = @Content(schema = @Schema(hidden = true))
-                    ),
-                    @ApiResponse(
-                            responseCode = "400",
-                            description = "BAD_REQUEST",
                             content = @Content(
                                     mediaType = "application/json",
                                     schema = @Schema(
                                             type = "string"
                                     )
                             )
+                    ),
+                    @ApiResponse(
+                            responseCode = "403",
+                            description = "Forbidden",
+                            content = @Content(schema = @Schema(hidden = true))
                     )
             },
             tags = "Пользователи"
     )
-    //@PreAuthorize("hasAnyRole('USER')") //401?
     @PostMapping(path = "set_password", consumes = "application/json")
     public ResponseEntity<?> setPassword(
             @RequestBody @Valid NewPassword password,
-            //@AuthenticationPrincipal UserDetails user,
             BindingResult bindingResult
     ) {
         if (bindingResult.hasErrors()) {
             String errorMessage = bindingResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.joining(", "));
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorMessage);
         }
         return ResponseEntity.status(HttpStatus.OK).build();
     }
@@ -141,6 +141,7 @@ public class UserController {
         if (bindingResult.hasErrors()) {
             String errorMessage = bindingResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.joining(", "));
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
+            //return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorMessage);
         }
         return ResponseEntity.status(HttpStatus.OK).body(new UpdateUser());
     }
@@ -153,17 +154,6 @@ public class UserController {
                     content = @Content(
                             mediaType = "multipart/form-data",
                             schema = @Schema(implementation = MultipartFile.class)
-/*                            schema = @Schema(
-                                    implementation = Object.class,
-                                    properties = {
-                                            @SchemaProperty(
-                                                    schema = @Schema(
-                                                            type = "string",
-                                                            format = "binary"
-                                                    )
-                                            )
-                                    }
-                            )*/
                     )
             ),
             responses = {
@@ -182,9 +172,43 @@ public class UserController {
     )
     @PatchMapping(path = "me/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> updateUserImage(
-            @RequestBody MultipartFile image
+            @RequestBody MultipartFile image,
+            @AuthenticationPrincipal UserPrincipal user
     ) {
+        Image avatar = imageMapper.toImage(image);
+        userService.setAvatar(user.getUser(), avatar);
         return ResponseEntity.status(HttpStatus.OK).body(new UpdateUser());
     }
+
+/*    @Operation(
+            summary = "Обновление аватара авторизованного пользователя",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "Файл изображения",
+                    required = true,
+                    content = @Content(
+                            mediaType = "multipart/form-data",
+                            schema = @Schema(implementation = MultipartFile.class)
+                    )
+            ),
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "OK",
+                            content = @Content(schema = @Schema(hidden = true))
+                    ),
+                    @ApiResponse(
+                            responseCode = "401",
+                            description = "Unauthorized",
+                            content = @Content(schema = @Schema(hidden = true))
+                    )
+            },
+            tags = "Пользователи"
+    )
+    @PatchMapping(path = "me/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> updateUserImage(
+            @RequestParam("image") MultipartFile image
+    ) {
+        return ResponseEntity.status(HttpStatus.OK).body(new UpdateUser());
+    }*/
 
 }
