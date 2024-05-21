@@ -137,8 +137,6 @@ class AuthControllerTest {
                                     .contentType(MediaType.APPLICATION_JSON)
                     )
                     .andExpect(status().isOk());
-
-            //todo как убедиться что пользователь действительно сохранен
         }
 
         @Test
