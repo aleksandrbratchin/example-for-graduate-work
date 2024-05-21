@@ -23,7 +23,6 @@ public class WebSecurityConfig {
             "/api-docs/**",
             "/webjars/**",
             "/login",
-            //"/image/**",
             "/register"
     };
 
@@ -44,7 +43,7 @@ public class WebSecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(); //картинка не грузится
+        return new BCryptPasswordEncoder(); //картинка не грузится стотри в сторону encoder.matches(...)
         //todo return NoOpPasswordEncoder.getInstance(); //картинка грузится
     }
 
