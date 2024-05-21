@@ -70,7 +70,7 @@ class AuthControllerTest {
                                     .content(jsonRegister)
                                     .contentType(MediaType.APPLICATION_JSON)
                     )
-                    .andExpect(status().is2xxSuccessful());
+                    .andExpect(status().isCreated());
 
             //todo как убедиться что пользователь действительно сохранен
         }
@@ -93,7 +93,7 @@ class AuthControllerTest {
                                     .content(jsonRegister)
                                     .contentType(MediaType.APPLICATION_JSON)
                     )
-                    .andExpect(status().is4xxClientError());
+                    .andExpect(status().isBadRequest());
         }
 
         @Test
@@ -107,7 +107,7 @@ class AuthControllerTest {
                                     .content(jsonRegister)
                                     .contentType(MediaType.APPLICATION_JSON)
                     )
-                    .andExpect(status().is4xxClientError())
+                    .andExpect(status().isBadRequest())
                     .andReturn();
             MockHttpServletResponse response = mvcResult.getResponse();
             assertThat(response.getContentAsString()).contains("Логин не может быть пуст");
@@ -121,6 +121,7 @@ class AuthControllerTest {
 
     @Nested
     class LoginTest {
+
         @Test
         @SneakyThrows
         void login() {
@@ -135,7 +136,7 @@ class AuthControllerTest {
                                     .content(jsonLogin)
                                     .contentType(MediaType.APPLICATION_JSON)
                     )
-                    .andExpect(status().is2xxSuccessful());
+                    .andExpect(status().isOk());
 
             //todo как убедиться что пользователь действительно сохранен
         }
@@ -154,7 +155,7 @@ class AuthControllerTest {
                                     .content(jsonLogin)
                                     .contentType(MediaType.APPLICATION_JSON)
                     )
-                    .andExpect(status().is4xxClientError());
+                    .andExpect(status().isUnauthorized());
         }
 
         @Test
@@ -171,7 +172,7 @@ class AuthControllerTest {
                                     .content(jsonLogin)
                                     .contentType(MediaType.APPLICATION_JSON)
                     )
-                    .andExpect(status().is4xxClientError());
+                    .andExpect(status().isUnauthorized());
         }
 
         @Test
@@ -185,7 +186,7 @@ class AuthControllerTest {
                                     .content(jsonLogin)
                                     .contentType(MediaType.APPLICATION_JSON)
                     )
-                    .andExpect(status().is4xxClientError())
+                    .andExpect(status().isUnauthorized())
                     .andReturn();
             MockHttpServletResponse response = mvcResult.getResponse();
             assertThat(response.getContentAsString()).contains("Логин не может быть пуст");
