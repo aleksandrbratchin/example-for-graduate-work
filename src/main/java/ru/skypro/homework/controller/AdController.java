@@ -83,8 +83,8 @@ public class AdController {
     )
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> addAd(
-            @RequestBody @Valid CreateOrUpdateAd properties,
-            @RequestBody MultipartFile image
+            @RequestPart @Valid CreateOrUpdateAd properties,
+            @RequestPart MultipartFile image
     ) {
         return ResponseEntity.ok().build();
     }
