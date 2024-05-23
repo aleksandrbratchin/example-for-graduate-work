@@ -21,7 +21,7 @@ class RegisterDtoTest {
     @Test
     public void whenAllAcceptable() {
         Register registerDto = Register.builder()
-                .username("login")
+                .username("login@a.r")
                 .password("Password")
                 .firstName("Иван")
                 .lastName("Иванов")
