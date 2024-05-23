@@ -1,7 +1,6 @@
 package ru.skypro.homework.mapper;
 
-import jakarta.persistence.Column;
-import org.mapstruct.InjectionStrategy;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
@@ -11,9 +10,10 @@ import ru.skypro.homework.dto.response.CommentsResponse;
 import ru.skypro.homework.model.Comment;
 import ru.skypro.homework.model.User;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring", uses = User.class)
 public interface CommentMapper {
-
 
 
     @Mappings({
@@ -45,14 +45,18 @@ public interface CommentMapper {
             @Mapping(target = "createdAt", ignore = true)
     })
     Comment toComment (CreateOrUpdateComment createOrUpdateComment);
+    List<CommentResponse> resultsToResultsDtos (List <CommentResponse> results);
+
+    Integer countToDto (Integer count);
 
     @Mappings(
             {
-                    @Mapping(target = "results", expression = "java (commentRepository.findAll())"),
-                    @Mapping(target = "count", expression = "java (commentRepository.count())")
+                    @Mapping(target = "results", source = "resultsToResultsDtos"),
+                    @Mapping(target = "count", source = "countToDto")
             }
     )
     CommentsResponse toCommentsResponse(Comment comment);
+
 }
 
 
