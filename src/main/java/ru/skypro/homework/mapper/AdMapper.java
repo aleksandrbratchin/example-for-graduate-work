@@ -1,55 +1,30 @@
 package ru.skypro.homework.mapper;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.Mappings;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 import ru.skypro.homework.dto.response.AdResponse;
-import ru.skypro.homework.dto.response.ExtendedAdResponse;
 import ru.skypro.homework.model.Ad;
 
-@Mapper(componentModel = "spring")
-public interface AdMapper {
-    @Mappings({
-            @Mapping(target = "pk", source = "id"),
-            @Mapping(target = "author", source = ""),
-            @Mapping(target = "image", source = "model.ad.image"),
-            @Mapping(target = "price", source = "model.ad.price"),
-            @Mapping(target = "title", source = "model.ad.title"),
-    })
-    AdResponse toAdResponse(Ad ad);
-    @Mappings({
-            @Mapping(target = "pk", source = "model.ad.pk"),
-            @Mapping(target = "author", source = ""),
-            @Mapping(target = "image", source = "model.ad.image"),
-            @Mapping(target = "price", source = "model.ad.price"),
-            @Mapping(target = "title", source = "model.ad.title"),
-    })
-    Ad toAd(AdResponse adResponse);
+@Service
+public class AdMapper {
+    @Value("${download.url}")
+    private String downloadUrl;
 
-    @Mappings({
-            @Mapping(target = "pk", source = "model.ad.pk"),
-            @Mapping(target = "authorFirstName", source = "authorFirstName"),
-            @Mapping(target = "authorLastName", source = "model.ad.authorLastName"),
-            @Mapping(target = "name", source = "model.ad.name"),
-            @Mapping(target = "email", source = "model.ad.email"),
-            @Mapping(target = "phone", source = "model.ad.phone"),
-            @Mapping(target = "image", source = "model.ad.image"),
-            @Mapping(target = "price", source = "model.ad.price"),
-            @Mapping(target = "title", source = "model.ad.title"),
-    })
-    ExtendedAdResponse toExtendedAdResponse(Ad ad);
-    @Mappings({
-            @Mapping(target = "pk", source = "model.ad.pk"),
-            @Mapping(target = "authorFirstName", source = "model.ad.authorFirstName"),
-            @Mapping(target = "authorLastName", source = "model.ad.authorLastName"),
-            @Mapping(target = "name", source = "model.ad.name"),
-            @Mapping(target = "email", source = "model.ad.email"),
-            @Mapping(target = "phone", source = "model.ad.phone"),
-            @Mapping(target = "image", source = "model.ad.image"),
-            @Mapping(target = "price", source = "model.ad.price"),
-            @Mapping(target = "title", source = "model.ad.title"),
-    })
-    Ad toAd (  ExtendedAdResponse extendedAdResponse);
+    public AdResponse mappingToDTO(Ad model) {
+        AdResponse adResponse = new AdResponse();
+        adResponse.setPk(Math.toIntExact(model.getId()));
+        adResponse.setAuthor(Math.toIntExact(model.getUser().getId()));
+        adResponse.setPrice(model.getPrice());
+        adResponse.setTitle(model.getTitle());
+        adResponse.setImage(String.format(downloadUrl, model.getAvatar().getId()));
+        return adResponse;
+    }
 
-
+    public Ad mappingToModel(AdResponse dto) {
+        Ad ad = new Ad();
+        ad.setId(Long.valueOf(dto.getPk()));
+        ad.setPrice(dto.getPrice());
+        ad.setTitle(dto.getTitle());
+        return ad;
+    }
 }
