@@ -158,7 +158,6 @@ public class UserController {
         if (bindingResult.hasErrors()) {
             String errorMessage = bindingResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.joining(", "));
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
-            //return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorMessage);
         }
         User update = userService.update(userPrincipal.getUser(), updateUser);
         return ResponseEntity.status(HttpStatus.OK).body(updateUserMapper.fromUser(update));
@@ -190,7 +189,7 @@ public class UserController {
     )
     @PatchMapping(path = "me/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> updateUserImage(
-            @RequestBody MultipartFile image,
+            @RequestPart("image") MultipartFile image,
             @AuthenticationPrincipal UserPrincipal user
     ) {
         Image avatar = imageMapper.toImage(image);
