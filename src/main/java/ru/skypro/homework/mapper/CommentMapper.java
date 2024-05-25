@@ -4,10 +4,12 @@ package ru.skypro.homework.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import ru.skypro.homework.dto.CreateOrUpdateComment;
 import ru.skypro.homework.dto.response.CommentResponse;
 import ru.skypro.homework.dto.response.CommentsResponse;
+import ru.skypro.homework.dto.response.UserResponse;
 import ru.skypro.homework.model.Comment;
 import ru.skypro.homework.model.User;
 
@@ -16,8 +18,6 @@ import java.util.List;
 @Mapper(componentModel = "spring", uses = {User.class})
 public abstract class CommentMapper {
 
-    @Value("${download.url}")
-    protected String downloadUrl;
     @Mappings({
             @Mapping(target = "author", source = "user.id"),
             @Mapping(target = "authorImage", source = "user.avatar.id"),
@@ -28,8 +28,10 @@ public abstract class CommentMapper {
     )
 
    public abstract CommentResponse toCommentResponse (Comment comment);
+
+
     @Mappings({
-            @Mapping(target = "user",expression = "java(User.builder().build())"),
+            @Mapping(target = "user", ignore = true),
             @Mapping(target = "id", source = "pk"),
     }
     )
