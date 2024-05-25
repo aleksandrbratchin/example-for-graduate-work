@@ -29,15 +29,15 @@ public class Ad extends ParentIDEntity {
     @Column(name = "description")
     private String description;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "avatar_id")
-    private Image avatar;
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "image_id")
+    private Image image;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToMany
+    @OneToMany()
     @JoinColumn(name = "comment_id")
     private List<Comment> comments;
 

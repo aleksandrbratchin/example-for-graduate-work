@@ -1,33 +1,38 @@
 package ru.skypro.homework.mapper;
 
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import ru.skypro.homework.dto.response.AdResponse;
 import ru.skypro.homework.dto.response.AdsResponse;
+import ru.skypro.homework.model.Ad;
 import ru.skypro.homework.repository.AdRepository;
 
 import java.util.List;
 
-@Service
+//@Mapper(componentModel = "spring")
+@Component
 public class AdsMapper {
-
-    private final AdRepository adRepository;
-    private final AdMapper adMapper;
-
     @Autowired
-    public AdsMapper(AdRepository adRepository, AdMapper adMapper) {
-        this.adRepository = adRepository;
-        this.adMapper = adMapper;
+    private AdMapper adMapper;
+
+    //    @Mapping(target = "count", expression = "java(ads.size())")
+//    @Mapping(target = "results", expression = "java(fromAds(ads))")
+    public AdsResponse toAdsResponse(List<Ad> ads) {
+        AdsResponse adsResponse = new AdsResponse();
+        adsResponse.setCount(ads.size());
+        adsResponse.setResults(fromAds(ads));
+        return adsResponse;
     }
 
-    public AdsResponse getAllAds() {
-        List<AdResponse> result = adRepository.findAll()
+
+    protected List<AdResponse> fromAds(List<Ad> ads) {
+        List<AdResponse> result = ads
                 .stream()
-                .map(adMapper::mappingToDTO)
+                .map(adMapper::mappingToDto)
                 .toList();
-        AdsResponse adsResponse = new AdsResponse();
-        adsResponse.setCount(result.size());
-        adsResponse.setResults(result);
-        return adsResponse;
+        return result;
     }
 }

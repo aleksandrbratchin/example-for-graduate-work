@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,12 +18,20 @@ import ru.skypro.homework.dto.CreateOrUpdateAd;
 import ru.skypro.homework.dto.response.AdResponse;
 import ru.skypro.homework.dto.response.AdsResponse;
 import ru.skypro.homework.dto.response.ExtendedAdResponse;
+import ru.skypro.homework.service.impl.AdService;
 
 @Slf4j
 @CrossOrigin(value = "http://localhost:3000")
 @RestController
 @RequestMapping("/ads")
 public class AdController {
+
+    private final AdService adService;
+
+    @Autowired
+    public AdController(AdService adService) {
+        this.adService = adService;
+    }
 
     @Operation(
             tags = "Объявления",
@@ -86,7 +95,8 @@ public class AdController {
             @RequestPart @Valid CreateOrUpdateAd properties,
             @RequestPart MultipartFile image
     ) {
-        return ResponseEntity.ok().build();
+
+        return ResponseEntity.ok().body(adService.createAd(properties, image));
     }
 
     @Operation(
