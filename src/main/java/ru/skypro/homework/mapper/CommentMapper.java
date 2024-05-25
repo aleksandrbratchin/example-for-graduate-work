@@ -4,6 +4,7 @@ package ru.skypro.homework.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
+import org.springframework.beans.factory.annotation.Value;
 import ru.skypro.homework.dto.CreateOrUpdateComment;
 import ru.skypro.homework.dto.response.CommentResponse;
 import ru.skypro.homework.dto.response.CommentsResponse;
@@ -12,50 +13,52 @@ import ru.skypro.homework.model.User;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring", uses = User.class)
-public interface CommentMapper {
+@Mapper(componentModel = "spring", uses = {User.class})
+public abstract class CommentMapper {
 
-
+    @Value("${download.url}")
+    protected String downloadUrl;
     @Mappings({
-            @Mapping(target = "author", source = "author.id"),
-            @Mapping(target = "authorImage", source = "author.avatar.id"),
-            @Mapping(target = "authorFirstName", source = "author.firstName"),
-            @Mapping(target = "createdAt", source = "createdAt"),
+            @Mapping(target = "author", source = "user.id"),
+            @Mapping(target = "authorImage", source = "user.avatar.id"),
+            @Mapping(target = "authorFirstName", source = "user.firstName"),
             @Mapping(target = "pk", source = "id"),
-            @Mapping(target = "text", source ="text" )
+
     }
     )
 
-    CommentResponse toCommentResponse (Comment comment);
+   public abstract CommentResponse toCommentResponse (Comment comment);
     @Mappings({
-            @Mapping(target = "author",expression = "java(User.builder().build())"),
-            @Mapping(target = "createdAt", source = "createdAt"),
+            @Mapping(target = "user",expression = "java(User.builder().build())"),
             @Mapping(target = "id", source = "pk"),
-            @Mapping(target = "text", source ="text" )
     }
     )
-    Comment toComment (CommentResponse commentResponse);
+    public abstract Comment toComment (CommentResponse commentResponse);
 
 
-    CreateOrUpdateComment toCreateOrUpdateComment (Comment comment);
+
+    public abstract CreateOrUpdateComment toCreateOrUpdateComment (Comment comment);
     @Mappings({
-            @Mapping(target = "author", ignore = true),
+            @Mapping(target = "user", ignore = true),
             @Mapping(target = "id", ignore = true),
-            @Mapping(target = "text", source = "text"),
             @Mapping(target = "createdAt", ignore = true)
     })
-    Comment toComment (CreateOrUpdateComment createOrUpdateComment);
-    List<CommentResponse> resultsToResultsDtos (List <CommentResponse> results);
+    public abstract Comment toComment (CreateOrUpdateComment createOrUpdateComment);
 
-    Integer countToDto (Integer count);
+    protected List<CommentResponse> toListWithDto(List<Comment> comments) {
+        return comments
+                .stream()
+                .map(this::toCommentResponse)
+                .toList();
+    }
+    public  CommentsResponse toCommentsResponse(List<Comment> comments) {
+        CommentsResponse commentsResponse = new CommentsResponse();
+        commentsResponse.setCount(comments.size());
+        commentsResponse.setResults(toListWithDto(comments));
+        return commentsResponse;
+    }
 
-    @Mappings(
-            {
-                    @Mapping(target = "results", source = "resultsToResultsDtos"),
-                    @Mapping(target = "count", source = "countToDto")
-            }
-    )
-    CommentsResponse toCommentsResponse(Comment comment);
+
 
 }
 
