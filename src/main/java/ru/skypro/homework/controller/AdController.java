@@ -1,12 +1,10 @@
 package ru.skypro.homework.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Encoding;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -58,14 +56,12 @@ public class AdController {
             summary = "Добавление объявления",
             operationId = "addAd",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    content = {
-                            @Content(
-                                    mediaType = "multipart/form-data",
-                                    encoding = @Encoding(
-                                            name = "properties",
-                                            contentType = "application/json"
-                                    )
-                            )
+                    content = {@Content(
+                            mediaType = "multipart/form-data",
+                            encoding = @Encoding(
+                                    name = "properties",
+                                    contentType = "application/json"
+                            ))
                     }
             ),
             responses = {
@@ -86,9 +82,13 @@ public class AdController {
                                     schema = @Schema(hidden = true)
                             )
                     )
+            )),
+                    @ApiResponse(responseCode = "401",
+                            description = "Unauthorized")
             }
 
     )
+
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> addAd(
             @RequestPart @Valid CreateOrUpdateAd properties,
@@ -112,13 +112,11 @@ public class AdController {
                     ),
                     @ApiResponse(
                             responseCode = "401",
-                            description = "Unauthorized",
-                            content = @Content(schema = @Schema(hidden = true))
+                            description = "Unauthorized"
                     ),
                     @ApiResponse(
                             responseCode = "404",
-                            description = "Not found",
-                            content = @Content(schema = @Schema(hidden = true))
+                            description = "Not found"
                     )
             }
     )
@@ -132,24 +130,24 @@ public class AdController {
             summary = "Удаление объявления",
             responses = {
                     @ApiResponse(
-                            responseCode = "204",
-                            description = "No Content",
-                            content = @Content(schema = @Schema(hidden = true))
+                            responseCode = "200",
+                            description = "OK",
+                            content = {
+                                    @Content(mediaType = "application/json",
+                                            schema = @Schema(implementation = ExtendedAdResponse.class))
+                            }
                     ),
                     @ApiResponse(
                             responseCode = "401",
-                            description = "Unauthorized",
-                            content = @Content(schema = @Schema(hidden = true))
+                            description = "Unauthorized"
                     ),
                     @ApiResponse(
                             responseCode = "403",
-                            description = "Forbidden",
-                            content = @Content(schema = @Schema(hidden = true))
+                            description = "Forbidden"
                     ),
                     @ApiResponse(
                             responseCode = "404",
-                            description = "Not found",
-                            content = @Content(schema = @Schema(hidden = true))
+                            description = "Not found"
                     )
             }
     )
@@ -172,18 +170,15 @@ public class AdController {
                     ),
                     @ApiResponse(
                             responseCode = "403",
-                            description = "Forbidden",
-                            content = @Content(schema = @Schema(hidden = true))
+                            description = "Forbidden"
                     ),
                     @ApiResponse(
                             responseCode = "401",
-                            description = "Unauthorized",
-                            content = @Content(schema = @Schema(hidden = true))
+                            description = "Unauthorized"
                     ),
                     @ApiResponse(
                             responseCode = "400",
-                            description = "BAD_REQUEST",
-                            content = @Content(schema = @Schema(hidden = true))
+                            description = "BAD_REQUEST"
                     )
             }
     )
@@ -206,8 +201,7 @@ public class AdController {
                     ),
                     @ApiResponse(
                             responseCode = "401",
-                            description = "Unauthorized",
-                            content = @Content(schema = @Schema(hidden = true))
+                            description = "Unauthorized"
                     )
             }
     )
@@ -220,40 +214,37 @@ public class AdController {
             tags = "Объявления",
             summary = "Обновление картинки объявления",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    content = {
-                            @Content(
-                                    mediaType = "multipart/form-data"
-                            )
+                    content = {@Content(
+                            mediaType = "multipart/form-data"
+                    )
                     }
             ),
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "OK",
-                            content = @Content(
-                                    mediaType = "application/octet-stream",
-                                    array = @ArraySchema(schema = @Schema(type = "string", format = "byte"))
-                            )),
+            responses = {@ApiResponse(responseCode = "200", description = "OK",
+                    content = @Content(
+                            mediaType = "application/octet-stream",
+
+                            schema = @Schema(
+                                    type = "string",
+                                    format = "byte"
+                            )
+                    )),
                     @ApiResponse(
                             responseCode = "403",
-                            description = "Forbidden",
-                            content = @Content(schema = @Schema(hidden = true))
+                            description = "Forbidden"
                     ),
                     @ApiResponse(responseCode = "401",
-                            description = "Unauthorized",
-                            content = @Content(schema = @Schema(hidden = true))
+                            description = "Unauthorized"
                     ),
                     @ApiResponse(
                             responseCode = "404",
-                            description = "Not found",
-                            content = @Content(schema = @Schema(hidden = true))
+                            description = "Not found"
                     )
             }
 
     )
     @PatchMapping(value = "/{id}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> updateImageAds(
-            @PathVariable Integer id,
-            @RequestPart(name = "image") MultipartFile image
-    ) {
+    public ResponseEntity<?> updateImageAds(@PathVariable Integer id,
+                                            @RequestPart(name = "image") MultipartFile image) {
         return ResponseEntity.ok().build();
     }
 }
