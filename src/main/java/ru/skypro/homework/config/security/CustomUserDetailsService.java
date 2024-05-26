@@ -1,26 +1,17 @@
 package ru.skypro.homework.config.security;
 
-import jakarta.annotation.PostConstruct;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
-import org.springframework.web.context.WebApplicationContext;
 import ru.skypro.homework.model.User;
 import ru.skypro.homework.service.impl.UserService;
 
 @Service
+@RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
 
-    @Autowired
-    private WebApplicationContext applicationContext;
-
-    private UserService userService;
-
-    @PostConstruct
-    public void completeSetup() {
-        userService = applicationContext.getBean(UserService.class);
-    }
+    private final UserService userService;
 
     @Override
     public UserDetails loadUserByUsername(final String username) {

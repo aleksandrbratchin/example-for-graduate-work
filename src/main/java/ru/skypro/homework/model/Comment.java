@@ -1,11 +1,7 @@
 package ru.skypro.homework.model;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
-import ru.skypro.homework.dto.response.CommentResponse;
-
-import java.util.List;
 
 @Getter
 @Setter

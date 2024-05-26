@@ -22,11 +22,11 @@ public class RoleUserDeserializer extends StdDeserializer<Role> {
 
     @Override
     public Role deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
-        Role role = null;
+        Role role;
         try {
             role = Role.valueOf(jsonParser.getValueAsString());
         } catch (IllegalArgumentException e) {
-            return role;
+            return null;
         }
         return role;
     }

@@ -9,7 +9,6 @@ import ru.skypro.homework.dto.Role;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 @Entity
 @Table(name = "users")
 public class User extends ParentIDEntity {
@@ -49,4 +48,16 @@ public class User extends ParentIDEntity {
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "avatar_id", referencedColumnName = "id")
     private Image avatar;
+
+    @Builder
+    public User(Long id, String username, String password, String firstName, String lastName, String phone, Role role, Image avatar) {
+        super(id);
+        this.username = username;
+        this.password = password;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.phone = phone;
+        this.role = role;
+        this.avatar = avatar;
+    }
 }

@@ -13,6 +13,7 @@ public abstract class UserMapper {
     @Value("${download.url}")
     protected String downloadUrl;
 
+    @Mapping(target = "id", ignore = true)
     @Mapping(target = "avatar", ignore = true)
     public abstract User fromRegister(Register register);
 

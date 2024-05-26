@@ -10,7 +10,7 @@ public class UserResponse {
      * id пользователя
      */
     @Schema(description = "id пользователя")
-    private Integer id;
+    private Long id;
     /**
      * логин пользователя
      */

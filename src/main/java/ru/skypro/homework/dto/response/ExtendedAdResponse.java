@@ -9,7 +9,7 @@ public class ExtendedAdResponse {
      * id объявления
      */
     @Schema(description = "id объявления")
-    private Integer pk;
+    private Long pk;
     /**
      * имя автора объявления
      */
