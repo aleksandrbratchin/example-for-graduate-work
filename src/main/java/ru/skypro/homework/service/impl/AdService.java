@@ -6,10 +6,17 @@ import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.dto.CreateOrUpdateAd;
 import ru.skypro.homework.dto.response.AdResponse;
 import ru.skypro.homework.dto.response.AdsResponse;
+import ru.skypro.homework.dto.response.ExtendedAdResponse;
 import ru.skypro.homework.mapper.*;
 import ru.skypro.homework.model.Ad;
 import ru.skypro.homework.model.Image;
+import ru.skypro.homework.model.User;
 import ru.skypro.homework.repository.AdRepository;
+import ru.skypro.homework.repository.UserRepository;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class AdService {
@@ -31,9 +38,9 @@ public class AdService {
         this.imageMapper = imageMapper;
     }
 
-//    public AdsResponse getAllAds() {
-//        return adsMapper.getAllAds();
-//    }
+    public AdsResponse getAllAds() {
+        return adsMapper.toAdsResponse();
+    }
 
     public AdResponse createAd(CreateOrUpdateAd properties, MultipartFile image) {
         Ad ad = createOrUpdateAdMapper.toAd(properties);
@@ -44,7 +51,13 @@ public class AdService {
         return adResponse;
     }
 
-//public AdResponse addAd(CreateOrUpdateAd properties, MultipartFile image){
-//
-//}
+    public ExtendedAdResponse getAdById(long id) {
+        Ad ad = adRepository.findById(id).get();
+        return extendedAdResponseMapper.toDto(ad);
+    }
+
+    public void deleteAd(long id) {
+        adRepository.deleteById(id);
+    }
+
 }

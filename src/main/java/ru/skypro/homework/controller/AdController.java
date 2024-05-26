@@ -18,7 +18,10 @@ import ru.skypro.homework.dto.CreateOrUpdateAd;
 import ru.skypro.homework.dto.response.AdResponse;
 import ru.skypro.homework.dto.response.AdsResponse;
 import ru.skypro.homework.dto.response.ExtendedAdResponse;
+import ru.skypro.homework.model.Ad;
 import ru.skypro.homework.service.impl.AdService;
+
+import java.util.List;
 
 @Slf4j
 @CrossOrigin(value = "http://localhost:3000")
@@ -51,7 +54,7 @@ public class AdController {
     )
     @GetMapping()
     public ResponseEntity<?> getAllAds() {
-        return ResponseEntity.ok().body(new AdsResponse());
+        return ResponseEntity.ok().body(adService.getAllAds());
     }
 
     @Operation(
@@ -125,7 +128,7 @@ public class AdController {
     )
     @GetMapping("/{id}")
     public ResponseEntity<?> getAdById(@PathVariable long id) {
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.ok(adService.getAdById(id));
     }
 
     @Operation(
@@ -156,6 +159,7 @@ public class AdController {
     )
     @DeleteMapping("/{id}")
     public void deleteAd(@PathVariable long id) {
+        adService.deleteAd(id);
     }
 
     @Operation(
@@ -213,7 +217,7 @@ public class AdController {
     )
     @GetMapping("/me")
     public ResponseEntity<?> getAdsByAuthUser() {
-        return ResponseEntity.ok().body(new AdsResponse());
+        return ResponseEntity.ok().build();
     }
 
     @Operation(
