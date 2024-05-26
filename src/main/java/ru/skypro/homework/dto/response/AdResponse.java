@@ -9,12 +9,12 @@ public class AdResponse {
      * id объявления
      */
     @Schema(description = "id объявления")
-    private long pk;
+    private Long pk;
     /**
      * id автора объявления
      */
     @Schema(description = "id автора объявления")
-    private long author;
+    private Long author;
     /**
      * ссылка на картинку объявления
      */

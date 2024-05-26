@@ -9,7 +9,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,10 +17,7 @@ import ru.skypro.homework.dto.CreateOrUpdateAd;
 import ru.skypro.homework.dto.response.AdResponse;
 import ru.skypro.homework.dto.response.AdsResponse;
 import ru.skypro.homework.dto.response.ExtendedAdResponse;
-import ru.skypro.homework.model.Ad;
 import ru.skypro.homework.service.impl.AdService;
-
-import java.util.List;
 
 @Slf4j
 @CrossOrigin(value = "http://localhost:3000")

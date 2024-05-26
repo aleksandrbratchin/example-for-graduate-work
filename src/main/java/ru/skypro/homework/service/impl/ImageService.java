@@ -17,7 +17,7 @@ public class ImageService {
      * @return {@link Image}
      */
     public Image findById(Long id) {
-        return imageRepository.findById(id).orElseThrow(() -> new RuntimeException()); //todo exception
+        return imageRepository.findById(id).orElseThrow(RuntimeException::new); //todo exception
     }
 
 }

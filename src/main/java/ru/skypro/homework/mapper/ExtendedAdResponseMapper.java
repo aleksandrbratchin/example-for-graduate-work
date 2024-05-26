@@ -3,7 +3,6 @@ package ru.skypro.homework.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 import ru.skypro.homework.dto.response.ExtendedAdResponse;
 import ru.skypro.homework.model.Ad;
 

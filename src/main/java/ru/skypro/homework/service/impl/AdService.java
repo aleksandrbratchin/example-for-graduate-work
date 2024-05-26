@@ -10,13 +10,7 @@ import ru.skypro.homework.dto.response.ExtendedAdResponse;
 import ru.skypro.homework.mapper.*;
 import ru.skypro.homework.model.Ad;
 import ru.skypro.homework.model.Image;
-import ru.skypro.homework.model.User;
 import ru.skypro.homework.repository.AdRepository;
-import ru.skypro.homework.repository.UserRepository;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class AdService {
@@ -47,12 +41,11 @@ public class AdService {
         Image image1 = imageMapper.toImage(image);
         ad.setImage(image1);
         Ad save = adRepository.save(ad);
-        AdResponse adResponse = adMapper.mappingToDto(save);
-        return adResponse;
+        return adMapper.mappingToDto(save);
     }
 
-    public ExtendedAdResponse getAdById(long id) {
-        Ad ad = adRepository.findById(id).get();
+    public ExtendedAdResponse getAdById(Long id) {
+        Ad ad = adRepository.findById(id).orElseThrow(RuntimeException::new); //todo
         return extendedAdResponseMapper.toDto(ad);
     }
 

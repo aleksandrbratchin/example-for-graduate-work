@@ -9,7 +9,6 @@ import ru.skypro.homework.repository.AdRepository;
 import java.util.List;
 import java.util.stream.Collectors;
 
-//@Mapper(componentModel = "spring")
 @Component
 public class AdsMapper {
 
@@ -25,28 +24,11 @@ public class AdsMapper {
     public AdsResponse toAdsResponse() {
         List<AdResponse> result = adRepository.findAll()
                 .stream()
-                .map(ad -> adMapper.mappingToDto(ad))
+                .map(adMapper::mappingToDto)
                 .collect(Collectors.toList());
         AdsResponse adsResponse = new AdsResponse();
         adsResponse.setCount(result.size());
         adsResponse.setResults(result);
         return adsResponse;
     }
-    //    @Mapping(target = "count", expression = "java(ads.size())")
-//    @Mapping(target = "results", expression = "java(fromAds(ads))")
-//    public AdsResponse toAdsResponse(List<Ad> ads) {
-//        AdsResponse adsResponse = new AdsResponse();
-//        adsResponse.setCount(ads.size());
-//        adsResponse.setResults(fromAds(ads));
-//        return adsResponse;
-//    }
-//
-//
-//    protected List<AdResponse> fromAds(List<Ad> ads) {
-//        List<AdResponse> result = ads
-//                .stream()
-//                .map(adMapper::mappingToDto)
-//                .toList();
-//        return result;
-//    }
 }
