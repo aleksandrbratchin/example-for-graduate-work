@@ -39,8 +39,7 @@ class UserMapperTest {
 
         assertThat(userResponse).isNotNull();
         assertThat(userResponse.getId()).isEqualTo(2L);
-        assertThat(userResponse.getUsername()).isEqualTo("testuser");
-        assertThat(userResponse.getPassword()).isEqualTo("password");
+        assertThat(userResponse.getEmail()).isEqualTo("testuser");
         assertThat(userResponse.getFirstName()).isEqualTo("John");
         assertThat(userResponse.getLastName()).isEqualTo("Doe");
         assertThat(userResponse.getPhone()).isEqualTo("+7 (123) 456-78-99");

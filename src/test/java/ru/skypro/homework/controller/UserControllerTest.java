@@ -57,12 +57,11 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.firstName").value("Jack"))
                 .andExpect(jsonPath("$.lastName").value("Sparrow"))
                 .andExpect(jsonPath("$.role").value("ADMIN"))
-                .andExpect(jsonPath("$.username").value("captain.jack.sparrow@gmail.com"))
+                .andExpect(jsonPath("$.email").value("captain.jack.sparrow@gmail.com"))
                 .andExpect(jsonPath("$.phone").value("+7 (812) 1234567"))
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.id").isNumber())
                 .andExpect(jsonPath("$.image").value(startsWith("/image/")));
-
     }
 
     @Test
