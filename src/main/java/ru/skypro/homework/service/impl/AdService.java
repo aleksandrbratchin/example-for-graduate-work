@@ -51,6 +51,10 @@ public class AdService {
         return extendedAdResponseMapper.toDto(ad);
     }
 
+    public Ad findById(Long id) {
+        return adRepository.findById(id).orElseThrow(RuntimeException::new);
+    }
+
     public void deleteAd(long id) {
         adRepository.deleteById(id);
     }

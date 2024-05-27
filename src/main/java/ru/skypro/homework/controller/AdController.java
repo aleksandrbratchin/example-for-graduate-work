@@ -8,11 +8,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.config.security.UserPrincipal;
@@ -21,6 +23,8 @@ import ru.skypro.homework.dto.response.AdResponse;
 import ru.skypro.homework.dto.response.AdsResponse;
 import ru.skypro.homework.dto.response.ExtendedAdResponse;
 import ru.skypro.homework.service.impl.AdService;
+
+import java.util.stream.Collectors;
 
 @Slf4j
 @CrossOrigin(value = "http://localhost:3000")
@@ -87,19 +91,20 @@ public class AdController {
                                     schema = @Schema(hidden = true)
                             )
                     )
-                    ,
-                    @ApiResponse(responseCode = "401",
-                            description = "Unauthorized")
             }
 
     )
-
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> addAd(
             @RequestPart @Valid CreateOrUpdateAd properties,
             @RequestPart MultipartFile image,
-            @AuthenticationPrincipal UserPrincipal principal
+            @AuthenticationPrincipal UserPrincipal principal,
+            BindingResult bindingResult
     ) {
+        if (bindingResult.hasErrors()) {
+            String errorMessage = bindingResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.joining(", "));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorMessage);
+        }
         return ResponseEntity.ok().body(adService.createAd(properties, image, principal.getUser()));
     }
 
@@ -157,12 +162,17 @@ public class AdController {
             }
     )
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('USER') or id == user.user.id")
-    public void deleteAd(
+    @PreAuthorize("hasRole('ADMIN') or #user.user.id == @adService.findById(#id).user.id")
+    public ResponseEntity<?> deleteAd(
             @PathVariable Long id,
             @AuthenticationPrincipal UserPrincipal user
     ) {
-        adService.deleteAd(id);
+        try {
+            adService.deleteAd(id);
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok().build();
     }
 
     @Operation(
