@@ -32,13 +32,12 @@ public class Comment extends ParentIDEntity {
     @Column(name = "text")
     private String text;
 
-
     @Builder
-
     public Comment(Long id, User user, LocalDateTime createdAt, String text) {
         super(id);
         this.user = user;
         this.createdAt = createdAt;
         this.text = text;
     }
+
 }
