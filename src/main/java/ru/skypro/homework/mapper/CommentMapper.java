@@ -9,7 +9,6 @@ import ru.skypro.homework.dto.response.CommentResponse;
 import ru.skypro.homework.dto.response.CommentsResponse;
 import ru.skypro.homework.model.Comment;
 import ru.skypro.homework.model.User;
-
 import java.util.List;
 
 @Mapper(componentModel = "spring", uses = {User.class})
@@ -19,6 +18,7 @@ public abstract class CommentMapper {
             @Mapping(target = "author", source = "user.id"),
             @Mapping(target = "authorImage", source = "user.avatar.id"),
             @Mapping(target = "authorFirstName", source = "user.firstName"),
+            @Mapping(target = "createdAt", source = "createdAt.nano"),
             @Mapping(target = "pk", source = "id")
     })
     public abstract CommentResponse toCommentResponse(Comment comment);
@@ -26,6 +26,7 @@ public abstract class CommentMapper {
 
     @Mappings({
             @Mapping(target = "user", ignore = true),
+            @Mapping(target = "createdAt", ignore = true),
             @Mapping(target = "id", source = "pk")
     })
     public abstract Comment toComment(CommentResponse commentResponse);
