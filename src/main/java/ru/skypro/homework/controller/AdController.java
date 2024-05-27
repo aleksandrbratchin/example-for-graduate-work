@@ -10,8 +10,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import ru.skypro.homework.config.security.UserPrincipal;
 import ru.skypro.homework.dto.CreateOrUpdateAd;
 import ru.skypro.homework.dto.response.AdResponse;
 import ru.skypro.homework.dto.response.AdsResponse;
@@ -83,7 +87,7 @@ public class AdController {
                                     schema = @Schema(hidden = true)
                             )
                     )
-            ,
+                    ,
                     @ApiResponse(responseCode = "401",
                             description = "Unauthorized")
             }
@@ -93,9 +97,10 @@ public class AdController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> addAd(
             @RequestPart @Valid CreateOrUpdateAd properties,
-            @RequestPart MultipartFile image
+            @RequestPart MultipartFile image,
+            @AuthenticationPrincipal UserPrincipal principal
     ) {
-        return ResponseEntity.ok().body(adService.createAd(properties, image));
+        return ResponseEntity.ok().body(adService.createAd(properties, image, principal.getUser()));
     }
 
     @Operation(
@@ -152,7 +157,11 @@ public class AdController {
             }
     )
     @DeleteMapping("/{id}")
-    public void deleteAd(@PathVariable long id) {
+    @PreAuthorize("hasRole('USER') or id == user.user.id")
+    public void deleteAd(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserPrincipal user
+    ) {
         adService.deleteAd(id);
     }
 
@@ -183,7 +192,7 @@ public class AdController {
             }
     )
     @PatchMapping("/{id}")
-    public ResponseEntity<?> updateAdInfo(@PathVariable long id) {
+    public ResponseEntity<?> updateAdInfo(@PathVariable Long id) {
         return ResponseEntity.ok().build();
     }
 
@@ -240,10 +249,9 @@ public class AdController {
                             description = "Not found"
                     )
             }
-
     )
     @PatchMapping(value = "/{id}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> updateImageAds(@PathVariable Integer id,
+    public ResponseEntity<?> updateImageAds(@PathVariable Long id,
                                             @RequestPart(name = "image") MultipartFile image) {
         return ResponseEntity.ok().build();
     }

@@ -10,6 +10,7 @@ import ru.skypro.homework.dto.response.ExtendedAdResponse;
 import ru.skypro.homework.mapper.*;
 import ru.skypro.homework.model.Ad;
 import ru.skypro.homework.model.Image;
+import ru.skypro.homework.model.User;
 import ru.skypro.homework.repository.AdRepository;
 
 @Service
@@ -36,10 +37,11 @@ public class AdService {
         return adsMapper.toAdsResponse();
     }
 
-    public AdResponse createAd(CreateOrUpdateAd properties, MultipartFile image) {
+    public AdResponse createAd(CreateOrUpdateAd properties, MultipartFile image, User user) {
         Ad ad = createOrUpdateAdMapper.toAd(properties);
         Image image1 = imageMapper.toImage(image);
         ad.setImage(image1);
+        ad.setUser(user);
         Ad save = adRepository.save(ad);
         return adMapper.mappingToDto(save);
     }
