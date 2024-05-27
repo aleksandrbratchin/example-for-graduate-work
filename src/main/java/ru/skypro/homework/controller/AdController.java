@@ -5,8 +5,9 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Encoding;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,14 +16,20 @@ import ru.skypro.homework.dto.CreateOrUpdateAd;
 import ru.skypro.homework.dto.response.AdResponse;
 import ru.skypro.homework.dto.response.AdsResponse;
 import ru.skypro.homework.dto.response.ExtendedAdResponse;
-
-import java.util.Collection;
+import ru.skypro.homework.service.impl.AdService;
 
 @Slf4j
 @CrossOrigin(value = "http://localhost:3000")
 @RestController
 @RequestMapping("/ads")
 public class AdController {
+
+    private final AdService adService;
+
+    @Autowired
+    public AdController(AdService adService) {
+        this.adService = adService;
+    }
 
     @Operation(
             tags = "Объявления",
@@ -31,16 +38,18 @@ public class AdController {
                     @ApiResponse(
                             responseCode = "200",
                             description = "OK",
-                            content = {
-                                    @Content(mediaType = "application/json",
-                                            schema = @Schema(implementation = AdsResponse.class))
-                            }
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(
+                                            implementation = AdsResponse.class
+                                    )
+                            )
                     )
             }
     )
     @GetMapping()
-    public ResponseEntity<Collection<?>> getAllAds() {
-        return ResponseEntity.ok().build();
+    public ResponseEntity<?> getAllAds() {
+        return ResponseEntity.ok().body(new AdsResponse()/*adService.getAllAds()*/);
     }
 
     @Operation(
@@ -56,11 +65,25 @@ public class AdController {
                             ))
                     }
             ),
-            responses = {@ApiResponse(responseCode = "200", description = "OK", content = @Content(
-                    schema = @Schema(
-                            implementation = AdResponse.class
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "OK",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(
+                                            implementation = AdResponse.class
+                                    )
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "401",
+                            description = "Unauthorized",
+                            content = @Content(
+                                    schema = @Schema(hidden = true)
+                            )
                     )
-            )),
+            ,
                     @ApiResponse(responseCode = "401",
                             description = "Unauthorized")
             }
@@ -68,9 +91,11 @@ public class AdController {
     )
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> addAd(@RequestPart(name = "properties") AdResponse properties,
-                                   @RequestPart(name = "image") MultipartFile image) {
-        return ResponseEntity.ok().build();
+    public ResponseEntity<?> addAd(
+            @RequestPart @Valid CreateOrUpdateAd properties,
+            @RequestPart MultipartFile image
+    ) {
+        return ResponseEntity.ok().body(adService.createAd(properties, image));
     }
 
     @Operation(
@@ -97,7 +122,7 @@ public class AdController {
     )
     @GetMapping("/{id}")
     public ResponseEntity<?> getAdById(@PathVariable long id) {
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.ok(adService.getAdById(id));
     }
 
     @Operation(
@@ -128,6 +153,7 @@ public class AdController {
     )
     @DeleteMapping("/{id}")
     public void deleteAd(@PathVariable long id) {
+        adService.deleteAd(id);
     }
 
     @Operation(
@@ -181,7 +207,7 @@ public class AdController {
     )
     @GetMapping("/me")
     public ResponseEntity<?> getAdsByAuthUser() {
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok().body(new AdsResponse());
     }
 
     @Operation(
