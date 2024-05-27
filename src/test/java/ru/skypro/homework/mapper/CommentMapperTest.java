@@ -1,18 +1,5 @@
 package ru.skypro.homework.mapper;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import ru.skypro.homework.dto.CreateOrUpdateComment;
-import ru.skypro.homework.dto.response.CommentResponse;
-import ru.skypro.homework.model.Comment;
-import ru.skypro.homework.model.User;
-
-import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.List;
-
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-
 
 class CommentMapperTest {
 //
