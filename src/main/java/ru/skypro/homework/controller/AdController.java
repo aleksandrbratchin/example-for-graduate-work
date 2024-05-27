@@ -49,7 +49,7 @@ public class AdController {
     )
     @GetMapping()
     public ResponseEntity<?> getAllAds() {
-        return ResponseEntity.ok().body(adService.getAllAds());
+        return ResponseEntity.ok().body(new AdsResponse()/*adService.getAllAds()*/);
     }
 
     @Operation(
@@ -95,7 +95,6 @@ public class AdController {
             @RequestPart @Valid CreateOrUpdateAd properties,
             @RequestPart MultipartFile image
     ) {
-
         return ResponseEntity.ok().body(adService.createAd(properties, image));
     }
 
@@ -208,7 +207,7 @@ public class AdController {
     )
     @GetMapping("/me")
     public ResponseEntity<?> getAdsByAuthUser() {
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok().body(new AdsResponse());
     }
 
     @Operation(

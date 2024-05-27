@@ -6,17 +6,21 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
+import ru.skypro.homework.dto.NewPassword;
+import ru.skypro.homework.dto.UpdateUser;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.hamcrest.Matchers.startsWith;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Testcontainers
@@ -46,11 +50,60 @@ class UserControllerTest {
 
     @Test
     @SneakyThrows
-    @WithUserDetails("user@gmail.com")
+    @WithUserDetails("captain.jack.sparrow@gmail.com")
     void getRegister() {
         mockMvc.perform(get("/users/me"))
                 .andExpect(status().is2xxSuccessful())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.lastName", new Object[0]).value("lastName"));
+                .andExpect(jsonPath("$.firstName").value("Jack"))
+                .andExpect(jsonPath("$.lastName").value("Sparrow"))
+                .andExpect(jsonPath("$.role").value("ADMIN"))
+                .andExpect(jsonPath("$.username").value("captain.jack.sparrow@gmail.com"))
+                .andExpect(jsonPath("$.phone").value("+7 (812) 1234567"))
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.id").isNumber())
+                .andExpect(jsonPath("$.image").value(startsWith("/image/")));
+
     }
+
+    @Test
+    @SneakyThrows
+    @WithUserDetails("elizabeth.swann@gmail.com")
+    void testSetPassword() {
+        NewPassword newPassword = new NewPassword("GovernorDaughter", "MsrTurner");
+        mockMvc.perform(post("/users/set_password")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(newPassword)))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @SneakyThrows
+    @WithUserDetails("james.norrington@gmail.com")
+    void testUpdateUser() {
+        UpdateUser updateUser = UpdateUser.builder()
+                .firstName("James1")
+                .lastName("Norrington1")
+                .phone("+7 (154) 4895761")
+                .build();
+
+        mockMvc.perform(patch("/users/me")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateUser)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.firstName").value("James1"))
+                .andExpect(jsonPath("$.lastName").value("Norrington1"))
+                .andExpect(jsonPath("$.phone").value("+7 (154) 4895761"));
+    }
+
+/*    @Test
+    @SneakyThrows
+    @WithUserDetails("user@gmail.com")
+    void testUpdateUserImage() {
+        MockMultipartFile imageFile = new MockMultipartFile("image", "avatar.png", MediaType.IMAGE_PNG_VALUE, "avatar".getBytes());
+
+        mockMvc.perform(multipart("/users/me/image")
+                        .file(imageFile))
+                .andExpect(status().isOk());
+    }*/
 
 }

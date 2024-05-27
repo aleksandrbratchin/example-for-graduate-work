@@ -56,12 +56,12 @@ class AuthControllerTest {
         @SneakyThrows
         void register_RegisterNewUser() {
             Register register = Register.builder()
-                    .role(Role.USER)
-                    .phone("+7 (111) 111-22-33")
-                    .firstName("firstName")
-                    .lastName("lastName")
-                    .password("password")
-                    .username("testuser@gmail.com")
+                    .role(Role.ADMIN)
+                    .phone("+7 (666) 6666666")
+                    .firstName("Davy")
+                    .lastName("Jones")
+                    .password("Locker123")
+                    .username("davy.jones@gmail.com")
                     .build();
             String jsonRegister = objectMapper.writeValueAsString(register);
 
@@ -79,12 +79,12 @@ class AuthControllerTest {
         @SneakyThrows
         void register_UserAlreadyExists() {
             Register register = Register.builder()
-                    .role(Role.USER)
-                    .phone("+7 (111) 111-22-33")
-                    .firstName("firstName")
-                    .lastName("lastName")
-                    .password("password")
-                    .username("user@gmail.com")
+                    .role(Role.ADMIN)
+                    .phone("+7 (812) 1234567")
+                    .firstName("Jack")
+                    .lastName("Sparrow")
+                    .password("BlackPearl123")
+                    .username("captain.jack.sparrow@gmail.com")
                     .build();
             String jsonRegister = objectMapper.writeValueAsString(register);
 
@@ -126,8 +126,8 @@ class AuthControllerTest {
         @SneakyThrows
         void login() {
             Login login = Login.builder()
-                    .password("password")
-                    .username("user@gmail.com")
+                    .password("BlackPearl123")
+                    .username("captain.jack.sparrow@gmail.com")
                     .build();
             String jsonLogin = objectMapper.writeValueAsString(login);
 
@@ -143,8 +143,8 @@ class AuthControllerTest {
         @SneakyThrows
         void login_IncorrectPassword() {
             Login login = Login.builder()
-                    .password("IncorrectPassword")
-                    .username("user@gmail.com")
+                    .password("WickedWench")
+                    .username("captain.jack.sparrow@gmail.com")
                     .build();
             String jsonLogin = objectMapper.writeValueAsString(login);
 

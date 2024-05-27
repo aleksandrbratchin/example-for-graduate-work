@@ -41,6 +41,9 @@ public class UserService {
      * Обновить аватар пользователя
      */
     public void setAvatar(User user, Image image) {
+        if(user.getAvatar() != null){
+            image.setId(user.getAvatar().getId());
+        }
         user.setAvatar(image);
         userRepository.save(user);
     }

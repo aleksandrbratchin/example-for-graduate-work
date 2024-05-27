@@ -15,12 +15,12 @@ public class User extends ParentIDEntity {
     /**
      * логин пользователя
      */
-    @Column(name = "username")
+    @Column(name = "username", nullable = false, unique = true)
     private String username;
     /**
      * пароль пользователя
      */
-    @Column(name = "password", nullable = false, unique = true)
+    @Column(name = "password")
     private String password;
     /**
      * имя пользователя
@@ -41,6 +41,7 @@ public class User extends ParentIDEntity {
      * роль пользователя
      */
     @Column(name = "role")
+    @Enumerated(EnumType.STRING)
     private Role role;
     /**
      * аватар пользователя
