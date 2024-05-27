@@ -5,4 +5,5 @@ import ru.skypro.homework.model.Ad;
 
 
 public interface AdRepository extends JpaRepository <Ad, Long> {
+
 }
