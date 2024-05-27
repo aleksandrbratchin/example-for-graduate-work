@@ -1,6 +1,7 @@
 package ru.skypro.homework.service.impl;
 
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -9,7 +10,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import ru.skypro.homework.config.security.CuctomAuthenticationProvider;
 import ru.skypro.homework.dto.Register;
 import ru.skypro.homework.mapper.UserMapper;
 import ru.skypro.homework.model.User;
@@ -19,14 +19,14 @@ import ru.skypro.homework.service.AuthService;
 public class AuthServiceImpl implements AuthService {
 
     private final UserDetailsService userDetailsService;
-    private final CuctomAuthenticationProvider authenticationManager;
+    private final AuthenticationManager authenticationManager;
     private final UserService userService;
     private final UserMapper userMapper;
     private final PasswordEncoder encoder;
 
     public AuthServiceImpl(
             @Qualifier("customUserDetailsService") UserDetailsService userDetailsService,
-            CuctomAuthenticationProvider authenticationManager,
+            AuthenticationManager authenticationManager,
             UserService userService,
             UserMapper userMapper,
             PasswordEncoder passwordEncoder
