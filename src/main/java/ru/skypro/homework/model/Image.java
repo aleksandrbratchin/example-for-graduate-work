@@ -25,4 +25,5 @@ public class Image extends ParentIDEntity {
         this.mediaType = mediaType;
         this.data = data;
     }
+
 }
