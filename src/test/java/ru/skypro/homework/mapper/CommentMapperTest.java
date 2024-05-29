@@ -32,12 +32,11 @@ class CommentMapperTest {
 
         setDateTest(LocalDateTime.now());
 
-        commentTest = Comment.builder()
-                .id(1L)
-                .text("testtesttest")
-                .user(userTest)
-                .createdAt(dateTest)
-                .build();
+        commentTest = new Comment();
+        commentTest.setId(1L);
+        commentTest.setText("testtesttest");
+        commentTest.setUser(userTest);
+        commentTest.setCreatedAt(dateTest);
     }
 
     @Test

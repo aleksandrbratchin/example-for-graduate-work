@@ -25,8 +25,6 @@ public abstract class CommentMapper {
 
 
     @Mappings({
-            @Mapping(target = "user", ignore = true),
-            @Mapping(target = "createdAt", ignore = true),
             @Mapping(target = "id", source = "pk")
     })
     public abstract Comment toComment(CommentResponse commentResponse);
@@ -35,9 +33,7 @@ public abstract class CommentMapper {
     public abstract CreateOrUpdateComment toCreateOrUpdateComment(Comment comment);
 
     @Mappings({
-            @Mapping(target = "user", ignore = true),
-            @Mapping(target = "id", ignore = true),
-            @Mapping(target = "createdAt", ignore = true)
+            @Mapping(target = "id", ignore = true)
     })
     public abstract Comment toComment(CreateOrUpdateComment createOrUpdateComment);
 

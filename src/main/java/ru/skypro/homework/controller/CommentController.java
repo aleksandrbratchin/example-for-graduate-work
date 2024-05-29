@@ -8,11 +8,21 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import ru.skypro.homework.config.security.UserPrincipal;
 import ru.skypro.homework.dto.CreateOrUpdateComment;
 import ru.skypro.homework.dto.response.CommentResponse;
 import ru.skypro.homework.dto.response.CommentsResponse;
+import ru.skypro.homework.service.impl.CommentService;
+
+import java.util.stream.Collectors;
 
 @Slf4j
 @CrossOrigin(value = "http://localhost:3000")
@@ -20,6 +30,13 @@ import ru.skypro.homework.dto.response.CommentsResponse;
 @RequestMapping("/ads")
 @RequiredArgsConstructor
 public class CommentController {
+
+    @Autowired
+    private CommentService commentService;
+
+    public CommentController(CommentService commentService) {
+        this.commentService = commentService;
+    }
 
     @Operation(
             summary = "Получение комментариев объявления",
@@ -51,9 +68,14 @@ public class CommentController {
 
     @GetMapping("/{id}/comments")
     public ResponseEntity<?> getComments(
-            @PathVariable int id
+            @PathVariable int id,
+            BindingResult bindingResult
     ) {
-        return ResponseEntity.ok().build();
+            if (bindingResult.hasErrors()) {
+                String errorMessage = bindingResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.joining(", "));
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorMessage);
+            }
+        return ResponseEntity.ok().body(commentService.getComments(id));
     }
 
     @Operation(
@@ -85,9 +107,15 @@ public class CommentController {
     @PostMapping(value = "/{id}/comments")
     public ResponseEntity<?> addComment(
             @PathVariable int id,
-            @RequestBody @Valid CreateOrUpdateComment properties
+            @RequestBody @Valid CreateOrUpdateComment properties,
+            @AuthenticationPrincipal UserPrincipal principal,
+            BindingResult bindingResult
     ) {
-        return ResponseEntity.ok().build();
+        if (bindingResult.hasErrors()) {
+            String errorMessage = bindingResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.joining(", "));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorMessage);
+        }
+        return ResponseEntity.ok().body(commentService.addCommentToAd(id,properties,principal.getUser()));
 
     }
 
@@ -118,11 +146,18 @@ public class CommentController {
             },
             tags = "Комментарии"
     )
+    @PreAuthorize("hasRole('ADMIN') or #user.user.id == @adService.findById(#id).user.id")
     @DeleteMapping("/{adId}/comments/{commentId}")
     public ResponseEntity<?> deleteComment(
             @PathVariable int adId,
-            @PathVariable int commentId
+            @PathVariable int commentId,
+            BindingResult bindingResult
     ) {
+        if (bindingResult.hasErrors()) {
+            String errorMessage = bindingResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.joining(", "));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorMessage);
+        }
+        commentService.deleteComment(adId,commentId);
         return ResponseEntity.ok().build();
     }
 
@@ -157,12 +192,19 @@ public class CommentController {
             },
             tags = "Комментарии"
     )
+    @PreAuthorize("hasRole('ADMIN') or #user.user.id == @adService.findById(#id).user.id")
     @PatchMapping(path = "/{adId}/comments/{commentId}")
-    public ResponseEntity<CreateOrUpdateComment> updateComment(
+    public ResponseEntity<?> updateComment(
             @PathVariable int adId,
             @PathVariable int commentId,
-            @RequestBody @Valid CreateOrUpdateComment createOrUpdateComment) {
-        return ResponseEntity.ok().body(createOrUpdateComment);
+            @RequestBody @Valid CreateOrUpdateComment createOrUpdateComment,
+            @AuthenticationPrincipal UserPrincipal principal,
+            BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            String errorMessage = bindingResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.joining(", "));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorMessage);
+        }
+        return ResponseEntity.ok().body(commentService.updateComment(adId,commentId, createOrUpdateComment,principal.getUser()));
     }
 }
 
