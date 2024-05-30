@@ -12,11 +12,8 @@ import ru.skypro.homework.model.Ad;
 import ru.skypro.homework.model.Image;
 import ru.skypro.homework.model.User;
 import ru.skypro.homework.repository.AdRepository;
-import ru.skypro.homework.repository.UserRepository;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class AdService {
@@ -27,28 +24,26 @@ public class AdService {
     private final ExtendedAdResponseMapper extendedAdResponseMapper;
     private final AdRepository adRepository;
     private final ImageMapper imageMapper;
-    private final UserRepository userRepository;
 
     @Autowired
-    public AdService(AdMapper adMapper, AdsMapper adsMapper, CreateOrUpdateAdMapper createOrUpdateAdMapper, ExtendedAdResponseMapper extendedAdResponseMapper, AdRepository adRepository, ImageMapper imageMapper, UserRepository userRepository) {
+    public AdService(AdMapper adMapper, AdsMapper adsMapper, CreateOrUpdateAdMapper createOrUpdateAdMapper, ExtendedAdResponseMapper extendedAdResponseMapper, AdRepository adRepository, ImageMapper imageMapper) {
         this.adMapper = adMapper;
         this.adsMapper = adsMapper;
         this.createOrUpdateAdMapper = createOrUpdateAdMapper;
         this.extendedAdResponseMapper = extendedAdResponseMapper;
         this.adRepository = adRepository;
         this.imageMapper = imageMapper;
-        this.userRepository = userRepository;
     }
 
     public AdsResponse getAllAds() {
-        return adsMapper.toAdsResponse();
+        List<Ad> result = adRepository.findAll();
+        return adsMapper.toAdsResponse(result);
     }
 
-    public AdResponse createAd(CreateOrUpdateAd properties, MultipartFile image, User user) {
+    public AdResponse createAd(CreateOrUpdateAd properties, MultipartFile image) {
         Ad ad = createOrUpdateAdMapper.toAd(properties);
         Image image1 = imageMapper.toImage(image);
         ad.setImage(image1);
-        ad.setUser(user);
         Ad save = adRepository.save(ad);
         return adMapper.mappingToDto(save);
     }
@@ -58,7 +53,11 @@ public class AdService {
         return extendedAdResponseMapper.toDto(ad);
     }
 
-    public void deleteAd(long id) {
+    public Ad findById(Long id) {
+        return adRepository.findById(id).orElseThrow(RuntimeException::new); //todo
+    }
+
+    public void deleteAd(Long id) {
         adRepository.deleteById(id);
     }
 
@@ -71,16 +70,9 @@ public class AdService {
         return adMapper.mappingToDto(save);
     }
 
-    public AdsResponse getAdsByAuthUser(String username) {
-        Optional<User> user = userRepository.findByUsername(username);
-        List<AdResponse> result = adRepository.findByUser(user)
-                .stream()
-                .map(adMapper::mappingToDto)
-                .collect(Collectors.toList());
-        AdsResponse adsResponse = new AdsResponse();
-        adsResponse.setCount(result.size());
-        adsResponse.setResults(result);
-        return adsResponse;
+    public AdsResponse getAdsByUser(User user) {
+        List<Ad> result = adRepository.findByUser(user);
+        return adsMapper.toAdsResponse(result);
     }
 
     public AdResponse updateImageAd(Long id, MultipartFile image) {

@@ -98,14 +98,13 @@ public class AdController {
     public ResponseEntity<?> addAd(
             @RequestPart @Valid CreateOrUpdateAd properties,
             @RequestPart MultipartFile image,
-            @AuthenticationPrincipal UserPrincipal principal,
             BindingResult bindingResult
     ) {
         if (bindingResult.hasErrors()) {
             String errorMessage = bindingResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.joining(", "));
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorMessage);
         }
-        return ResponseEntity.ok().body(adService.createAd(properties, image, principal.getUser()));
+        return ResponseEntity.ok().body(adService.createAd(properties, image));
     }
 
     @Operation(
@@ -131,7 +130,7 @@ public class AdController {
             }
     )
     @GetMapping("/{id}")
-    public ResponseEntity<?> getAdById(@PathVariable long id) {
+    public ResponseEntity<?> getAdById(@PathVariable Long id) {
         return ResponseEntity.ok(adService.getAdById(id));
     }
 
@@ -203,7 +202,12 @@ public class AdController {
     )
     @PatchMapping("/{id}")
     public ResponseEntity<?> updateAdInfo(@PathVariable Long id,
-                                          @RequestBody CreateOrUpdateAd properties) {
+                                          @RequestBody @Valid CreateOrUpdateAd properties,
+                                          BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            String errorMessage = bindingResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.joining(", "));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
+        }
         return ResponseEntity.ok().body(adService.updateAd(id, properties));
     }
 
@@ -227,8 +231,7 @@ public class AdController {
     )
     @GetMapping("/me")
     public ResponseEntity<?> getAdsByAuthUser(@AuthenticationPrincipal UserPrincipal userPrincipal) {
-        String name = userPrincipal.getUsername();
-        return ResponseEntity.ok().body(adService.getAdsByAuthUser(name));
+        return ResponseEntity.ok().body(adService.getAdsByUser(userPrincipal.getUser()));
     }
 
     @Operation(
