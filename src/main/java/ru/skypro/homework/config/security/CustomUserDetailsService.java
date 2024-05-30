@@ -13,7 +13,6 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     private final UserService userService;
 
-
     @Override
     public UserDetails loadUserByUsername(final String username) {
         final User user = userService.findByUsername(username);

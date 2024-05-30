@@ -10,7 +10,10 @@ import ru.skypro.homework.dto.response.ExtendedAdResponse;
 import ru.skypro.homework.mapper.*;
 import ru.skypro.homework.model.Ad;
 import ru.skypro.homework.model.Image;
+import ru.skypro.homework.model.User;
 import ru.skypro.homework.repository.AdRepository;
+
+import java.util.List;
 
 @Service
 public class AdService {
@@ -33,7 +36,8 @@ public class AdService {
     }
 
     public AdsResponse getAllAds() {
-        return adsMapper.toAdsResponse();
+        List<Ad> result = adRepository.findAll();
+        return adsMapper.toAdsResponse(result);
     }
 
     public AdResponse createAd(CreateOrUpdateAd properties, MultipartFile image) {
@@ -49,8 +53,33 @@ public class AdService {
         return extendedAdResponseMapper.toDto(ad);
     }
 
-    public void deleteAd(long id) {
+    public Ad findById(Long id) {
+        return adRepository.findById(id).orElseThrow(RuntimeException::new); //todo
+    }
+
+    public void deleteAd(Long id) {
         adRepository.deleteById(id);
     }
 
+    public AdResponse updateAd(Long id, CreateOrUpdateAd properties) {
+        Ad ad = adRepository.findById(id).orElseThrow(RuntimeException::new);
+        ad.setTitle(properties.getTitle());
+        ad.setPrice(properties.getPrice());
+        ad.setDescription(properties.getDescription());
+        Ad save = adRepository.save(ad);
+        return adMapper.mappingToDto(save);
+    }
+
+    public AdsResponse getAdsByUser(User user) {
+        List<Ad> result = adRepository.findByUser(user);
+        return adsMapper.toAdsResponse(result);
+    }
+
+    public AdResponse updateImageAd(Long id, MultipartFile image) {
+        Ad ad = adRepository.findById(id).orElseThrow(RuntimeException::new);
+        Image image1 = imageMapper.toImage(image);
+        ad.setImage(image1);
+        Ad save = adRepository.save(ad);
+        return adMapper.mappingToDto(save);
+    }
 }

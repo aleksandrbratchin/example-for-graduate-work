@@ -8,10 +8,10 @@ import ru.skypro.homework.model.Ad;
 @Mapper(componentModel = "spring")
 public interface CreateOrUpdateAdMapper {
 
+    @Mapping(target = "id", ignore = true)
     @Mapping(target = "comments", ignore = true)
     @Mapping(target = "user", ignore = true)
     @Mapping(target = "image", ignore = true)
-    @Mapping(target = "id", ignore = true)
     Ad toAd(CreateOrUpdateAd createOrUpdateAd);
 
 }

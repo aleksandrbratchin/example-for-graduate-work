@@ -8,15 +8,23 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import ru.skypro.homework.config.security.UserPrincipal;
 import ru.skypro.homework.dto.CreateOrUpdateAd;
 import ru.skypro.homework.dto.response.AdResponse;
 import ru.skypro.homework.dto.response.AdsResponse;
 import ru.skypro.homework.dto.response.ExtendedAdResponse;
 import ru.skypro.homework.service.impl.AdService;
+
+import java.util.stream.Collectors;
 
 @Slf4j
 @CrossOrigin(value = "http://localhost:3000")
@@ -49,7 +57,7 @@ public class AdController {
     )
     @GetMapping()
     public ResponseEntity<?> getAllAds() {
-        return ResponseEntity.ok().body(new AdsResponse()/*adService.getAllAds()*/);
+        return ResponseEntity.ok().body(adService.getAllAds());
     }
 
     @Operation(
@@ -83,18 +91,19 @@ public class AdController {
                                     schema = @Schema(hidden = true)
                             )
                     )
-            ,
-                    @ApiResponse(responseCode = "401",
-                            description = "Unauthorized")
             }
 
     )
-
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> addAd(
             @RequestPart @Valid CreateOrUpdateAd properties,
-            @RequestPart MultipartFile image
+            @RequestPart MultipartFile image,
+            BindingResult bindingResult
     ) {
+        if (bindingResult.hasErrors()) {
+            String errorMessage = bindingResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.joining(", "));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorMessage);
+        }
         return ResponseEntity.ok().body(adService.createAd(properties, image));
     }
 
@@ -121,7 +130,7 @@ public class AdController {
             }
     )
     @GetMapping("/{id}")
-    public ResponseEntity<?> getAdById(@PathVariable long id) {
+    public ResponseEntity<?> getAdById(@PathVariable Long id) {
         return ResponseEntity.ok(adService.getAdById(id));
     }
 
@@ -152,8 +161,17 @@ public class AdController {
             }
     )
     @DeleteMapping("/{id}")
-    public void deleteAd(@PathVariable long id) {
-        adService.deleteAd(id);
+    @PreAuthorize("hasRole('ADMIN') or #user.user.id == @adService.findById(#id).user.id")
+    public ResponseEntity<?> deleteAd(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserPrincipal user
+    ) {
+        try {
+            adService.deleteAd(id);
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok().build();
     }
 
     @Operation(
@@ -183,8 +201,14 @@ public class AdController {
             }
     )
     @PatchMapping("/{id}")
-    public ResponseEntity<?> updateAdInfo(@PathVariable long id) {
-        return ResponseEntity.ok().build();
+    public ResponseEntity<?> updateAdInfo(@PathVariable Long id,
+                                          @RequestBody @Valid CreateOrUpdateAd properties,
+                                          BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            String errorMessage = bindingResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.joining(", "));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
+        }
+        return ResponseEntity.ok().body(adService.updateAd(id, properties));
     }
 
     @Operation(
@@ -206,8 +230,8 @@ public class AdController {
             }
     )
     @GetMapping("/me")
-    public ResponseEntity<?> getAdsByAuthUser() {
-        return ResponseEntity.ok().body(new AdsResponse());
+    public ResponseEntity<?> getAdsByAuthUser(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        return ResponseEntity.ok().body(adService.getAdsByUser(userPrincipal.getUser()));
     }
 
     @Operation(
@@ -240,11 +264,10 @@ public class AdController {
                             description = "Not found"
                     )
             }
-
     )
     @PatchMapping(value = "/{id}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> updateImageAds(@PathVariable Integer id,
+    public ResponseEntity<?> updateImageAds(@PathVariable Long id,
                                             @RequestPart(name = "image") MultipartFile image) {
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok().body(adService.updateImageAd(id, image));
     }
 }

@@ -6,10 +6,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithUserDetails;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -35,18 +35,10 @@ class UserControllerTest {
     private ObjectMapper objectMapper;
 
     @Container
+    @ServiceConnection
     public static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(DockerImageName.parse("postgres:latest"))
             .withDatabaseName("integration-tests-db")
             .withInitScript("scriptdb/createdb.sql");
-
-    @DynamicPropertySource
-    static void configureProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", postgres::getJdbcUrl);
-        registry.add("spring.datasource.username", postgres::getUsername);
-        registry.add("spring.datasource.password", postgres::getPassword);
-        //registry.add("spring.jpa.hibernate.ddl-auto", () -> "update");
-        //registry.add("spring.liquibase.enabled", () -> "true"); // потом моэно с liquibase попробовать
-    }
 
     @Test
     @SneakyThrows
@@ -57,12 +49,11 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.firstName").value("Jack"))
                 .andExpect(jsonPath("$.lastName").value("Sparrow"))
                 .andExpect(jsonPath("$.role").value("ADMIN"))
-                .andExpect(jsonPath("$.username").value("captain.jack.sparrow@gmail.com"))
+                .andExpect(jsonPath("$.email").value("captain.jack.sparrow@gmail.com"))
                 .andExpect(jsonPath("$.phone").value("+7 (812) 1234567"))
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.id").isNumber())
                 .andExpect(jsonPath("$.image").value(startsWith("/image/")));
-
     }
 
     @Test
@@ -95,15 +86,19 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.phone").value("+7 (154) 4895761"));
     }
 
-/*    @Test
+    @Test
     @SneakyThrows
-    @WithUserDetails("user@gmail.com")
+    @WithUserDetails("james.norrington@gmail.com")
     void testUpdateUserImage() {
         MockMultipartFile imageFile = new MockMultipartFile("image", "avatar.png", MediaType.IMAGE_PNG_VALUE, "avatar".getBytes());
 
         mockMvc.perform(multipart("/users/me/image")
-                        .file(imageFile))
+                        .file(imageFile)
+                        .with(request -> {
+                            request.setMethod("PATCH");
+                            return request;
+                        }))
                 .andExpect(status().isOk());
-    }*/
+    }
 
 }
