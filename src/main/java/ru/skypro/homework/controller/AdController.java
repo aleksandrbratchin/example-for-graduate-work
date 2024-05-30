@@ -57,7 +57,7 @@ public class AdController {
     )
     @GetMapping()
     public ResponseEntity<?> getAllAds() {
-        return ResponseEntity.ok().body(new AdsResponse()/*adService.getAllAds()*/);
+        return ResponseEntity.ok().body(adService.getAllAds());
     }
 
     @Operation(
@@ -202,8 +202,9 @@ public class AdController {
             }
     )
     @PatchMapping("/{id}")
-    public ResponseEntity<?> updateAdInfo(@PathVariable Long id) {
-        return ResponseEntity.ok().build();
+    public ResponseEntity<?> updateAdInfo(@PathVariable Long id,
+                                          @RequestBody CreateOrUpdateAd properties) {
+        return ResponseEntity.ok().body(adService.updateAd(id, properties));
     }
 
     @Operation(
@@ -225,8 +226,9 @@ public class AdController {
             }
     )
     @GetMapping("/me")
-    public ResponseEntity<?> getAdsByAuthUser() {
-        return ResponseEntity.ok().body(new AdsResponse());
+    public ResponseEntity<?> getAdsByAuthUser(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        String name = userPrincipal.getUsername();
+        return ResponseEntity.ok().body(adService.getAdsByAuthUser(name));
     }
 
     @Operation(
@@ -263,6 +265,6 @@ public class AdController {
     @PatchMapping(value = "/{id}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> updateImageAds(@PathVariable Long id,
                                             @RequestPart(name = "image") MultipartFile image) {
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok().body(adService.updateImageAd(id, image));
     }
 }
