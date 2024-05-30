@@ -4,31 +4,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.skypro.homework.dto.response.AdResponse;
 import ru.skypro.homework.dto.response.AdsResponse;
-import ru.skypro.homework.repository.AdRepository;
+import ru.skypro.homework.model.Ad;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 public class AdsMapper {
 
     private final AdMapper adMapper;
-    private final AdRepository adRepository;
 
     @Autowired
-    public AdsMapper(AdMapper adMapper, AdRepository adRepository) {
+    public AdsMapper(AdMapper adMapper) {
         this.adMapper = adMapper;
-        this.adRepository = adRepository;
     }
 
-    public AdsResponse toAdsResponse() {
-        List<AdResponse> result = adRepository.findAll()
-                .stream()
-                .map(adMapper::mappingToDto)
-                .collect(Collectors.toList());
+    public AdsResponse toAdsResponse(List<Ad> ads) {
+        List<AdResponse> adResponses = ads.stream().map(adMapper::mappingToDto).toList();
         AdsResponse adsResponse = new AdsResponse();
-        adsResponse.setCount(result.size());
-        adsResponse.setResults(result);
+        adsResponse.setCount(adResponses.size());
+        adsResponse.setResults(adResponses);
         return adsResponse;
     }
 }

@@ -4,7 +4,6 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.model.Image;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -35,9 +34,7 @@ class ImageMapperTest {
 
     @Test
     public void testToImageWithNullFile() {
-        MultipartFile nullFile = null;
-
-        Image image = imageMapper.toImage(nullFile);
+        Image image = imageMapper.toImage(null);
 
         assertThat(image).isNull();
     }

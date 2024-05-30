@@ -57,7 +57,7 @@ public class AdController {
     )
     @GetMapping()
     public ResponseEntity<?> getAllAds() {
-        return ResponseEntity.ok().body(new AdsResponse()/*adService.getAllAds()*/);
+        return ResponseEntity.ok().body(adService.getAllAds());
     }
 
     @Operation(
@@ -98,14 +98,13 @@ public class AdController {
     public ResponseEntity<?> addAd(
             @RequestPart @Valid CreateOrUpdateAd properties,
             @RequestPart MultipartFile image,
-            @AuthenticationPrincipal UserPrincipal principal,
             BindingResult bindingResult
     ) {
         if (bindingResult.hasErrors()) {
             String errorMessage = bindingResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.joining(", "));
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorMessage);
         }
-        return ResponseEntity.ok().body(adService.createAd(properties, image, principal.getUser()));
+        return ResponseEntity.ok().body(adService.createAd(properties, image));
     }
 
     @Operation(
@@ -131,7 +130,7 @@ public class AdController {
             }
     )
     @GetMapping("/{id}")
-    public ResponseEntity<?> getAdById(@PathVariable long id) {
+    public ResponseEntity<?> getAdById(@PathVariable Long id) {
         return ResponseEntity.ok(adService.getAdById(id));
     }
 
@@ -202,8 +201,14 @@ public class AdController {
             }
     )
     @PatchMapping("/{id}")
-    public ResponseEntity<?> updateAdInfo(@PathVariable Long id) {
-        return ResponseEntity.ok().build();
+    public ResponseEntity<?> updateAdInfo(@PathVariable Long id,
+                                          @RequestBody @Valid CreateOrUpdateAd properties,
+                                          BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            String errorMessage = bindingResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.joining(", "));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
+        }
+        return ResponseEntity.ok().body(adService.updateAd(id, properties));
     }
 
     @Operation(
@@ -225,8 +230,8 @@ public class AdController {
             }
     )
     @GetMapping("/me")
-    public ResponseEntity<?> getAdsByAuthUser() {
-        return ResponseEntity.ok().body(new AdsResponse());
+    public ResponseEntity<?> getAdsByAuthUser(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        return ResponseEntity.ok().body(adService.getAdsByUser(userPrincipal.getUser()));
     }
 
     @Operation(
@@ -263,6 +268,6 @@ public class AdController {
     @PatchMapping(value = "/{id}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> updateImageAds(@PathVariable Long id,
                                             @RequestPart(name = "image") MultipartFile image) {
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok().body(adService.updateImageAd(id, image));
     }
 }
