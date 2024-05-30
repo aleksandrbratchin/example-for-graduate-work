@@ -39,8 +39,8 @@ public class Ad extends ParentIDEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToMany()
-    @JoinColumn(name = "comment_id")
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "ad_id", referencedColumnName = "id")
     private List<Comment> comments;
 
 }

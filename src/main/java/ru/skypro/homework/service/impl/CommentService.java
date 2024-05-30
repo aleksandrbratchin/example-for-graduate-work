@@ -1,7 +1,6 @@
 package ru.skypro.homework.service.impl;
 
-import lombok.RequiredArgsConstructor;
-import org.mapstruct.factory.Mappers;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.skypro.homework.dto.CreateOrUpdateComment;
@@ -10,18 +9,13 @@ import ru.skypro.homework.dto.response.CommentsResponse;
 import ru.skypro.homework.mapper.CommentMapper;
 import ru.skypro.homework.model.Ad;
 import ru.skypro.homework.model.Comment;
-import ru.skypro.homework.model.User;
 import ru.skypro.homework.repository.AdRepository;
 import ru.skypro.homework.repository.CommentRepository;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
-
+@Transactional
 public class CommentService {
 
     private final CommentRepository commentRepository;
@@ -29,7 +23,6 @@ public class CommentService {
     private final CommentMapper commentMapper;
 
     @Autowired
-
     public CommentService(CommentRepository commentRepository, AdRepository adRepository, CommentMapper commentMapper) {
         this.commentRepository = commentRepository;
         this.adRepository = adRepository;
@@ -42,24 +35,14 @@ public class CommentService {
      * @param id объявления
      * @return CommentResponse
      */
-
-    public CommentResponse addCommentToAd(int id, CreateOrUpdateComment properties, User user) {
+    public CommentResponse addCommentToAd(Long id, CreateOrUpdateComment properties) {
         Comment commentNew = commentMapper.toComment(properties);
-        commentNew.setUser(user);
-        commentNew.setCreatedAt(LocalDateTime.now());
-        commentRepository.save(commentNew);
-        Optional<Ad> adToComment = adRepository.findById((long) id);
-        Ad adEntityToComment;
-        if (adToComment.isPresent()) {
-            adEntityToComment = adToComment.get();
-        } else {
-            throw new RuntimeException("Такого объявления не найдено");
-        }
+        Comment saveComment = commentRepository.save(commentNew);
+        Ad adEntityToComment = adRepository.findById(id).orElseThrow(() -> new RuntimeException("Такого объявления не найдено"));
         List<Comment> commentsList = adEntityToComment.getComments();
-        commentsList.add(commentNew);
-        adEntityToComment.setComments(commentsList);
+        commentsList.add(saveComment);
         adRepository.save(adEntityToComment);
-        return commentMapper.toCommentResponse(commentNew);
+        return commentMapper.toCommentResponse(saveComment);
     }
 
     /**
@@ -68,17 +51,12 @@ public class CommentService {
      * @param adId      объявления
      * @param commentId комментария
      */
-    public void deleteComment(int adId, int commentId) {
-        Optional<Ad> adToDeleteComment = adRepository.findById((long) adId);
-        Ad adEntityToDeleteComment;
-        if (adToDeleteComment.isPresent()) {
-            adEntityToDeleteComment = adToDeleteComment.get();
-        } else {
-            throw new RuntimeException("Такого объявления не найдено");
-        }
-        List<Comment> commentsList = adEntityToDeleteComment.getComments();
-        commentsList.remove(commentId);
-        commentRepository.deleteById((long) commentId);
+    public void deleteComment(Long adId, Long commentId) {
+        Ad ad = adRepository.findById(adId).orElseThrow(() -> new RuntimeException("Такого объявления не найдено"));
+        Comment comment = ad.getComments().stream().filter(adComment -> adComment.getId().equals(commentId)).findFirst().orElseThrow(() -> new RuntimeException("Такого комментария не найдено"));
+        ad.getComments().remove(comment);
+        adRepository.save(ad);
+        commentRepository.deleteById(comment.getId());
     }
 
     /**
@@ -87,29 +65,14 @@ public class CommentService {
      * @param adId      идентификатор объявления
      * @param commentId идентификатор комментария
      */
-
-    public CommentResponse updateComment(int adId,
-                                         int commentId,
-                                         CreateOrUpdateComment createOrUpdateComment,
-                                         User user) {
-        Comment commentUpdate = commentMapper.toComment(createOrUpdateComment);
-        commentUpdate.setId((long) commentId);
-        commentUpdate.setUser(user);
-        commentUpdate.setCreatedAt(LocalDateTime.now());
-        commentRepository.save(commentUpdate);
-
-        Optional<Ad> adToUpdateComment = adRepository.findById((long) adId);
-        Ad adEntityToUpdateComment;
-        if (adToUpdateComment.isPresent()) {
-            adEntityToUpdateComment = adToUpdateComment.get();
-        } else {
-            throw new RuntimeException("Такого объявления не найдено");
-        }
-        List<Comment> commentList = adEntityToUpdateComment.getComments();
-        commentList.set(commentId, commentUpdate);
-        adRepository.save(adEntityToUpdateComment);
-
-        return commentMapper.toCommentResponse(commentUpdate);
+    public CommentResponse updateComment(Long adId,
+                                         Long commentId,
+                                         CreateOrUpdateComment createOrUpdateComment) {
+        Ad ad = adRepository.findById(adId).orElseThrow(() -> new RuntimeException("Такого объявления не найдено"));
+        Comment comment = ad.getComments().stream().filter(adComment -> adComment.getId().equals(commentId)).findFirst().orElseThrow(() -> new RuntimeException("Такого комментария не найдено"));
+        comment.setText(createOrUpdateComment.getText());
+        commentRepository.save(comment);
+        return commentMapper.toCommentResponse(comment);
     }
 
     /**
@@ -117,16 +80,8 @@ public class CommentService {
      *
      * @param id идентификатор объявления
      */
-
-    public CommentsResponse getComments(int id) {
-        Optional<Ad> ad = adRepository.findById((long) id);
-        Ad adEntity;
-        if (ad.isPresent()) {
-            adEntity = ad.get();
-        } else {
-            throw new RuntimeException("Такого объявления не найдено");
-        }
-
-        return commentMapper.toCommentsResponse(adEntity.getComments());
+    public CommentsResponse getComments(Long id) {
+        Ad ad = adRepository.findById(id).orElseThrow(() -> new RuntimeException("Такого объявления не найдено"));
+        return commentMapper.toCommentsResponse(ad.getComments());
     }
 }
