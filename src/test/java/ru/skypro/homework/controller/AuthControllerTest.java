@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -37,18 +38,10 @@ class AuthControllerTest {
     private ObjectMapper objectMapper;
 
     @Container
+    @ServiceConnection
     public static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(DockerImageName.parse("postgres:latest"))
             .withDatabaseName("integration-tests-db")
             .withInitScript("scriptdb/createdb.sql");
-
-    @DynamicPropertySource
-    static void configureProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", postgres::getJdbcUrl);
-        registry.add("spring.datasource.username", postgres::getUsername);
-        registry.add("spring.datasource.password", postgres::getPassword);
-        //registry.add("spring.jpa.hibernate.ddl-auto", () -> "update");
-        //registry.add("spring.liquibase.enabled", () -> "true"); // потом можно с liquibase попробовать
-    }
 
     @Nested
     class RegisterTest {
