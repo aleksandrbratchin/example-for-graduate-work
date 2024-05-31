@@ -187,6 +187,7 @@ public class CommentController {
             @PathVariable Long adId,
             @PathVariable Long commentId,
             @RequestBody @Valid CreateOrUpdateComment createOrUpdateComment,
+            @AuthenticationPrincipal UserPrincipal user,
             BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             String errorMessage = bindingResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.joining(", "));
