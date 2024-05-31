@@ -30,7 +30,6 @@ import java.util.stream.Collectors;
 @RequestMapping("/ads")
 @RequiredArgsConstructor
 public class CommentController {
-
     @Autowired
     private CommentService commentService;
 
@@ -109,7 +108,7 @@ public class CommentController {
             String errorMessage = bindingResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.joining(", "));
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorMessage);
         }
-        return ResponseEntity.ok().body(commentService.addCommentToAd(id,properties));
+        return ResponseEntity.ok().body(commentService.addCommentToAd(id, properties));
 
     }
 
@@ -146,8 +145,8 @@ public class CommentController {
             @PathVariable Long adId,
             @PathVariable Long commentId,
             @AuthenticationPrincipal UserPrincipal user
-    ){
-        commentService.deleteComment(adId,commentId);
+    ) {
+        commentService.deleteComment(adId, commentId);
         return ResponseEntity.ok().build();
     }
 
@@ -193,7 +192,7 @@ public class CommentController {
             String errorMessage = bindingResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.joining(", "));
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorMessage);
         }
-        return ResponseEntity.ok().body(commentService.updateComment(adId,commentId, createOrUpdateComment));
+        return ResponseEntity.ok().body(commentService.updateComment(adId, commentId, createOrUpdateComment));
     }
 }
 
