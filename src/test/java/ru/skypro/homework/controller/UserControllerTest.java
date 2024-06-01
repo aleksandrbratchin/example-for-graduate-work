@@ -88,7 +88,7 @@ class UserControllerTest {
 
     @Test
     @SneakyThrows
-    @WithUserDetails("james.norrington@gmail.com")
+    @WithUserDetails("captain.jack.sparrow@gmail.com")
     void testUpdateUserImage() {
         MockMultipartFile imageFile = new MockMultipartFile("image", "avatar.png", MediaType.IMAGE_PNG_VALUE, "avatar".getBytes());
 

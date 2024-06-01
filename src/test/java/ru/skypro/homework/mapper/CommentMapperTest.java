@@ -2,20 +2,24 @@ package ru.skypro.homework.mapper;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mapstruct.factory.Mappers;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import ru.skypro.homework.dto.CreateOrUpdateComment;
 import ru.skypro.homework.dto.response.CommentResponse;
 import ru.skypro.homework.dto.response.CommentsResponse;
 import ru.skypro.homework.model.Comment;
 import ru.skypro.homework.model.User;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-
+@SpringBootTest
 class CommentMapperTest {
-    private final CommentMapper commentMapper = Mappers.getMapper(CommentMapper.class);
+
+    @Autowired
+    private CommentMapper commentMapper;
     private User userTest;
     private Comment commentTest;
     private LocalDateTime dateTest;
@@ -59,7 +63,7 @@ class CommentMapperTest {
     void equalityCommentAndCreateOrUpdateComment() {
         CreateOrUpdateComment exp = new CreateOrUpdateComment("testtesttest");
 
-        CreateOrUpdateComment aq=commentMapper.toCreateOrUpdateComment(commentTest);
+        CreateOrUpdateComment aq = commentMapper.toCreateOrUpdateComment(commentTest);
 
         assertThat(aq.getText()).isEqualTo(exp.getText());
     }
