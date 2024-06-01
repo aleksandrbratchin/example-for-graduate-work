@@ -63,7 +63,7 @@ public class CommentController {
 
     @GetMapping("/{id}/comments")
     public ResponseEntity<?> getComments(
-            @PathVariable int id,
+            @PathVariable Long id,
             BindingResult bindingResult
     ) {
             if (bindingResult.hasErrors()) {
