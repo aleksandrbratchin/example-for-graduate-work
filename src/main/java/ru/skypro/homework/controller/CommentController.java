@@ -41,7 +41,6 @@ public class CommentController {
                                     mediaType = "application/json",
                                     schema = @Schema(implementation = CommentsResponse.class
                                     )
-
                             )
                     ),
                     @ApiResponse(

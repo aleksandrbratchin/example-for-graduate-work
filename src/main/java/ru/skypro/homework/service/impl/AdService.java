@@ -1,5 +1,6 @@
 package ru.skypro.homework.service.impl;
 
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,6 +17,7 @@ import ru.skypro.homework.repository.AdRepository;
 import java.util.List;
 
 @Service
+@Transactional
 public class AdService {
 
     private final AdMapper adMapper;

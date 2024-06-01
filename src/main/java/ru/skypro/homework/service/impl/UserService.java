@@ -1,5 +1,6 @@
 package ru.skypro.homework.service.impl;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -13,6 +14,7 @@ import ru.skypro.homework.model.User;
 import ru.skypro.homework.repository.UserRepository;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class UserService {
 
