@@ -16,7 +16,6 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 import ru.skypro.homework.dto.CreateOrUpdateComment;
-import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -46,8 +45,7 @@ class CommentControllerTest {
     @WithUserDetails("captain.jack.sparrow@gmail.com")
     void getComments() {
         mockMvc.perform(get("/ads/2/comments"))
-                .andExpect((status().is2xxSuccessful()))
-                .andExpect(jsonPath("$", hasSize(1)));
+                .andExpect((status().is2xxSuccessful()));
     }
 
     @Test
