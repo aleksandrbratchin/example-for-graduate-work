@@ -1,0 +1,22 @@
+databaseChangeLog:
+  - changeSet:
+      id: 15
+      author: aleksbratchin
+      context: test
+      changes:
+        - sql:
+            sql: |
+              INSERT INTO "comment"
+                (created_at, "text", user_id, ad_id)
+              VALUES ('2024-06-01 11:19:47.907', 'самый быстроходный корабль в мире', 1, 1);
+
+  - changeSet:
+      id: 16
+      author: aleksbratchin
+      context: test
+      changes:
+        - sql:
+            sql: |
+              INSERT INTO "comment"
+                (created_at, "text", user_id, ad_id)
+              VALUES ('2024-06-01 11:20:15.205', 'корабль Ост-индской компании', 1, 2);
