@@ -5,4 +5,6 @@ import ru.skypro.homework.model.Comment;
 
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 
+    Comment findById (long id);
+
 }
