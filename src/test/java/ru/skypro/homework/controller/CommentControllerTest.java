@@ -9,12 +9,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithUserDetails;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 import ru.skypro.homework.dto.CreateOrUpdateComment;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -32,8 +35,12 @@ class CommentControllerTest {
     @Container
     @ServiceConnection
     public static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(DockerImageName.parse("postgres:latest"))
-            .withDatabaseName("integration-tests-db")
-            .withInitScript("scriptdb/createdb.sql");
+            .withDatabaseName("integration-tests-db");
+
+    @DynamicPropertySource
+    static void configureProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.liquibase.contexts", () -> "prod,test");
+    }
 
     @Test
     @SneakyThrows
@@ -47,10 +54,10 @@ class CommentControllerTest {
     @SneakyThrows
     @WithUserDetails("captain.jack.sparrow@gmail.com")
     void addComment() {
-        CreateOrUpdateComment createOrUpdateComment=new CreateOrUpdateComment("новый комментарий");
+        CreateOrUpdateComment createOrUpdateComment = new CreateOrUpdateComment("новый комментарий");
         mockMvc.perform(post("/ads/2/comments")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(createOrUpdateComment)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(createOrUpdateComment)))
                 .andExpect(status().isOk());
     }
 
@@ -62,6 +69,7 @@ class CommentControllerTest {
                 .andExpect((status().is2xxSuccessful()));
 
     }
+
     @Test
     @SneakyThrows
     @WithUserDetails("james.norrington@gmail.com")
@@ -84,6 +92,7 @@ class CommentControllerTest {
                 .andExpect(jsonPath("$.text").value("обновленный комментарий"));
 
     }
+
     @Test
     @SneakyThrows
     @WithUserDetails("james.norrington@gmail.com")

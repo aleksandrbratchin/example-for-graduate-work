@@ -1,0 +1,55 @@
+databaseChangeLog:
+  - changeSet:
+      id: 6
+      author: aleksbratchin
+      context: test
+      changes:
+        - sql:
+            sql: |
+              INSERT INTO users
+                (first_name, last_name, "password", phone, "role", username, avatar_id)
+              VALUES ('Jack', 'Sparrow', '$2a$10$3X6Ja2M58GD5qSEtligDqepIA1WYMUUxZLSecg8pFIMO588D30Nty', '+7 (812) 1234567', 'ADMIN', 'captain.jack.sparrow@gmail.com', 1);
+
+  - changeSet:
+      id: 7
+      author: aleksbratchin
+      context: test
+      changes:
+        - sql:
+            sql: |
+              INSERT INTO users
+                (first_name, last_name, "password", phone, "role", username, avatar_id)
+              VALUES ('Will', 'Turner', '$2a$10$E.u4KBrpaX.LW9Y/ytMd9u52c/jSbYKi80tSgOWXtTzIETFcPYpYm', '+7 (921) 7654321', 'USER', 'will.turner@gmail.com', NULL);
+
+  - changeSet:
+      id: 8
+      author: aleksbratchin
+      context: test
+      changes:
+        - sql:
+            sql: |
+              INSERT INTO users
+                (first_name, last_name, "password", phone, "role", username, avatar_id)
+              VALUES ('Hector', 'Barbossa', '$2a$10$9DkcgLEGsr4FQ1QFqcF5meKpiiVdYSCcNEI3Amv4IsN/BD5cDXB0a', '+7 (499) 8765432', 'ADMIN', 'hector.barbossa@gmail.com', NULL);
+
+  - changeSet:
+      id: 9
+      author: aleksbratchin
+      context: test
+      changes:
+        - sql:
+            sql: |
+              INSERT INTO users
+                (first_name, last_name, "password", phone, "role", username, avatar_id)
+              VALUES ('James', 'Norrington', '$2a$10$nCiwHUxUHwnyoVXaEskpkuLSJtwtJrdK3VNm7qJMIzgnHDtUWfaE6', '+7 (812) 9876543', 'ADMIN', 'james.norrington@gmail.com', NULL);
+
+  - changeSet:
+      id: 10
+      author: aleksbratchin
+      context: test
+      changes:
+        - sql:
+            sql: |
+              INSERT INTO users
+                (first_name, last_name, "password", phone, "role", username, avatar_id)
+              VALUES ('Elizabeth', 'Swann', '$2a$10$brEWkkdZLiX9LFTa6BQqVO5RbmOR.MjxdmHvZiIzfW5SwZFE/vNpy', '+7 (495) 2345678', 'USER', 'elizabeth.swann@gmail.com', NULL);
