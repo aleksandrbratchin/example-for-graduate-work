@@ -1,7 +1,8 @@
 package ru.skypro.homework.mapper;
 
 import org.junit.jupiter.api.Test;
-import org.mapstruct.factory.Mappers;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import ru.skypro.homework.dto.Role;
 import ru.skypro.homework.dto.response.AdResponse;
 import ru.skypro.homework.model.Ad;
@@ -10,9 +11,11 @@ import ru.skypro.homework.model.User;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@SpringBootTest
 class AdMapperTest {
 
-    private final AdMapper adMapper = Mappers.getMapper(AdMapper.class);
+    @Autowired
+    private  AdMapper adMapper;
 
     @Test
     public void testAdToAdResponse() {
@@ -52,7 +55,7 @@ class AdMapperTest {
         assertThat(adResponse).isNotNull();
         assertThat(adResponse.getPk()).isEqualTo(3);
         assertThat(adResponse.getAuthor()).isEqualTo(2);
-        //assertThat(adResponse.getImage()).isEqualTo("data:image/png;base64," + Base64.getEncoder().encodeToString(new byte[]{1, 2, 3, 4}));
+        assertThat(adResponse.getImage()).isEqualTo("/image/" + avatar.getId());
         assertThat(adResponse.getPrice()).isEqualTo(100);
         assertThat(adResponse.getTitle()).isEqualTo("Test Title");
     }
