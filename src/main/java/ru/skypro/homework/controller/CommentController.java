@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -62,8 +63,13 @@ public class CommentController {
 
     @GetMapping("/{id}/comments")
     public ResponseEntity<?> getComments(
-            @PathVariable Long id
+            @PathVariable int id,
+            BindingResult bindingResult
     ) {
+            if (bindingResult.hasErrors()) {
+                String errorMessage = bindingResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.joining(", "));
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorMessage);
+            }
         return ResponseEntity.ok().body(commentService.getComments(id));
     }
 
