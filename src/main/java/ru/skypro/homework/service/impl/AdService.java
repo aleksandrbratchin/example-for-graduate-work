@@ -82,4 +82,5 @@ public class AdService {
         Ad save = adRepository.save(ad);
         return adMapper.mappingToDto(save);
     }
+
 }

@@ -18,13 +18,13 @@ public class UpdateUser {
     /**
      * имя пользователя
      */
-    @FirstName //todo почему в тз другие ограничения?
+    @FirstName
     @Schema(description = "имя пользователя")
     private String firstName;
     /**
      * фамилия пользователя
      */
-    @LastName //todo почему в тз другие ограничения?
+    @LastName
     @Schema(description = "фамилия пользователя")
     private String lastName;
     /**

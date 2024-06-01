@@ -2,6 +2,7 @@ package ru.skypro.homework.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.web.multipart.MultipartFile;
+import ru.skypro.homework.exception.FileProcessingException;
 import ru.skypro.homework.model.Image;
 
 import java.io.IOException;
@@ -19,7 +20,7 @@ public abstract class ImageMapper {
         try {
             return file != null ? file.getBytes() : null;
         } catch (IOException e) {
-            throw new RuntimeException("Ошибка преобразования MultipartFile в массив байтов", e);
+            throw new FileProcessingException("Ошибка преобразования MultipartFile в массив байтов", e);
         }
     }
 

@@ -190,6 +190,5 @@ public class CommentController {
         }
         return ResponseEntity.ok().body(commentService.updateComment(adId, commentId, createOrUpdateComment));
     }
+
 }
-
-
