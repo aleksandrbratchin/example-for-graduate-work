@@ -42,5 +42,4 @@ public class Comment extends ParentIDEntity {
         super(id);
         this.text = text;
     }
-
 }

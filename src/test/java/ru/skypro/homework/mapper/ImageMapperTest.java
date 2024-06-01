@@ -2,15 +2,21 @@ package ru.skypro.homework.mapper;
 
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
-import org.mapstruct.factory.Mappers;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ru.skypro.homework.model.Image;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = {ImageMapperImpl.class})
 class ImageMapperTest {
 
-    private final ImageMapper imageMapper = Mappers.getMapper(ImageMapper.class);
+    @Autowired
+    private ImageMapper imageMapper;
 
     @Test
     @SneakyThrows
