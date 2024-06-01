@@ -4,13 +4,14 @@ import jakarta.persistence.*;
 import lombok.*;
 import ru.skypro.homework.dto.Role;
 
-
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "users")
+@Table(name = "users", indexes = {
+        @Index(name = "idx_username", columnList = "username")
+})
 public class User extends ParentIDEntity {
     /**
      * логин пользователя
@@ -20,7 +21,7 @@ public class User extends ParentIDEntity {
     /**
      * пароль пользователя
      */
-    @Column(name = "password")
+    @Column(name = "password", nullable = false)
     private String password;
     /**
      * имя пользователя

@@ -2,6 +2,7 @@ package ru.skypro.homework.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.skypro.homework.exception.ImageNotFoundException;
 import ru.skypro.homework.model.Image;
 import ru.skypro.homework.repository.ImageRepository;
 
@@ -17,7 +18,7 @@ public class ImageService {
      * @return {@link Image}
      */
     public Image findById(Long id) {
-        return imageRepository.findById(id).orElseThrow(RuntimeException::new); //todo exception
+        return imageRepository.findById(id).orElseThrow(() -> new ImageNotFoundException("Изображение с идентификатором " + id + " не найдено!"));
     }
 
 }

@@ -80,7 +80,6 @@ class RegisterDtoTest {
             );
         }
 
-        //todo проверить другие ограничения
     }
 
 }

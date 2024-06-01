@@ -9,7 +9,6 @@ import ru.skypro.homework.dto.response.CommentsResponse;
 import ru.skypro.homework.mapper.CommentMapper;
 import ru.skypro.homework.model.Ad;
 import ru.skypro.homework.model.Comment;
-import ru.skypro.homework.model.User;
 import ru.skypro.homework.repository.AdRepository;
 import ru.skypro.homework.repository.CommentRepository;
 

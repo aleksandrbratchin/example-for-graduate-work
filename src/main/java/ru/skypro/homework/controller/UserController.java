@@ -84,7 +84,6 @@ public class UserController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
-
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
@@ -155,12 +154,16 @@ public class UserController {
             @AuthenticationPrincipal UserPrincipal userPrincipal,
             BindingResult bindingResult
     ) {
-        if (bindingResult.hasErrors()) {
-            String errorMessage = bindingResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.joining(", "));
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
+        try{
+            if (bindingResult.hasErrors()) {
+                String errorMessage = bindingResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.joining(", "));
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
+            }
+            User update = userService.update(userPrincipal.getUser(), updateUser);
+            return ResponseEntity.status(HttpStatus.OK).body(updateUserMapper.fromUser(update));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
-        User update = userService.update(userPrincipal.getUser(), updateUser);
-        return ResponseEntity.status(HttpStatus.OK).body(updateUserMapper.fromUser(update));
     }
 
     @Operation(
@@ -192,9 +195,13 @@ public class UserController {
             @RequestPart("image") MultipartFile image,
             @AuthenticationPrincipal UserPrincipal user
     ) {
-        Image avatar = imageMapper.toImage(image);
-        userService.setAvatar(user.getUser(), avatar);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        try {
+            Image avatar = imageMapper.toImage(image);
+            userService.setAvatar(user.getUser(), avatar);
+            return ResponseEntity.status(HttpStatus.OK).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
     }
 
 }
