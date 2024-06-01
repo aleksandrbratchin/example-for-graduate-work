@@ -37,12 +37,13 @@ public class CommentService {
      */
     public CommentResponse addCommentToAd(Long id, CreateOrUpdateComment properties) {
         Comment commentNew = commentMapper.toComment(properties);
-        Comment saveComment = commentRepository.save(commentNew);
-        Ad adEntityToComment = adRepository.findById(id).orElseThrow(() -> new RuntimeException("Такого объявления не найдено"));
-        List<Comment> commentsList = adEntityToComment.getComments();
-        commentsList.add(saveComment);
-        adRepository.save(adEntityToComment);
-        return commentMapper.toCommentResponse(saveComment);
+        Comment save = commentRepository.save(commentNew);
+        Ad adToComment = adRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Такого объявления не найдено"));
+        List<Comment> commentsList = adToComment.getComments();
+        commentsList.add(save);
+        adRepository.save(adToComment);
+        return commentMapper.toCommentResponse(commentNew);
     }
 
     /**
@@ -52,11 +53,15 @@ public class CommentService {
      * @param commentId комментария
      */
     public void deleteComment(Long adId, Long commentId) {
-        Ad ad = adRepository.findById(adId).orElseThrow(() -> new RuntimeException("Такого объявления не найдено"));
-        Comment comment = ad.getComments().stream().filter(adComment -> adComment.getId().equals(commentId)).findFirst().orElseThrow(() -> new RuntimeException("Такого комментария не найдено"));
-        ad.getComments().remove(comment);
-        adRepository.save(ad);
-        commentRepository.deleteById(comment.getId());
+        Ad adToDeleteComment = adRepository.findById(adId).orElseThrow(() -> new RuntimeException("Такого объявления не найдено"));
+        List<Comment> commentsList = adToDeleteComment.getComments();
+        Comment nes = commentsList.stream()
+                .filter((comment) -> comment.getId().equals(commentId))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("такого комментария не найдено"));
+        commentsList.remove(nes);
+        adRepository.save(adToDeleteComment);
+        commentRepository.deleteById(commentId);
     }
 
     /**
@@ -65,14 +70,20 @@ public class CommentService {
      * @param adId      идентификатор объявления
      * @param commentId идентификатор комментария
      */
+
     public CommentResponse updateComment(Long adId,
                                          Long commentId,
                                          CreateOrUpdateComment createOrUpdateComment) {
-        Ad ad = adRepository.findById(adId).orElseThrow(() -> new RuntimeException("Такого объявления не найдено"));
-        Comment comment = ad.getComments().stream().filter(adComment -> adComment.getId().equals(commentId)).findFirst().orElseThrow(() -> new RuntimeException("Такого комментария не найдено"));
-        comment.setText(createOrUpdateComment.getText());
-        commentRepository.save(comment);
-        return commentMapper.toCommentResponse(comment);
+
+        Ad adToUpdateComment = adRepository.findById(adId).orElseThrow(()->new RuntimeException("Такого объявления не найдено"));
+        List<Comment> commentsList = adToUpdateComment.getComments();
+        Comment nes = commentsList.stream()
+                .filter((comment) -> comment.getId().equals(commentId))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("такого комментария не найдено"));
+        nes.setText(createOrUpdateComment.getText());
+        commentRepository.save(nes);
+        return commentMapper.toCommentResponse(nes);
     }
 
     /**

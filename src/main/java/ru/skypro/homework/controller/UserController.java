@@ -84,7 +84,6 @@ public class UserController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
-
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import ru.skypro.homework.config.security.UserPrincipal;
 import ru.skypro.homework.dto.NewPassword;
 import ru.skypro.homework.dto.UpdateUser;
+import ru.skypro.homework.exception.IncorrectCurrentPasswordException;
 import ru.skypro.homework.model.Image;
 import ru.skypro.homework.model.User;
 import ru.skypro.homework.repository.UserRepository;
@@ -66,7 +67,7 @@ public class UserService {
     public void updatePassword(UserPrincipal userPrincipal, NewPassword password) {
         User user = userPrincipal.getUser();
         if (!encoder.matches(password.getCurrentPassword(), user.getPassword())) {
-            throw new RuntimeException();//todo
+            throw new IncorrectCurrentPasswordException("Текущий пароль неверен");
         }
         user.setPassword(encoder.encode(password.getNewPassword()));
         userRepository.save(user);
