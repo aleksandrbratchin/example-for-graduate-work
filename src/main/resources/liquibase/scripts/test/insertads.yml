@@ -4,18 +4,45 @@ databaseChangeLog:
       author: aleksbratchin
       context: test
       changes:
-        - sql:
-            sql: |
-              INSERT INTO ads
-                (description, price, title, image_id, user_id)
-              VALUES ('bestShip', 10000000, 'blackPearl', 2, 1);
+        - insert:
+            tableName: ads
+            columns:
+              - column:
+                  name: description
+                  value: 'bestShip'
+              - column:
+                  name: price
+                  value: 10000000
+              - column:
+                  name: title
+                  value: 'blackPearl'
+              - column:
+                  name: image_id
+                  value: 2
+              - column:
+                  name: user_id
+                  value: 1
+
   - changeSet:
       id: 14
       author: aleksbratchin
       context: test
       changes:
-        - sql:
-            sql: |
-              INSERT INTO ads
-                (description, price, title, image_id, user_id)
-              VALUES ('fastShip', 5000, 'smashing', 3, 1);
+        - insert:
+            tableName: ads
+            columns:
+              - column:
+                  name: description
+                  value: 'fastShip'
+              - column:
+                  name: price
+                  value: 5000
+              - column:
+                  name: title
+                  value: 'smashing'
+              - column:
+                  name: image_id
+                  value: 3
+              - column:
+                  name: user_id
+                  value: 1
