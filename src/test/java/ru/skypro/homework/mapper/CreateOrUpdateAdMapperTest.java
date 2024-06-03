@@ -5,8 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.skypro.homework.dto.CreateOrUpdateAd;
 import ru.skypro.homework.model.Ad;
-import ru.skypro.homework.model.Image;
-import ru.skypro.homework.model.User;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 

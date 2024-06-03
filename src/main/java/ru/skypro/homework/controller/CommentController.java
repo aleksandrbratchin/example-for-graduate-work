@@ -174,7 +174,7 @@ public class CommentController {
             },
             tags = "Комментарии"
     )
-    @PreAuthorize("#user.user.id == @adService.findById(#adId).user.id")
+    @PreAuthorize("hasRole('ADMIN') or #user.user.id == @adService.findById(#adId).user.id")
     @PatchMapping(path = "/{adId}/comments/{commentId}")
     public ResponseEntity<?> updateComment(
             @PathVariable Long adId,

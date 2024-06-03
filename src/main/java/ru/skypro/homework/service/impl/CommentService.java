@@ -75,7 +75,7 @@ public class CommentService {
                                          Long commentId,
                                          CreateOrUpdateComment createOrUpdateComment) {
 
-        Ad adToUpdateComment = adRepository.findById(adId).orElseThrow(() -> new AdNotFoundException ("Такого объявления не найдено"));
+        Ad adToUpdateComment = adRepository.findById(adId).orElseThrow(() -> new AdNotFoundException("Такого объявления не найдено"));
         List<Comment> commentsList = adToUpdateComment.getComments();
         Comment nes = commentsList.stream()
                 .filter((comment) -> comment.getId().equals(commentId))

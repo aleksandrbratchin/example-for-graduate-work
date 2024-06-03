@@ -201,8 +201,10 @@ public class AdController {
             }
     )
     @PatchMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or #user.user.id == @adService.findById(#id).user.id")
     public ResponseEntity<?> updateAdInfo(@PathVariable Long id,
                                           @RequestBody @Valid CreateOrUpdateAd properties,
+                                          @AuthenticationPrincipal UserPrincipal user,
                                           BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             String errorMessage = bindingResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.joining(", "));
@@ -266,8 +268,10 @@ public class AdController {
             }
     )
     @PatchMapping(value = "/{id}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasRole('ADMIN') or #user.user.id == @adService.findById(#id).user.id")
     public ResponseEntity<?> updateImageAds(@PathVariable Long id,
-                                            @RequestPart(name = "image") MultipartFile image) {
+                                            @RequestPart(name = "image") MultipartFile image,
+                                            @AuthenticationPrincipal UserPrincipal user) {
         return ResponseEntity.ok().body(adService.updateImageAd(id, image));
     }
 }
