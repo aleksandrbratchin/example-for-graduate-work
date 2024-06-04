@@ -22,7 +22,7 @@ import ru.skypro.homework.dto.response.AdResponse;
 import ru.skypro.homework.dto.response.AdsResponse;
 import ru.skypro.homework.dto.response.ExtendedAdResponse;
 import ru.skypro.homework.mapper.*;
-import ru.skypro.homework.service.impl.AdService;
+import ru.skypro.homework.service.AdServiceApi;
 import ru.skypro.homework.utils.ValidationUtils;
 
 @Slf4j
@@ -32,7 +32,7 @@ import ru.skypro.homework.utils.ValidationUtils;
 @RequiredArgsConstructor
 public class AdController {
 
-    private final AdService adService;
+    private final AdServiceApi adService;
     private final AdMapper adMapper;
     private final AdsMapper adsMapper;
     private final CreateOrUpdateAdMapper createOrUpdateAdMapper;
