@@ -47,4 +47,6 @@ public interface CommentServiceApi {
      * @param id идентификатор объявления
      */
     List<Comment> getComments(Long id);
+
+    Comment findById(Long id);
 }

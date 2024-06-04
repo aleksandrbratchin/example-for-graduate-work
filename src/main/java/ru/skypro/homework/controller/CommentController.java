@@ -131,7 +131,7 @@ public class CommentController {
             },
             tags = "Комментарии"
     )
-    @PreAuthorize("hasRole('ADMIN') or #user.user.id == @adService.findById(#adId).user.id")
+    @PreAuthorize("hasRole('ADMIN') or #user.user.id == @commentService.findById(#commentId).user.id")
     @DeleteMapping("/{adId}/comments/{commentId}")
     public ResponseEntity<?> deleteComment(
             @PathVariable Long adId,
@@ -172,7 +172,7 @@ public class CommentController {
             },
             tags = "Комментарии"
     )
-    @PreAuthorize("hasRole('ADMIN') or #user.user.id == @adService.findById(#adId).user.id")
+    @PreAuthorize("hasRole('ADMIN') or #user.user.id == @commentService.findById(#commentId).user.id")
     @PatchMapping(path = "/{adId}/comments/{commentId}")
     public ResponseEntity<?> updateComment(
             @PathVariable Long adId,
