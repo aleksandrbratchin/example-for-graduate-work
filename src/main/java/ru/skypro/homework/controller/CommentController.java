@@ -18,6 +18,7 @@ import ru.skypro.homework.config.security.UserPrincipal;
 import ru.skypro.homework.dto.CreateOrUpdateComment;
 import ru.skypro.homework.dto.response.CommentResponse;
 import ru.skypro.homework.dto.response.CommentsResponse;
+import ru.skypro.homework.mapper.CommentMapper;
 import ru.skypro.homework.service.impl.CommentService;
 
 import java.util.stream.Collectors;
@@ -30,6 +31,7 @@ import java.util.stream.Collectors;
 public class CommentController {
 
     private final CommentService commentService;
+    private final CommentMapper commentMapper;
 
     @Operation(
             summary = "Получение комментариев объявления",
@@ -62,7 +64,7 @@ public class CommentController {
     public ResponseEntity<?> getComments(
             @PathVariable Long id
     ) {
-        return ResponseEntity.ok().body(commentService.getComments(id));
+        return ResponseEntity.ok().body(commentMapper.toCommentsResponse(commentService.getComments(id)));
     }
 
     @Operation(
@@ -94,14 +96,18 @@ public class CommentController {
     @PostMapping(value = "/{id}/comments")
     public ResponseEntity<?> addComment(
             @PathVariable Long id,
-            @RequestBody @Valid CreateOrUpdateComment properties,
+            @RequestBody @Valid CreateOrUpdateComment createComment,
             BindingResult bindingResult
     ) {
         if (bindingResult.hasErrors()) {
             String errorMessage = bindingResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.joining(", "));
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorMessage);
         }
-        return ResponseEntity.ok().body(commentService.addCommentToAd(id, properties));
+        return ResponseEntity.ok().body(
+                commentMapper.toCommentResponse(
+                        commentService.addCommentToAd(id, commentMapper.toComment(createComment))
+                )
+        );
 
     }
 
@@ -182,11 +188,12 @@ public class CommentController {
             @AuthenticationPrincipal UserPrincipal user,
             @RequestBody @Valid CreateOrUpdateComment createOrUpdateComment,
             BindingResult bindingResult) {
+
         if (bindingResult.hasErrors()) {
             String errorMessage = bindingResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.joining(", "));
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorMessage);
         }
-        return ResponseEntity.ok().body(commentService.updateComment(adId, commentId, createOrUpdateComment));
+        return ResponseEntity.ok().body(commentMapper.toCommentResponse(commentService.updateComment(adId, commentId, createOrUpdateComment)));
     }
 }
 

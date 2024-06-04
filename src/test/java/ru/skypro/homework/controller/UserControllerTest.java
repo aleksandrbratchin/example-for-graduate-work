@@ -110,7 +110,11 @@ class UserControllerTest {
         @SneakyThrows
         @WithUserDetails("captain.jack.sparrow@gmail.com")
         void testUpdateUserImage() {
-            MockMultipartFile imageFile = new MockMultipartFile("image", "avatar.png", MediaType.IMAGE_PNG_VALUE, "avatar".getBytes());
+            MockMultipartFile imageFile = new MockMultipartFile(
+                    "image",
+                    "avatar.png", MediaType.IMAGE_PNG_VALUE,
+                    "avatar".getBytes()
+            );
 
             mockMvc.perform(multipart("/users/me/image")
                             .file(imageFile)
@@ -187,7 +191,11 @@ class UserControllerTest {
         @Test
         @SneakyThrows
         void testUpdateUserImage() {
-            MockMultipartFile imageFile = new MockMultipartFile("image", "avatar.png", MediaType.IMAGE_PNG_VALUE, "avatar".getBytes());
+            MockMultipartFile imageFile = new MockMultipartFile(
+                    "image",
+                    "avatar.png", MediaType.IMAGE_PNG_VALUE,
+                    "avatar".getBytes()
+            );
 
             mockMvc.perform(multipart("/users/me/image")
                             .file(imageFile)

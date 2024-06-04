@@ -25,15 +25,13 @@ class CommentMapperTest {
     private Comment commentTest;
     private LocalDateTime dateTest;
 
-    private Image avatar;
-
     public void setDateTest(LocalDateTime dateTest) {
         this.dateTest = dateTest;
     }
 
     @BeforeEach
     public void setUp() {
-        avatar = Image.builder()
+        Image avatar = Image.builder()
                 .id(1L)
                 .fileSize(1024)
                 .mediaType("image/png")

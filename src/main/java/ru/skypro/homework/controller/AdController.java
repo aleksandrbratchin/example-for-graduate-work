@@ -6,8 +6,8 @@ import io.swagger.v3.oas.annotations.media.Encoding;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -30,14 +30,10 @@ import java.util.stream.Collectors;
 @CrossOrigin(value = "http://localhost:3000")
 @RestController
 @RequestMapping("/ads")
+@RequiredArgsConstructor
 public class AdController {
 
     private final AdService adService;
-
-    @Autowired
-    public AdController(AdService adService) {
-        this.adService = adService;
-    }
 
     @Operation(
             tags = "Объявления",
@@ -115,8 +111,10 @@ public class AdController {
                             responseCode = "200",
                             description = "OK",
                             content = {
-                                    @Content(mediaType = "application/json",
-                                            schema = @Schema(implementation = ExtendedAdResponse.class))
+                                    @Content(
+                                            mediaType = "application/json",
+                                            schema = @Schema(implementation = ExtendedAdResponse.class)
+                                    )
                             }
                     ),
                     @ApiResponse(

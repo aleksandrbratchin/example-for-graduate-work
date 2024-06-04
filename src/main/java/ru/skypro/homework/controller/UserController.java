@@ -154,16 +154,12 @@ public class UserController {
             @RequestBody @Valid UpdateUser updateUser,
             BindingResult bindingResult
     ) {
-        try {
-            if (bindingResult.hasErrors()) {
-                String errorMessage = bindingResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.joining(", "));
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorMessage);
-            }
-            User update = userService.update(userPrincipal.getUser(), updateUser);
-            return ResponseEntity.status(HttpStatus.OK).body(updateUserMapper.fromUser(update));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        if (bindingResult.hasErrors()) {
+            String errorMessage = bindingResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.joining(", "));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorMessage);
         }
+        User update = userService.update(userPrincipal.getUser(), updateUser);
+        return ResponseEntity.status(HttpStatus.OK).body(updateUserMapper.fromUser(update));
     }
 
     @Operation(
