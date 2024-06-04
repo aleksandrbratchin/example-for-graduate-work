@@ -8,6 +8,7 @@ import ru.skypro.homework.dto.CreateOrUpdateComment;
 import ru.skypro.homework.dto.response.CommentResponse;
 import ru.skypro.homework.dto.response.CommentsResponse;
 import ru.skypro.homework.model.Comment;
+import ru.skypro.homework.model.Image;
 import ru.skypro.homework.model.User;
 
 import java.time.LocalDateTime;
@@ -24,13 +25,22 @@ class CommentMapperTest {
     private Comment commentTest;
     private LocalDateTime dateTest;
 
+    private Image avatar;
+
     public void setDateTest(LocalDateTime dateTest) {
         this.dateTest = dateTest;
     }
 
     @BeforeEach
     public void setUp() {
+        avatar = Image.builder()
+                .id(1L)
+                .fileSize(1024)
+                .mediaType("image/png")
+                .data(new byte[]{1, 2, 3, 4})
+                .build();
         userTest = new User();
+        userTest.setAvatar(avatar);
         userTest.setId(1L);
         userTest.setUsername("test");
 
@@ -76,6 +86,7 @@ class CommentMapperTest {
         commentResponseTest.setText("testtesttest");
         commentResponseTest.setAuthor(userTest.getId().intValue());
         commentResponseTest.setCreatedAt(dateTest.getNano());
+        commentResponseTest.setAuthorImage("/image/" + userTest.getAvatar().getId());
         List<CommentResponse> exp = List.of(commentResponseTest);
 
         List<CommentResponse> aq = commentMapper.toListWithDto(base);
@@ -91,6 +102,7 @@ class CommentMapperTest {
         commentResponseTest.setText("testtesttest");
         commentResponseTest.setAuthor(userTest.getId().intValue());
         commentResponseTest.setCreatedAt(dateTest.getNano());
+        commentResponseTest.setAuthorImage("/image/" + userTest.getAvatar().getId());
         List<Comment> base = List.of(commentTest);
         List<CommentResponse> second = List.of(commentResponseTest);
         int countExp = 1;

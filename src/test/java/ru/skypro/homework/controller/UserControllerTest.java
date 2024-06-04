@@ -39,7 +39,7 @@ class UserControllerTest {
 
     @Container
     @ServiceConnection
-    public static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(DockerImageName.parse("postgres:latest"))
+    public static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(DockerImageName.parse("postgres:16.3-bullseye"))
             .withDatabaseName("integration-tests-db");
 
     @DynamicPropertySource

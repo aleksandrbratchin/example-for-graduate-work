@@ -4,6 +4,7 @@ package ru.skypro.homework.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
+import org.springframework.beans.factory.annotation.Value;
 import ru.skypro.homework.dto.CreateOrUpdateComment;
 import ru.skypro.homework.dto.response.CommentResponse;
 import ru.skypro.homework.dto.response.CommentsResponse;
@@ -14,21 +15,17 @@ import java.util.List;
 @Mapper(componentModel = "spring", uses = {User.class})
 public abstract class CommentMapper {
 
+    @Value("${download.url}")
+    protected String downloadUrl;
+
     @Mappings({
             @Mapping(target = "author", source = "user.id"),
-            @Mapping(target = "authorImage", source = "user.avatar.id"),
+            @Mapping(target = "authorImage",  expression = "java(comment.getUser().getAvatar() == null ? \"\" : downloadUrl + comment.getUser().getAvatar().getId())"),
             @Mapping(target = "authorFirstName", source = "user.firstName"),
             @Mapping(target = "createdAt", source = "createdAt.nano"),
             @Mapping(target = "pk", source = "id")
     })
     public abstract CommentResponse toCommentResponse(Comment comment);
-
-
-    @Mappings({
-            @Mapping(target = "id", source = "pk")
-    })
-    public abstract Comment toComment(CommentResponse commentResponse);
-
 
     public abstract CreateOrUpdateComment toCreateOrUpdateComment(Comment comment);
 

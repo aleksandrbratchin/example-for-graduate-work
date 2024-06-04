@@ -32,13 +32,13 @@ public class AdControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
     @Autowired
     private ObjectMapper objectMapper;
 
-
     @Container
     @ServiceConnection
-    private static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(DockerImageName.parse("postgres:latest"))
+    private static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(DockerImageName.parse("postgres:16.3-bullseye"))
             .withDatabaseName("integration-tests-db");
 
     @DynamicPropertySource
@@ -81,7 +81,7 @@ public class AdControllerTest {
     @SneakyThrows
     @WithUserDetails("captain.jack.sparrow@gmail.com")
     void getAdById() {
-        mockMvc.perform(get("/ads/{id}",1))
+        mockMvc.perform(get("/ads/{id}", 1))
                 .andExpect(status().isOk());
     }
 
@@ -89,7 +89,7 @@ public class AdControllerTest {
     @SneakyThrows
     @WithUserDetails("captain.jack.sparrow@gmail.com")
     void deleteAd() {
-        mockMvc.perform(delete("/ads/{id}",1))
+        mockMvc.perform(delete("/ads/{id}", 1))
                 .andExpect(status().isOk());
     }
 
@@ -98,7 +98,7 @@ public class AdControllerTest {
     @WithUserDetails("captain.jack.sparrow@gmail.com")
     void updateAdInfo() {
         CreateOrUpdateAd ad = new CreateOrUpdateAd("testadeaddde", 100, "testtestadad");
-        mockMvc.perform(patch("/ads/{id}",1)
+        mockMvc.perform(patch("/ads/{id}", 1)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(ad)))
                 .andExpect(status().isOk())
@@ -156,7 +156,7 @@ public class AdControllerTest {
         @WithUserDetails("captain.jack.sparrow@gmail.com")
         void updateAdInfo() {
             CreateOrUpdateAd ad = new CreateOrUpdateAd("", -1, "");
-            mockMvc.perform(patch("/ads/{id}",2)
+            mockMvc.perform(patch("/ads/{id}", 2)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(ad)))
                     .andExpect(status().isForbidden());
