@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -24,8 +23,7 @@ import ru.skypro.homework.dto.response.AdsResponse;
 import ru.skypro.homework.dto.response.ExtendedAdResponse;
 import ru.skypro.homework.mapper.*;
 import ru.skypro.homework.service.impl.AdService;
-
-import java.util.stream.Collectors;
+import ru.skypro.homework.utils.ValidationUtils;
 
 @Slf4j
 @CrossOrigin(value = "http://localhost:3000")
@@ -105,10 +103,15 @@ public class AdController {
             BindingResult bindingResult
     ) {
         if (bindingResult.hasErrors()) {
-            String errorMessage = bindingResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.joining(", "));
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorMessage);
+            ValidationUtils.createErrorResponse(bindingResult.getAllErrors(), HttpStatus.UNAUTHORIZED);
         }
-        return ResponseEntity.ok().body(adMapper.mappingToDto(adService.createAd(createOrUpdateAdMapper.toAd(properties), imageMapper.toImage(image))));
+        return ResponseEntity.ok().body(
+                adMapper.mappingToDto(
+                        adService.createAd(
+                                createOrUpdateAdMapper.toAd(properties),
+                                imageMapper.toImage(image))
+                )
+        );
     }
 
     @Operation(
@@ -219,8 +222,7 @@ public class AdController {
             BindingResult bindingResult
     ) {
         if (bindingResult.hasErrors()) {
-            String errorMessage = bindingResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.joining(", "));
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorMessage);
+            ValidationUtils.createErrorResponse(bindingResult.getAllErrors(), HttpStatus.FORBIDDEN);
         }
         return ResponseEntity.ok().body(adMapper.mappingToDto(adService.updateAd(id, properties)));
     }

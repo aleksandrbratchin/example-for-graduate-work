@@ -7,7 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.support.DefaultMessageSourceResolvable;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -25,8 +25,7 @@ import ru.skypro.homework.mapper.UserMapper;
 import ru.skypro.homework.model.Image;
 import ru.skypro.homework.model.User;
 import ru.skypro.homework.service.impl.UserService;
-
-import java.util.stream.Collectors;
+import ru.skypro.homework.utils.ValidationUtils;
 
 @Slf4j
 @CrossOrigin(value = "http://localhost:3000")
@@ -76,14 +75,9 @@ public class UserController {
             BindingResult bindingResult
     ) {
         if (bindingResult.hasErrors()) {
-            String errorMessage = bindingResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.joining(", "));
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorMessage);
+            ValidationUtils.createErrorResponse(bindingResult.getAllErrors(), HttpStatus.FORBIDDEN);
         }
-        try {
-            userService.updatePassword(userPrincipal.getUser(), password);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
+        userService.updatePassword(userPrincipal.getUser(), password);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
@@ -109,12 +103,9 @@ public class UserController {
             tags = "Пользователи"
     )
     @GetMapping("me")
-    public ResponseEntity<?> getUser(
-            @AuthenticationPrincipal UserPrincipal user
-    ) {
-        return ResponseEntity.status(HttpStatus.OK).body(
-                userMapper.toUserResponse(user.getUser())
-        );
+    public ResponseEntity<?> getUser(@AuthenticationPrincipal UserPrincipal user) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(userMapper.toUserResponse(user.getUser()));
     }
 
     @Operation(
@@ -155,8 +146,7 @@ public class UserController {
             BindingResult bindingResult
     ) {
         if (bindingResult.hasErrors()) {
-            String errorMessage = bindingResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.joining(", "));
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorMessage);
+            ValidationUtils.createErrorResponse(bindingResult.getAllErrors(), HttpStatus.UNAUTHORIZED);
         }
         User update = userService.update(userPrincipal.getUser(), updateUser);
         return ResponseEntity.status(HttpStatus.OK).body(updateUserMapper.fromUser(update));
@@ -191,13 +181,9 @@ public class UserController {
             @RequestPart("image") MultipartFile image,
             @AuthenticationPrincipal UserPrincipal user
     ) {
-        try {
-            Image avatar = imageMapper.toImage(image);
-            userService.setAvatar(user.getUser(), avatar);
-            return ResponseEntity.status(HttpStatus.OK).build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
+        Image avatar = imageMapper.toImage(image);
+        userService.setAvatar(user.getUser(), avatar);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
 }

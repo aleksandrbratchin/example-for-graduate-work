@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,8 +19,7 @@ import ru.skypro.homework.dto.response.CommentResponse;
 import ru.skypro.homework.dto.response.CommentsResponse;
 import ru.skypro.homework.mapper.CommentMapper;
 import ru.skypro.homework.service.impl.CommentService;
-
-import java.util.stream.Collectors;
+import ru.skypro.homework.utils.ValidationUtils;
 
 @Slf4j
 @CrossOrigin(value = "http://localhost:3000")
@@ -61,9 +59,7 @@ public class CommentController {
     )
 
     @GetMapping("/{id}/comments")
-    public ResponseEntity<?> getComments(
-            @PathVariable Long id
-    ) {
+    public ResponseEntity<?> getComments(@PathVariable Long id) {
         return ResponseEntity.ok().body(commentMapper.toCommentsResponse(commentService.getComments(id)));
     }
 
@@ -99,8 +95,7 @@ public class CommentController {
             BindingResult bindingResult
     ) {
         if (bindingResult.hasErrors()) {
-            String errorMessage = bindingResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.joining(", "));
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorMessage);
+            ValidationUtils.createErrorResponse(bindingResult.getAllErrors(), HttpStatus.UNAUTHORIZED);
         }
         return ResponseEntity.ok().body(
                 commentMapper.toCommentResponse(
@@ -186,10 +181,11 @@ public class CommentController {
             @RequestBody @Valid CreateOrUpdateComment createOrUpdateComment,
             BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            String errorMessage = bindingResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.joining(", "));
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorMessage);
+            ValidationUtils.createErrorResponse(bindingResult.getAllErrors(), HttpStatus.FORBIDDEN);
         }
-        return ResponseEntity.ok().body(commentMapper.toCommentResponse(commentService.updateComment(adId, commentId, createOrUpdateComment)));
+        return ResponseEntity.ok().body(
+                commentMapper.toCommentResponse(commentService.updateComment(adId, commentId, createOrUpdateComment))
+        );
     }
 
 }

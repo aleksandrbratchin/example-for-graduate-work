@@ -15,7 +15,9 @@ public class ImageService implements ImageServiceApi {
 
     @Override
     public Image findById(Long id) {
-        return imageRepository.findById(id).orElseThrow(() -> new ImageNotFoundException("Изображение с идентификатором " + id + " не найдено!"));
+        return imageRepository.findById(id).orElseThrow(
+                () -> new ImageNotFoundException("Изображение с идентификатором " + id + " не найдено!")
+        );
     }
 
 }

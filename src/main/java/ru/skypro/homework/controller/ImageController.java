@@ -28,9 +28,7 @@ public class ImageController {
                     "image/*"
             }
     )
-    public ResponseEntity<byte[]> download(
-            @PathVariable Long id
-    ) {
+    public ResponseEntity<byte[]> download(@PathVariable Long id) {
         Image image = imageService.findById(id);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.parseMediaType(image.getMediaType()));
