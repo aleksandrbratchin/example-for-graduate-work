@@ -8,7 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.skypro.homework.model.Image;
-import ru.skypro.homework.service.impl.ImageService;
+import ru.skypro.homework.service.ImageServiceApi;
 
 @Slf4j
 @CrossOrigin(value = "http://localhost:3000")
@@ -17,7 +17,7 @@ import ru.skypro.homework.service.impl.ImageService;
 @RequiredArgsConstructor
 public class ImageController {
 
-    private final ImageService imageService;
+    private final ImageServiceApi imageService;
 
     @GetMapping(
             value = "{id}",

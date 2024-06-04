@@ -68,4 +68,11 @@ public class CommentService implements CommentServiceApi {
                 .orElseThrow(() -> new CommentNotFoundException("такого комментария не найдено"));
     }
 
+    @Override
+    public Comment findById(Long id) {
+        return commentRepository.findById(id).orElseThrow(
+                () -> new CommentNotFoundException("комментария c id=" + id + " не найдено")
+        );
+    }
+
 }

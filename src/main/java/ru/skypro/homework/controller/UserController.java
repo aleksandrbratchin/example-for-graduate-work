@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +23,7 @@ import ru.skypro.homework.mapper.UpdateUserMapper;
 import ru.skypro.homework.mapper.UserMapper;
 import ru.skypro.homework.model.Image;
 import ru.skypro.homework.model.User;
-import ru.skypro.homework.service.impl.UserService;
+import ru.skypro.homework.service.UserServiceApi;
 import ru.skypro.homework.utils.ValidationUtils;
 
 @Slf4j
@@ -34,7 +33,7 @@ import ru.skypro.homework.utils.ValidationUtils;
 @RequiredArgsConstructor
 public class UserController {
 
-    private final UserService userService;
+    private final UserServiceApi userService;
 
     private final ImageMapper imageMapper;
 

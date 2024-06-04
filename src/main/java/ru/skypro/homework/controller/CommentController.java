@@ -18,7 +18,7 @@ import ru.skypro.homework.dto.CreateOrUpdateComment;
 import ru.skypro.homework.dto.response.CommentResponse;
 import ru.skypro.homework.dto.response.CommentsResponse;
 import ru.skypro.homework.mapper.CommentMapper;
-import ru.skypro.homework.service.impl.CommentService;
+import ru.skypro.homework.service.CommentServiceApi;
 import ru.skypro.homework.utils.ValidationUtils;
 
 @Slf4j
@@ -28,7 +28,7 @@ import ru.skypro.homework.utils.ValidationUtils;
 @RequiredArgsConstructor
 public class CommentController {
 
-    private final CommentService commentService;
+    private final CommentServiceApi commentService;
     private final CommentMapper commentMapper;
 
     @Operation(
@@ -131,7 +131,7 @@ public class CommentController {
             },
             tags = "Комментарии"
     )
-    @PreAuthorize("hasRole('ADMIN') or #user.user.id == @adService.findById(#adId).user.id")
+    @PreAuthorize("hasRole('ADMIN') or #user.user.id == @commentService.findById(#commentId).user.id")
     @DeleteMapping("/{adId}/comments/{commentId}")
     public ResponseEntity<?> deleteComment(
             @PathVariable Long adId,
@@ -172,7 +172,7 @@ public class CommentController {
             },
             tags = "Комментарии"
     )
-    @PreAuthorize("hasRole('ADMIN') or #user.user.id == @adService.findById(#adId).user.id")
+    @PreAuthorize("hasRole('ADMIN') or #user.user.id == @commentService.findById(#commentId).user.id")
     @PatchMapping(path = "/{adId}/comments/{commentId}")
     public ResponseEntity<?> updateComment(
             @PathVariable Long adId,
