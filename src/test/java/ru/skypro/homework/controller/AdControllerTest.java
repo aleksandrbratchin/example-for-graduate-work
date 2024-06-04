@@ -8,10 +8,12 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -53,8 +55,25 @@ public class AdControllerTest {
 
     @Test
     @SneakyThrows
-    @WithUserDetails("captain.jack.sparrow@gmail.com")
+    @WithUserDetails("elizabeth.swann@gmail.com")
     void addAd() {
+        MockMultipartFile file = new MockMultipartFile(
+                "image", "image.png", MediaType.IMAGE_PNG_VALUE, "image".getBytes());
+
+        String invalidJson = "{ \"title\": \"Hidsdfsdfsdf\", \"price\": 10, \"description\": \"descsdfdsfsdfsdfsdfsd\" }";
+
+        MockMultipartFile properties = new MockMultipartFile(
+                "properties", "", MediaType.APPLICATION_JSON_VALUE, invalidJson.getBytes());
+
+        mockMvc.perform(multipart("/ads")
+                        .file(file)
+                        .file(properties)
+                        .contentType(MediaType.MULTIPART_FORM_DATA))
+
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.price").value(10))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.title").value("Hidsdfsdfsdf"))
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON));
     }
 
     @Test
@@ -97,6 +116,16 @@ public class AdControllerTest {
     @Test
     @SneakyThrows
     @WithUserDetails("captain.jack.sparrow@gmail.com")
-    void updateImageAds(){
+    void updateImageAds() {
+        MockMultipartFile file = new MockMultipartFile(
+                "image", "image.png", MediaType.IMAGE_PNG_VALUE, "image".getBytes());
+
+        mockMvc.perform(multipart("/ads/1/image")
+                        .file(file)
+                        .with(request -> {
+                            request.setMethod("PATCH");
+                            return request;
+                        }))
+                .andExpect(status().isOk());
     }
 }
