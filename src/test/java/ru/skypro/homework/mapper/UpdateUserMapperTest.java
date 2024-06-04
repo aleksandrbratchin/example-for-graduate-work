@@ -10,6 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 public class UpdateUserMapperTest {
+
     @Autowired
     private UpdateUserMapper updateUserMapper;
 
