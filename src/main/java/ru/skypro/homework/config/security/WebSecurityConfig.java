@@ -35,6 +35,7 @@ public class WebSecurityConfig {
             "/api-docs/**",
             "/webjars/**",
             "/login",
+            "/image/**",
             "/register"
     };
 
@@ -47,7 +48,7 @@ public class WebSecurityConfig {
                                 authorization
                                         .requestMatchers(AUTH_WHITELIST)
                                         .permitAll()
-                                        .requestMatchers("/ads/**", "/users/**", "/image/**")
+                                        .requestMatchers("/ads/**", "/users/**")
                                         .authenticated())
                 .httpBasic(withDefaults());
         return http.build();
