@@ -54,7 +54,7 @@ public class AuthController {
             BindingResult bindingResult
     ) {
         if (bindingResult.hasErrors()) {
-            ValidationUtils.createErrorResponse(bindingResult.getAllErrors(), HttpStatus.UNAUTHORIZED);
+            return ValidationUtils.createErrorResponse(bindingResult.getAllErrors(), HttpStatus.UNAUTHORIZED);
         }
         if (authServiceApi.login(login.getUsername(), login.getPassword())) {
             return ResponseEntity.ok().build();
@@ -90,7 +90,7 @@ public class AuthController {
             BindingResult bindingResult
     ) {
         if (bindingResult.hasErrors()) {
-            ValidationUtils.createErrorResponse(bindingResult.getAllErrors(), HttpStatus.BAD_REQUEST);
+            return ValidationUtils.createErrorResponse(bindingResult.getAllErrors(), HttpStatus.BAD_REQUEST);
         }
         if (authServiceApi.register(register)) {
             return ResponseEntity.status(HttpStatus.CREATED).build();

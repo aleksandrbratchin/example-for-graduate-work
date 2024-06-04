@@ -103,7 +103,7 @@ public class AdController {
             BindingResult bindingResult
     ) {
         if (bindingResult.hasErrors()) {
-            ValidationUtils.createErrorResponse(bindingResult.getAllErrors(), HttpStatus.UNAUTHORIZED);
+            return ValidationUtils.createErrorResponse(bindingResult.getAllErrors(), HttpStatus.UNAUTHORIZED);
         }
         return ResponseEntity.ok().body(
                 adMapper.mappingToDto(
@@ -222,7 +222,7 @@ public class AdController {
             BindingResult bindingResult
     ) {
         if (bindingResult.hasErrors()) {
-            ValidationUtils.createErrorResponse(bindingResult.getAllErrors(), HttpStatus.FORBIDDEN);
+            return ValidationUtils.createErrorResponse(bindingResult.getAllErrors(), HttpStatus.FORBIDDEN);
         }
         return ResponseEntity.ok().body(adMapper.mappingToDto(adService.updateAd(id, properties)));
     }

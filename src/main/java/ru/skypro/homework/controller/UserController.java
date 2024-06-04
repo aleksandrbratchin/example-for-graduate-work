@@ -75,7 +75,7 @@ public class UserController {
             BindingResult bindingResult
     ) {
         if (bindingResult.hasErrors()) {
-            ValidationUtils.createErrorResponse(bindingResult.getAllErrors(), HttpStatus.FORBIDDEN);
+            return ValidationUtils.createErrorResponse(bindingResult.getAllErrors(), HttpStatus.FORBIDDEN);
         }
         userService.updatePassword(userPrincipal.getUser(), password);
         return ResponseEntity.status(HttpStatus.OK).build();
@@ -146,7 +146,7 @@ public class UserController {
             BindingResult bindingResult
     ) {
         if (bindingResult.hasErrors()) {
-            ValidationUtils.createErrorResponse(bindingResult.getAllErrors(), HttpStatus.UNAUTHORIZED);
+            return ValidationUtils.createErrorResponse(bindingResult.getAllErrors(), HttpStatus.UNAUTHORIZED);
         }
         User update = userService.update(userPrincipal.getUser(), updateUser);
         return ResponseEntity.status(HttpStatus.OK).body(updateUserMapper.fromUser(update));
