@@ -96,8 +96,8 @@ public class AdController {
     )
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> addAd(
-            @RequestPart @Valid CreateOrUpdateAd properties,
             @RequestPart MultipartFile image,
+            @RequestPart @Valid CreateOrUpdateAd properties,
             BindingResult bindingResult
     ) {
         if (bindingResult.hasErrors()) {
@@ -203,12 +203,12 @@ public class AdController {
     @PatchMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or #user.user.id == @adService.findById(#id).user.id")
     public ResponseEntity<?> updateAdInfo(@PathVariable Long id,
-                                          @RequestBody @Valid CreateOrUpdateAd properties,
                                           @AuthenticationPrincipal UserPrincipal user,
+                                          @RequestBody @Valid CreateOrUpdateAd properties,
                                           BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             String errorMessage = bindingResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.joining(", "));
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorMessage);
         }
         return ResponseEntity.ok().body(adService.updateAd(id, properties));
     }

@@ -1,4 +1,4 @@
-package ru.skypro.homework.service.impl;
+package ru.skypro.homework.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,13 +13,18 @@ import ru.skypro.homework.exception.IncorrectCurrentPasswordException;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler({IncorrectCurrentPasswordException.class, UsernameNotFoundException.class})
-    public ResponseEntity<String> handleIncorrectCurrentPasswordException(IncorrectCurrentPasswordException ex) {
+    public ResponseEntity<String> handleForbiddenError(RuntimeException ex) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
     }
 
-    @ExceptionHandler({ImageNotFoundException.class, FileProcessingException.class})
-    public ResponseEntity<String> handleImageNotFoundException(ImageNotFoundException ex) {
+    @ExceptionHandler({FileProcessingException.class})
+    public ResponseEntity<String> handleBadRequestError(RuntimeException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+    @ExceptionHandler({ImageNotFoundException.class})
+    public ResponseEntity<String> handleNotFoundError(RuntimeException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 
 }

@@ -56,6 +56,10 @@ public class AdService {
         return extendedAdResponseMapper.toDto(ad);
     }
 
+    public Ad findById(Long id) {
+        return adRepository.findById(id).orElseThrow(() -> new AdNotFoundException("Такого объявления не найдено"));
+    }
+
     public void deleteAd(Long id) {
         adRepository.findById(id).orElseThrow(() -> new AdNotFoundException("Такого объявления не найдено"));
         adRepository.deleteById(id);

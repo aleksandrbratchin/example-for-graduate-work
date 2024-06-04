@@ -71,13 +71,13 @@ public class UserController {
     )
     @PostMapping(path = "set_password", consumes = "application/json")
     public ResponseEntity<?> setPassword(
-            @RequestBody @Valid NewPassword password,
             @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @RequestBody @Valid NewPassword password,
             BindingResult bindingResult
     ) {
         if (bindingResult.hasErrors()) {
             String errorMessage = bindingResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.joining(", "));
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorMessage);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorMessage);
         }
         try {
             userService.updatePassword(userPrincipal, password);
@@ -150,14 +150,14 @@ public class UserController {
     )
     @PatchMapping(path = "me", consumes = "application/json")
     public ResponseEntity<?> updateUser(
-            @RequestBody @Valid UpdateUser updateUser,
             @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @RequestBody @Valid UpdateUser updateUser,
             BindingResult bindingResult
     ) {
-        try{
+        try {
             if (bindingResult.hasErrors()) {
                 String errorMessage = bindingResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.joining(", "));
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorMessage);
             }
             User update = userService.update(userPrincipal.getUser(), updateUser);
             return ResponseEntity.status(HttpStatus.OK).body(updateUserMapper.fromUser(update));

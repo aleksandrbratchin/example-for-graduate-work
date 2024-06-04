@@ -2,6 +2,7 @@ package ru.skypro.homework.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -60,10 +61,10 @@ public class AdControllerTest {
         MockMultipartFile file = new MockMultipartFile(
                 "image", "image.png", MediaType.IMAGE_PNG_VALUE, "image".getBytes());
 
-        String invalidJson = "{ \"title\": \"Hidsdfsdfsdf\", \"price\": 10, \"description\": \"descsdfdsfsdfsdfsdfsd\" }";
+        String json = "{ \"title\": \"Hidsdfsdfsdf\", \"price\": 10, \"description\": \"descsdfdsfsdfsdfsdfsd\" }";
 
         MockMultipartFile properties = new MockMultipartFile(
-                "properties", "", MediaType.APPLICATION_JSON_VALUE, invalidJson.getBytes());
+                "properties", "", MediaType.APPLICATION_JSON_VALUE, json.getBytes());
 
         mockMvc.perform(multipart("/ads")
                         .file(file)
@@ -80,7 +81,7 @@ public class AdControllerTest {
     @SneakyThrows
     @WithUserDetails("captain.jack.sparrow@gmail.com")
     void getAdById() {
-        mockMvc.perform(get("/ads/1"))
+        mockMvc.perform(get("/ads/{id}",1))
                 .andExpect(status().isOk());
     }
 
@@ -88,7 +89,7 @@ public class AdControllerTest {
     @SneakyThrows
     @WithUserDetails("captain.jack.sparrow@gmail.com")
     void deleteAd() {
-        mockMvc.perform(delete("/ads/1"))
+        mockMvc.perform(delete("/ads/{id}",1))
                 .andExpect(status().isOk());
     }
 
@@ -97,7 +98,7 @@ public class AdControllerTest {
     @WithUserDetails("captain.jack.sparrow@gmail.com")
     void updateAdInfo() {
         CreateOrUpdateAd ad = new CreateOrUpdateAd("testadeaddde", 100, "testtestadad");
-        mockMvc.perform(patch("/ads/1")
+        mockMvc.perform(patch("/ads/{id}",1)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(ad)))
                 .andExpect(status().isOk())
@@ -120,7 +121,7 @@ public class AdControllerTest {
         MockMultipartFile file = new MockMultipartFile(
                 "image", "image.png", MediaType.IMAGE_PNG_VALUE, "image".getBytes());
 
-        mockMvc.perform(multipart("/ads/1/image")
+        mockMvc.perform(multipart("/ads/{id}/image", 1)
                         .file(file)
                         .with(request -> {
                             request.setMethod("PATCH");
@@ -128,4 +129,39 @@ public class AdControllerTest {
                         }))
                 .andExpect(status().isOk());
     }
+
+    @Nested
+    class ValidError {
+        @Test
+        @SneakyThrows
+        @WithUserDetails("captain.jack.sparrow@gmail.com")
+        void addAd() {
+            MockMultipartFile file = new MockMultipartFile(
+                    "image", "image.png", MediaType.IMAGE_PNG_VALUE, "image".getBytes());
+
+            String invalidJson = "{ \"title\": \"\", \"price\": -1, \"description\": \"\" }";
+
+            MockMultipartFile properties = new MockMultipartFile(
+                    "properties", "", MediaType.APPLICATION_JSON_VALUE, invalidJson.getBytes());
+
+            mockMvc.perform(multipart("/ads")
+                            .file(file)
+                            .file(properties)
+                            .contentType(MediaType.MULTIPART_FORM_DATA))
+                    .andExpect(status().isUnauthorized());
+        }
+
+        @Test
+        @SneakyThrows
+        @WithUserDetails("captain.jack.sparrow@gmail.com")
+        void updateAdInfo() {
+            CreateOrUpdateAd ad = new CreateOrUpdateAd("", -1, "");
+            mockMvc.perform(patch("/ads/{id}",2)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(ad)))
+                    .andExpect(status().isForbidden());
+        }
+
+    }
+
 }
