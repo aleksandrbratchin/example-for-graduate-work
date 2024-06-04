@@ -41,7 +41,8 @@ public class CommentController {
                             description = "OK",
                             content = @Content(
                                     mediaType = "application/json",
-                                    schema = @Schema(implementation = CommentsResponse.class
+                                    schema = @Schema(
+                                            implementation = CommentsResponse.class
                                     )
                             )
                     ),
@@ -55,7 +56,6 @@ public class CommentController {
                             description = "Not found",
                             content = @Content(schema = @Schema(hidden = true))
                     ),
-
             },
             tags = "Комментарии"
     )
@@ -89,7 +89,6 @@ public class CommentController {
                             description = "Not found",
                             content = @Content(schema = @Schema(hidden = true))
                     ),
-
             },
             tags = "Комментарии"
     )
@@ -134,7 +133,6 @@ public class CommentController {
                             description = "Forbidden",
                             content = @Content(schema = @Schema(hidden = true))
                     )
-
             },
             tags = "Комментарии"
     )
@@ -176,7 +174,6 @@ public class CommentController {
                             description = "Forbidden",
                             content = @Content(schema = @Schema(hidden = true))
                     )
-
             },
             tags = "Комментарии"
     )
@@ -188,13 +185,13 @@ public class CommentController {
             @AuthenticationPrincipal UserPrincipal user,
             @RequestBody @Valid CreateOrUpdateComment createOrUpdateComment,
             BindingResult bindingResult) {
-
         if (bindingResult.hasErrors()) {
             String errorMessage = bindingResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.joining(", "));
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorMessage);
         }
         return ResponseEntity.ok().body(commentMapper.toCommentResponse(commentService.updateComment(adId, commentId, createOrUpdateComment)));
     }
+
 }
 
 

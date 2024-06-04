@@ -22,6 +22,7 @@ import ru.skypro.homework.dto.CreateOrUpdateAd;
 import ru.skypro.homework.dto.response.AdResponse;
 import ru.skypro.homework.dto.response.AdsResponse;
 import ru.skypro.homework.dto.response.ExtendedAdResponse;
+import ru.skypro.homework.mapper.*;
 import ru.skypro.homework.service.impl.AdService;
 
 import java.util.stream.Collectors;
@@ -34,6 +35,11 @@ import java.util.stream.Collectors;
 public class AdController {
 
     private final AdService adService;
+    private final AdMapper adMapper;
+    private final AdsMapper adsMapper;
+    private final CreateOrUpdateAdMapper createOrUpdateAdMapper;
+    private final ExtendedAdResponseMapper extendedAdResponseMapper;
+    private final ImageMapper imageMapper;
 
     @Operation(
             tags = "Объявления",
@@ -53,7 +59,7 @@ public class AdController {
     )
     @GetMapping()
     public ResponseEntity<?> getAllAds() {
-        return ResponseEntity.ok().body(adService.getAllAds());
+        return ResponseEntity.ok().body(adsMapper.toAdsResponse(adService.getAllAds()));
     }
 
     @Operation(
@@ -61,12 +67,14 @@ public class AdController {
             summary = "Добавление объявления",
             operationId = "addAd",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    content = {@Content(
-                            mediaType = "multipart/form-data",
-                            encoding = @Encoding(
-                                    name = "properties",
-                                    contentType = "application/json"
-                            ))
+                    content = {
+                            @Content(
+                                    mediaType = "multipart/form-data",
+                                    encoding = @Encoding(
+                                            name = "properties",
+                                            contentType = "application/json"
+                                    )
+                            )
                     }
             ),
             responses = {
@@ -100,7 +108,7 @@ public class AdController {
             String errorMessage = bindingResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.joining(", "));
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorMessage);
         }
-        return ResponseEntity.ok().body(adService.createAd(properties, image));
+        return ResponseEntity.ok().body(adMapper.mappingToDto(adService.createAd(createOrUpdateAdMapper.toAd(properties), imageMapper.toImage(image))));
     }
 
     @Operation(
@@ -129,7 +137,7 @@ public class AdController {
     )
     @GetMapping("/{id}")
     public ResponseEntity<?> getAdById(@PathVariable Long id) {
-        return ResponseEntity.ok(adService.getAdById(id));
+        return ResponseEntity.ok(extendedAdResponseMapper.toDto(adService.findById(id)));
     }
 
     @Operation(
@@ -140,8 +148,10 @@ public class AdController {
                             responseCode = "200",
                             description = "OK",
                             content = {
-                                    @Content(mediaType = "application/json",
-                                            schema = @Schema(implementation = ExtendedAdResponse.class))
+                                    @Content(
+                                            mediaType = "application/json",
+                                            schema = @Schema(implementation = ExtendedAdResponse.class)
+                                    )
                             }
                     ),
                     @ApiResponse(
@@ -180,8 +190,10 @@ public class AdController {
                             responseCode = "200",
                             description = "OK",
                             content = {
-                                    @Content(mediaType = "application/json",
-                                            schema = @Schema(implementation = CreateOrUpdateAd.class))
+                                    @Content(
+                                            mediaType = "application/json",
+                                            schema = @Schema(implementation = CreateOrUpdateAd.class)
+                                    )
                             }
                     ),
                     @ApiResponse(
@@ -200,15 +212,17 @@ public class AdController {
     )
     @PatchMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or #user.user.id == @adService.findById(#id).user.id")
-    public ResponseEntity<?> updateAdInfo(@PathVariable Long id,
-                                          @AuthenticationPrincipal UserPrincipal user,
-                                          @RequestBody @Valid CreateOrUpdateAd properties,
-                                          BindingResult bindingResult) {
+    public ResponseEntity<?> updateAdInfo(
+            @AuthenticationPrincipal UserPrincipal user,
+            @PathVariable Long id,
+            @RequestBody @Valid CreateOrUpdateAd properties,
+            BindingResult bindingResult
+    ) {
         if (bindingResult.hasErrors()) {
             String errorMessage = bindingResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.joining(", "));
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorMessage);
         }
-        return ResponseEntity.ok().body(adService.updateAd(id, properties));
+        return ResponseEntity.ok().body(adMapper.mappingToDto(adService.updateAd(id, properties)));
     }
 
     @Operation(
@@ -219,8 +233,10 @@ public class AdController {
                             responseCode = "200",
                             description = "OK",
                             content = {
-                                    @Content(mediaType = "application/json",
-                                            schema = @Schema(implementation = AdsResponse.class))
+                                    @Content(
+                                            mediaType = "application/json",
+                                            schema = @Schema(implementation = AdsResponse.class)
+                                    )
                             }
                     ),
                     @ApiResponse(
@@ -231,27 +247,31 @@ public class AdController {
     )
     @GetMapping("/me")
     public ResponseEntity<?> getAdsByAuthUser(@AuthenticationPrincipal UserPrincipal userPrincipal) {
-        return ResponseEntity.ok().body(adService.getAdsByUser(userPrincipal.getUser()));
+        return ResponseEntity.ok().body(adsMapper.toAdsResponse(adService.getAdsByUser(userPrincipal.getUser())));
     }
 
     @Operation(
             tags = "Объявления",
             summary = "Обновление картинки объявления",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    content = {@Content(
-                            mediaType = "multipart/form-data"
-                    )
+                    content = {
+                            @Content(
+                                    mediaType = "multipart/form-data"
+                            )
                     }
             ),
-            responses = {@ApiResponse(responseCode = "200", description = "OK",
-                    content = @Content(
-                            mediaType = "application/octet-stream",
-
-                            schema = @Schema(
-                                    type = "string",
-                                    format = "byte"
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "OK",
+                            content = @Content(
+                                    mediaType = "application/octet-stream",
+                                    schema = @Schema(
+                                            type = "string",
+                                            format = "byte"
+                                    )
                             )
-                    )),
+                    ),
                     @ApiResponse(
                             responseCode = "403",
                             description = "Forbidden"
@@ -267,9 +287,13 @@ public class AdController {
     )
     @PatchMapping(value = "/{id}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN') or #user.user.id == @adService.findById(#id).user.id")
-    public ResponseEntity<?> updateImageAds(@PathVariable Long id,
-                                            @RequestPart(name = "image") MultipartFile image,
-                                            @AuthenticationPrincipal UserPrincipal user) {
-        return ResponseEntity.ok().body(adService.updateImageAd(id, image));
+    public ResponseEntity<?> updateImageAds(
+            @PathVariable Long id,
+            @RequestPart(name = "image") MultipartFile image,
+            @AuthenticationPrincipal UserPrincipal user
+    ) {
+        return ResponseEntity.ok().body(
+                adMapper.mappingToDto(adService.updateImageAd(id, imageMapper.toImage(image)))
+        );
     }
 }

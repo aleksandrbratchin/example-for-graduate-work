@@ -10,7 +10,8 @@ public interface CommentServiceApi {
 
     /**
      * Добавление комментария к объявлению
-     * @param id объявления
+     *
+     * @param id         объявления
      * @param newComment {@link Comment} для сохранения
      * @return {@link Comment} сохраненный коментарий
      */
@@ -19,6 +20,7 @@ public interface CommentServiceApi {
 
     /**
      * Удаление комментария к объявлению
+     *
      * @param adId      объявления
      * @param commentId комментария
      */
@@ -27,8 +29,9 @@ public interface CommentServiceApi {
 
     /**
      * Обновление комментария объявления
-     * @param adId идентификатор объявления
-     * @param commentId идентификатор комментария
+     *
+     * @param adId                  идентификатор объявления
+     * @param commentId             идентификатор комментария
      * @param createOrUpdateComment {@link CreateOrUpdateComment}
      * @return {@link Comment} измененный коментарий
      */
@@ -40,6 +43,7 @@ public interface CommentServiceApi {
 
     /**
      * Получение комментариев объявления
+     *
      * @param id идентификатор объявления
      */
     List<Comment> getComments(Long id);

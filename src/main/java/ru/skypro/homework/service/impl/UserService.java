@@ -14,48 +14,36 @@ import ru.skypro.homework.model.User;
 import ru.skypro.homework.repository.UserRepository;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
-public class UserService {
+public class UserService implements ru.skypro.homework.service.UserServiceApi {
 
     private final UserRepository userRepository;
 
     private final PasswordEncoder encoder;
 
-    /**
-     * Поиск пользователя по логину
-     * @param username логин пользователя
-     * @return {@link User}
-     */
+    @Override
     public User findByUsername(String username) {
-        return userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(username));
+        return userRepository.findByUsername(username).orElseThrow(
+                () -> new UsernameNotFoundException("Нет пользователя с таким логином \"" + username + "\"")
+        );
     }
 
-    /**
-     * Сохранить нового пользователя
-     * @param user пользователь которого надо сохранить {@link User}
-     * @return {@link User}
-     */
+    @Override
     public User save(User user) {
         return userRepository.save(user);
     }
 
-    /**
-     * Обновить аватар пользователя
-     */
+    @Override
+    @Transactional
     public void setAvatar(User user, Image image) {
-        if(user.getAvatar() != null){
+        if (user.getAvatar() != null) {
             image.setId(user.getAvatar().getId());
         }
         user.setAvatar(image);
         userRepository.save(user);
     }
 
-    /**
-     * Обновить данные о пользователе
-     * @param user пользователь которого надо сохранить {@link UpdateUser}
-     * @return {@link User}
-     */
+    @Override
     public User update(User user, UpdateUser updateUser) {
         user.setPhone(updateUser.getPhone());
         user.setFirstName(updateUser.getFirstName());
@@ -63,11 +51,8 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    /**
-     * Обновить пароль пользователя
-     */
-    public void updatePassword(UserPrincipal userPrincipal, NewPassword password) {
-        User user = userPrincipal.getUser();
+    @Override
+    public void updatePassword(User user, NewPassword password) {
         if (!encoder.matches(password.getCurrentPassword(), user.getPassword())) {
             throw new IncorrectCurrentPasswordException("Текущий пароль неверен");
         }

@@ -80,7 +80,7 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorMessage);
         }
         try {
-            userService.updatePassword(userPrincipal, password);
+            userService.updatePassword(userPrincipal.getUser(), password);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
