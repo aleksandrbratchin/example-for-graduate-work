@@ -179,12 +179,12 @@ public class CommentController {
     public ResponseEntity<?> updateComment(
             @PathVariable Long adId,
             @PathVariable Long commentId,
-            @RequestBody @Valid CreateOrUpdateComment createOrUpdateComment,
             @AuthenticationPrincipal UserPrincipal user,
+            @RequestBody @Valid CreateOrUpdateComment createOrUpdateComment,
             BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             String errorMessage = bindingResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.joining(", "));
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorMessage);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorMessage);
         }
         return ResponseEntity.ok().body(commentService.updateComment(adId, commentId, createOrUpdateComment));
     }

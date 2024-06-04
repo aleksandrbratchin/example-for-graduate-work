@@ -8,6 +8,7 @@ import ru.skypro.homework.dto.CreateOrUpdateAd;
 import ru.skypro.homework.dto.response.AdResponse;
 import ru.skypro.homework.dto.response.AdsResponse;
 import ru.skypro.homework.dto.response.ExtendedAdResponse;
+import ru.skypro.homework.exception.AdNotFoundException;
 import ru.skypro.homework.mapper.*;
 import ru.skypro.homework.model.Ad;
 import ru.skypro.homework.model.Image;
@@ -51,20 +52,21 @@ public class AdService {
     }
 
     public ExtendedAdResponse getAdById(Long id) {
-        Ad ad = adRepository.findById(id).orElseThrow(RuntimeException::new); //todo
+        Ad ad = adRepository.findById(id).orElseThrow(() -> new AdNotFoundException("Такого объявления не найдено"));
         return extendedAdResponseMapper.toDto(ad);
     }
 
     public Ad findById(Long id) {
-        return adRepository.findById(id).orElseThrow(RuntimeException::new); //todo
+        return adRepository.findById(id).orElseThrow(() -> new AdNotFoundException("Такого объявления не найдено"));
     }
 
     public void deleteAd(Long id) {
+        adRepository.findById(id).orElseThrow(() -> new AdNotFoundException("Такого объявления не найдено"));
         adRepository.deleteById(id);
     }
 
     public AdResponse updateAd(Long id, CreateOrUpdateAd properties) {
-        Ad ad = adRepository.findById(id).orElseThrow(RuntimeException::new);
+        Ad ad = adRepository.findById(id).orElseThrow(() -> new AdNotFoundException("Такого объявления не найдено"));
         ad.setTitle(properties.getTitle());
         ad.setPrice(properties.getPrice());
         ad.setDescription(properties.getDescription());
@@ -78,7 +80,7 @@ public class AdService {
     }
 
     public AdResponse updateImageAd(Long id, MultipartFile image) {
-        Ad ad = adRepository.findById(id).orElseThrow(RuntimeException::new);
+        Ad ad = adRepository.findById(id).orElseThrow(() -> new AdNotFoundException("Такого объявления не найдено"));
         Image image1 = imageMapper.toImage(image);
         ad.setImage(image1);
         Ad save = adRepository.save(ad);

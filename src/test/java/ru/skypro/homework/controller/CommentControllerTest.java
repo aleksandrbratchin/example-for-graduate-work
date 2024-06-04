@@ -2,6 +2,7 @@ package ru.skypro.homework.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -67,7 +68,6 @@ class CommentControllerTest {
     void deleteCommentByUserWhoCreate() {
         mockMvc.perform(delete("/ads/2/comments/2"))
                 .andExpect((status().is2xxSuccessful()));
-
     }
 
     @Test
@@ -104,4 +104,33 @@ class CommentControllerTest {
                         .content(objectMapper.writeValueAsString(createOrUpdateComment)))
                 .andExpect(status().is4xxClientError());
     }
+
+
+    @Nested
+    class ValidError {
+        @Test
+        @SneakyThrows
+        @WithUserDetails("captain.jack.sparrow@gmail.com")
+        void updateComment() {
+            CreateOrUpdateComment createOrUpdateComment = new CreateOrUpdateComment("");
+
+            mockMvc.perform(patch("/ads/2/comments/2")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(createOrUpdateComment)))
+                    .andExpect(status().isForbidden());
+        }
+
+        @Test
+        @SneakyThrows
+        @WithUserDetails("captain.jack.sparrow@gmail.com")
+        void addComment() {
+            CreateOrUpdateComment createOrUpdateComment = new CreateOrUpdateComment("");
+            mockMvc.perform(post("/ads/2/comments")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(createOrUpdateComment)))
+                    .andExpect(status().isUnauthorized());
+        }
+
+    }
+
 }
