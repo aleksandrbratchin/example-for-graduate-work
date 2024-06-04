@@ -13,7 +13,7 @@ public interface CommentServiceApi {
      *
      * @param id         объявления
      * @param newComment {@link Comment} для сохранения
-     * @return {@link Comment} сохраненный коментарий
+     * @return {@link Comment} сохраненный комментарий
      */
     @Transactional
     Comment addCommentToAd(Long id, Comment newComment);
@@ -33,7 +33,7 @@ public interface CommentServiceApi {
      * @param adId                  идентификатор объявления
      * @param commentId             идентификатор комментария
      * @param createOrUpdateComment {@link CreateOrUpdateComment}
-     * @return {@link Comment} измененный коментарий
+     * @return {@link Comment} измененный комментарий
      */
     Comment updateComment(
             Long adId,

@@ -48,7 +48,7 @@ class CommentControllerTest {
     @WithUserDetails("captain.jack.sparrow@gmail.com")
     void getComments() {
         mockMvc.perform(get("/ads/2/comments"))
-                .andExpect((status().is2xxSuccessful()));
+                .andExpect((status().isOk()));
     }
 
     @Test
@@ -64,6 +64,17 @@ class CommentControllerTest {
 
     @Test
     @SneakyThrows
+    void addCommentUnauthorized() {
+        CreateOrUpdateComment createOrUpdateComment = new CreateOrUpdateComment("попытка написать комментарий");
+
+        mockMvc.perform(post("/ads/2/comments")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(createOrUpdateComment)))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @SneakyThrows
     @WithUserDetails("captain.jack.sparrow@gmail.com")
     void deleteCommentByUserWhoCreate() {
         mockMvc.perform(delete("/ads/2/comments/2"))
@@ -72,11 +83,19 @@ class CommentControllerTest {
 
     @Test
     @SneakyThrows
-    @WithUserDetails("james.norrington@gmail.com")
-    void deleteCommentBySomeoneElse() {
+    @WithUserDetails("elizabeth.swann@gmail.com")
+    void deleteCommentBySomeoneElseUser() {
         mockMvc.perform(delete("/ads/2/comments/2"))
-                .andExpect((status().is4xxClientError()));
+                .andExpect((status().isForbidden()));
 
+    }
+
+    @Test
+    @SneakyThrows
+    @WithUserDetails("hector.barbossa@gmail.com")
+    void deleteCommentByAdmin() {
+        mockMvc.perform(delete("/ads/2/comments/2"))
+                .andExpect((status().is2xxSuccessful()));
     }
 
     @Test
@@ -96,13 +115,26 @@ class CommentControllerTest {
     @Test
     @SneakyThrows
     @WithUserDetails("james.norrington@gmail.com")
-    void updateCommentBySomeoneElse() {
+    void updateCommentBySomeoneElseUser() {
         CreateOrUpdateComment createOrUpdateComment = new CreateOrUpdateComment("обновленный комментарий");
 
         mockMvc.perform(patch("/ads/2/comments/2")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createOrUpdateComment)))
-                .andExpect(status().is4xxClientError());
+                .andExpect(status().isForbidden());
+    }
+
+
+    @Test
+    @SneakyThrows
+    @WithUserDetails(value = "james.norrington@gmail.com")
+    void updateCommentByAdmin() {
+        CreateOrUpdateComment createOrUpdateComment = new CreateOrUpdateComment("обновленный комментарий админом");
+
+        mockMvc.perform(patch("/ads/2/comments/2")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(createOrUpdateComment)))
+                .andExpect(status().isOk());
     }
 
 

@@ -5,9 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import ru.skypro.homework.exception.FileProcessingException;
-import ru.skypro.homework.exception.ImageNotFoundException;
-import ru.skypro.homework.exception.IncorrectCurrentPasswordException;
+import ru.skypro.homework.exception.*;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -22,7 +20,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 
-    @ExceptionHandler({ImageNotFoundException.class})
+    @ExceptionHandler({ImageNotFoundException.class, AdNotFoundException.class, CommentNotFoundException.class})
     public ResponseEntity<String> handleNotFoundError(RuntimeException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
