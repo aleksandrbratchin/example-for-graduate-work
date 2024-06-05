@@ -47,62 +47,129 @@ class CommentControllerTest {
     @SneakyThrows
     @WithUserDetails("captain.jack.sparrow@gmail.com")
     void getComments() {
-        mockMvc.perform(get("/ads/2/comments"))
-                .andExpect((status().is2xxSuccessful()));
+        mockMvc.perform(get("/ads/{id}/comments", 2))
+                .andExpect((status().isOk()));
     }
 
-    @Test
-    @SneakyThrows
-    @WithUserDetails("captain.jack.sparrow@gmail.com")
-    void addComment() {
-        CreateOrUpdateComment createOrUpdateComment = new CreateOrUpdateComment("новый комментарий");
-        mockMvc.perform(post("/ads/2/comments")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(createOrUpdateComment)))
-                .andExpect(status().isOk());
+    @Nested
+    public class AddCommentError {
+        @Test
+        @SneakyThrows
+        @WithUserDetails("captain.jack.sparrow@gmail.com")
+        void addComment() {
+            CreateOrUpdateComment createOrUpdateComment = new CreateOrUpdateComment("новый комментарий");
+            mockMvc.perform(post("/ads/{id}/comments", 2)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(createOrUpdateComment)))
+                    .andExpect(status().isOk());
+        }
+
+        @Test
+        @SneakyThrows
+        void addCommentUnauthorized() {
+            CreateOrUpdateComment createOrUpdateComment = new CreateOrUpdateComment("попытка написать комментарий");
+
+            mockMvc.perform(post("/ads/{id}/comments", 2)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(createOrUpdateComment)))
+                    .andExpect(status().isUnauthorized());
+        }
     }
 
-    @Test
-    @SneakyThrows
-    @WithUserDetails("captain.jack.sparrow@gmail.com")
-    void deleteCommentByUserWhoCreate() {
-        mockMvc.perform(delete("/ads/2/comments/2"))
-                .andExpect((status().is2xxSuccessful()));
+    @Nested
+    class DeleteCommentError {
+        @Test
+        @SneakyThrows
+        @WithUserDetails("captain.jack.sparrow@gmail.com")
+        void deleteCommentByUserWhoCreate() {
+            mockMvc.perform(delete("/ads/{adId}/comments/{commentId}", 1, 1))
+                    .andExpect((status().isOk()));
+        }
+
+        @Test
+        @SneakyThrows
+        @WithUserDetails("elizabeth.swann@gmail.com")
+        void deleteCommentBySomeoneElseUser() {
+            mockMvc.perform(delete("/ads/{adId}/comments/{commentId}", 2, 2))
+                    .andExpect((status().isForbidden()));
+
+        }
+
+        @Test
+        @SneakyThrows
+        @WithUserDetails("hector.barbossa@gmail.com")
+        void deleteCommentByAdmin() {
+            mockMvc.perform(delete("/ads/{adId}/comments/{commentId}", 2, 2))
+                    .andExpect((status().is2xxSuccessful()));
+        }
     }
 
-    @Test
-    @SneakyThrows
-    @WithUserDetails("james.norrington@gmail.com")
-    void deleteCommentBySomeoneElse() {
-        mockMvc.perform(delete("/ads/2/comments/2"))
-                .andExpect((status().is4xxClientError()));
+    @Nested
+    class UpdateCommentError {
+        @Test
+        @SneakyThrows
+        @WithUserDetails("captain.jack.sparrow@gmail.com")
+        void updateCommentByUserWhoCreate() {
+            CreateOrUpdateComment createOrUpdateComment = new CreateOrUpdateComment("обновленный комментарий");
 
+            mockMvc.perform(patch("/ads/{adId}/comments/{commentId}", 2, 2)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(createOrUpdateComment)))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.text").value("обновленный комментарий"));
+
+        }
+
+        @Test
+        @SneakyThrows
+        @WithUserDetails("elizabeth.swann@gmail.com")
+        void updateCommentBySomeoneElseUser() {
+            CreateOrUpdateComment createOrUpdateComment = new CreateOrUpdateComment("обновленный комментарий");
+
+            mockMvc.perform(patch("/ads/{adId}/comments/{commentId}", 1, 1)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(createOrUpdateComment)))
+                    .andExpect(status().isForbidden());
+        }
+
+        @Test
+        @SneakyThrows
+        @WithUserDetails(value = "james.norrington@gmail.com")
+        void updateCommentByAdmin() {
+            CreateOrUpdateComment createOrUpdateComment = new CreateOrUpdateComment("обновленный комментарий админом");
+
+            mockMvc.perform(patch("/ads/{adId}/comments/{commentId}", 2, 2)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(createOrUpdateComment)))
+                    .andExpect(status().isOk());
+        }
     }
 
-    @Test
-    @SneakyThrows
-    @WithUserDetails("captain.jack.sparrow@gmail.com")
-    void updateCommentByUserWhoCreate() {
-        CreateOrUpdateComment createOrUpdateComment = new CreateOrUpdateComment("обновленный комментарий");
+    @Nested
+    class NotFoundError {
+        @Test
+        @SneakyThrows
+        @WithUserDetails("james.norrington@gmail.com")
+        void notFoundAd() {
+            CreateOrUpdateComment createOrUpdateComment = new CreateOrUpdateComment("новый комментарий");
 
-        mockMvc.perform(patch("/ads/2/comments/2")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(createOrUpdateComment)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.text").value("обновленный комментарий"));
+            mockMvc.perform(post("/ads/{id}/comments", 200)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(createOrUpdateComment)))
+                    .andExpect(status().isNotFound());
+        }
 
-    }
+        @Test
+        @SneakyThrows
+        @WithUserDetails("james.norrington@gmail.com")
+        void notFoundComment() {
+            CreateOrUpdateComment createOrUpdateComment = new CreateOrUpdateComment("новый комментарий");
 
-    @Test
-    @SneakyThrows
-    @WithUserDetails("james.norrington@gmail.com")
-    void updateCommentBySomeoneElse() {
-        CreateOrUpdateComment createOrUpdateComment = new CreateOrUpdateComment("обновленный комментарий");
-
-        mockMvc.perform(patch("/ads/2/comments/2")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(createOrUpdateComment)))
-                .andExpect(status().is4xxClientError());
+            mockMvc.perform(patch("/ads/{adId}/comments/{commentId}", 1, 200)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(createOrUpdateComment)))
+                    .andExpect(status().isNotFound());
+        }
     }
 
 
