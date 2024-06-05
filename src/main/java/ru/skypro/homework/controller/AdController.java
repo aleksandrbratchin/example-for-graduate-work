@@ -107,7 +107,7 @@ public class AdController {
         }
         return ResponseEntity.ok().body(
                 adMapper.mappingToDto(
-                        adService.createAd(
+                        adService.createAdWithImage(
                                 createOrUpdateAdMapper.toAd(properties),
                                 imageMapper.toImage(image))
                 )
@@ -140,7 +140,7 @@ public class AdController {
     )
     @GetMapping("/{id}")
     public ResponseEntity<?> getAdById(@PathVariable Long id) {
-        return ResponseEntity.ok(extendedAdResponseMapper.toDto(adService.findById(id)));
+        return ResponseEntity.ok(extendedAdResponseMapper.toDto(adService.getAdById(id)));
     }
 
     @Operation(
@@ -172,7 +172,7 @@ public class AdController {
             }
     )
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or #user.user.id == @adService.findById(#id).user.id")
+    @PreAuthorize("hasRole('ADMIN') or #user.user.id == @adService.getAdById(#id).user.id")
     public ResponseEntity<?> deleteAd(
             @PathVariable Long id,
             @AuthenticationPrincipal UserPrincipal user
@@ -214,7 +214,7 @@ public class AdController {
             }
     )
     @PatchMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or #user.user.id == @adService.findById(#id).user.id")
+    @PreAuthorize("hasRole('ADMIN') or #user.user.id == @adService.getAdById(#id).user.id")
     public ResponseEntity<?> updateAdInfo(
             @AuthenticationPrincipal UserPrincipal user,
             @PathVariable Long id,
@@ -224,7 +224,7 @@ public class AdController {
         if (bindingResult.hasErrors()) {
             return ValidationUtils.createErrorResponse(bindingResult.getAllErrors(), HttpStatus.FORBIDDEN);
         }
-        return ResponseEntity.ok().body(adMapper.mappingToDto(adService.updateAd(id, properties)));
+        return ResponseEntity.ok().body(adMapper.mappingToDto(adService.updateAdDetails(id, properties)));
     }
 
     @Operation(
@@ -249,7 +249,7 @@ public class AdController {
     )
     @GetMapping("/me")
     public ResponseEntity<?> getAdsByAuthUser(@AuthenticationPrincipal UserPrincipal userPrincipal) {
-        return ResponseEntity.ok().body(adsMapper.toAdsResponse(adService.getAdsByUser(userPrincipal.getUser())));
+        return ResponseEntity.ok().body(adsMapper.toAdsResponse(adService.getUserAds(userPrincipal.getUser())));
     }
 
     @Operation(
@@ -288,14 +288,14 @@ public class AdController {
             }
     )
     @PatchMapping(value = "/{id}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @PreAuthorize("hasRole('ADMIN') or #user.user.id == @adService.findById(#id).user.id")
+    @PreAuthorize("hasRole('ADMIN') or #user.user.id == @adService.getAdById(#id).user.id")
     public ResponseEntity<?> updateImageAds(
             @PathVariable Long id,
             @RequestPart(name = "image") MultipartFile image,
             @AuthenticationPrincipal UserPrincipal user
     ) {
         return ResponseEntity.ok().body(
-                adMapper.mappingToDto(adService.updateImageAd(id, imageMapper.toImage(image)))
+                adMapper.mappingToDto(adService.updateAdImage(id, imageMapper.toImage(image)))
         );
     }
 }

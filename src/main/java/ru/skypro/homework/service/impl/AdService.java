@@ -9,12 +9,13 @@ import ru.skypro.homework.model.Ad;
 import ru.skypro.homework.model.Image;
 import ru.skypro.homework.model.User;
 import ru.skypro.homework.repository.AdRepository;
+import ru.skypro.homework.service.AdServiceApi;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class AdService implements ru.skypro.homework.service.AdServiceApi {
+public class AdService implements AdServiceApi {
 
     private final AdRepository adRepository;
 
@@ -25,13 +26,13 @@ public class AdService implements ru.skypro.homework.service.AdServiceApi {
 
     @Override
     @Transactional
-    public Ad createAd(Ad ad, Image image) {
+    public Ad createAdWithImage(Ad ad, Image image) {
         ad.setImage(image);
         return adRepository.save(ad);
     }
 
     @Override
-    public Ad findById(Long id) {
+    public Ad getAdById(Long id) {
         return adRepository.findById(id).orElseThrow(() -> new AdNotFoundException("Такого объявления не найдено"));
     }
 
@@ -41,8 +42,8 @@ public class AdService implements ru.skypro.homework.service.AdServiceApi {
     }
 
     @Override
-    public Ad updateAd(Long id, CreateOrUpdateAd properties) {
-        Ad ad = findById(id);
+    public Ad updateAdDetails(Long id, CreateOrUpdateAd properties) {
+        Ad ad = getAdById(id);
         ad.setTitle(properties.getTitle());
         ad.setPrice(properties.getPrice());
         ad.setDescription(properties.getDescription());
@@ -50,15 +51,20 @@ public class AdService implements ru.skypro.homework.service.AdServiceApi {
     }
 
     @Override
-    public List<Ad> getAdsByUser(User user) {
+    public List<Ad> getUserAds(User user) {
         return adRepository.findByUser(user);
     }
 
     @Override
     @Transactional
-    public Ad updateImageAd(Long id, Image image) {
-        Ad ad = findById(id);
+    public Ad updateAdImage(Long id, Image image) {
+        Ad ad = getAdById(id);
         ad.setImage(image);
+        return adRepository.save(ad);
+    }
+
+    @Override
+    public Ad save(Ad ad) {
         return adRepository.save(ad);
     }
 

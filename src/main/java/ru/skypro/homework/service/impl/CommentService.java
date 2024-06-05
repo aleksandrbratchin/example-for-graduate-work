@@ -4,12 +4,11 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.skypro.homework.dto.CreateOrUpdateComment;
-import ru.skypro.homework.exception.AdNotFoundException;
 import ru.skypro.homework.exception.CommentNotFoundException;
 import ru.skypro.homework.model.Ad;
 import ru.skypro.homework.model.Comment;
-import ru.skypro.homework.repository.AdRepository;
 import ru.skypro.homework.repository.CommentRepository;
+import ru.skypro.homework.service.AdServiceApi;
 import ru.skypro.homework.service.CommentServiceApi;
 
 import java.util.List;
@@ -20,24 +19,25 @@ public class CommentService implements CommentServiceApi {
 
     private final CommentRepository commentRepository;
 
-    private final AdRepository adRepository;
+    private final AdServiceApi adService;
 
     @Override
     @Transactional
-    public Comment addCommentToAd(Long id, Comment newComment) {
+    public Comment addCommentToAd(Long adId, Comment newComment) {
         Comment save = commentRepository.save(newComment);
-        Ad adToComment = getAdById(id);
-        adToComment.getComments().add(save);
-        adRepository.save(adToComment);
+        Ad ad = adService.getAdById(adId);
+        ad.getComments().add(save);
+        adService.save(ad);
         return save;
     }
 
     @Override
     @Transactional
-    public void deleteComment(Long adId, Long commentId) {
-        Ad adToDeleteComment = getAdById(adId);
-        adToDeleteComment.getComments().remove(getCommentFromAdById(adId, commentId));
-        adRepository.save(adToDeleteComment);
+    public void deleteCommentFromAd(Long adId, Long commentId) {
+        Ad ad = adService.getAdById(adId);
+        Comment comment = getCommentFromAdById(ad, commentId);
+        ad.getComments().remove(comment);
+        adService.save(ad);
         commentRepository.deleteById(commentId);
     }
 
@@ -47,31 +47,29 @@ public class CommentService implements CommentServiceApi {
             Long commentId,
             CreateOrUpdateComment createOrUpdateComment
     ) {
-        Comment comment = getCommentFromAdById(adId, commentId);
+        Ad ad = adService.getAdById(adId);
+        Comment comment = getCommentFromAdById(ad, commentId);
         comment.setText(createOrUpdateComment.getText());
         return commentRepository.save(comment);
     }
 
     @Override
-    public List<Comment> getComments(Long id) {
-        return getAdById(id).getComments();
+    public List<Comment> getCommentsForAd(Long id) {
+        return adService.getAdById(id).getComments();
     }
 
-    private Ad getAdById(Long id) {
-        return adRepository.findById(id).orElseThrow(() -> new AdNotFoundException("Такого объявления не найдено"));
-    }
-
-    private Comment getCommentFromAdById(Long adId, Long commentId) {
-        return getAdById(adId).getComments().stream()
-                .filter((comment) -> comment.getId().equals(commentId))
+    private Comment getCommentFromAdById(Ad ad, Long commentId) {
+        return ad.getComments().stream()
+                .filter(comment -> comment.getId().equals(commentId))
                 .findFirst()
-                .orElseThrow(() -> new CommentNotFoundException("такого комментария не найдено"));
+                .orElseThrow(() -> new CommentNotFoundException(
+                        "Комментарий с id=" + commentId + " не найден в объявлении с id=" + ad.getId()));
     }
 
     @Override
-    public Comment findById(Long id) {
+    public Comment getCommentById(Long id) {
         return commentRepository.findById(id).orElseThrow(
-                () -> new CommentNotFoundException("комментария c id=" + id + " не найдено")
+                () -> new CommentNotFoundException("Комментария с id=" + id + " не найдено")
         );
     }
 

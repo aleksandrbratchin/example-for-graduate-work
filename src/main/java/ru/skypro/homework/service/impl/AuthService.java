@@ -1,6 +1,7 @@
 package ru.skypro.homework.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -16,6 +17,7 @@ import ru.skypro.homework.model.User;
 import ru.skypro.homework.service.AuthServiceApi;
 
 @Service
+@Log4j2
 @RequiredArgsConstructor
 public class AuthService implements AuthServiceApi {
 
@@ -29,27 +31,33 @@ public class AuthService implements AuthServiceApi {
     public boolean login(String userName, String password) {
         try {
             Authentication authenticationToken = new UsernamePasswordAuthenticationToken(userName, password);
-
             Authentication authentication = authenticationManager.authenticate(authenticationToken);
-
             SecurityContextHolder.getContext().setAuthentication(authentication);
+            return true;
         } catch (AuthenticationException e) {
+            log.error("Не удалось войти в систему для пользователя: {}", userName, e);
             return false;
         }
-        return true;
     }
 
     @Override
     public boolean register(Register register) {
         try {
             userDetailsService.loadUserByUsername(register.getUsername());
+            log.error(
+                    "Регистрация не удалась: пользователь с именем пользователя {} уже существует.",
+                    register.getUsername()
+            );
+            return false;
         } catch (UsernameNotFoundException e) {
             User user = userMapper.fromRegister(register);
             user.setPassword(encoder.encode(register.getPassword()));
             userService.save(user);
+            log.info(
+                    "Пользователь успешно зарегистрирован с именем пользователя: {}",
+                    register.getUsername());
             return true;
         }
-        return false;
     }
 
 }

@@ -57,10 +57,9 @@ public class CommentController {
             },
             tags = "Комментарии"
     )
-
-    @GetMapping("/{id}/comments")
-    public ResponseEntity<?> getComments(@PathVariable Long id) {
-        return ResponseEntity.ok().body(commentMapper.toCommentsResponse(commentService.getComments(id)));
+    @GetMapping("/{adId}/comments")
+    public ResponseEntity<?> getCommentsForAd(@PathVariable Long adId) {
+        return ResponseEntity.ok().body(commentMapper.toCommentsResponse(commentService.getCommentsForAd(adId)));
     }
 
     @Operation(
@@ -88,9 +87,9 @@ public class CommentController {
             },
             tags = "Комментарии"
     )
-    @PostMapping(value = "/{id}/comments")
-    public ResponseEntity<?> addComment(
-            @PathVariable Long id,
+    @PostMapping(value = "/{adId}/comments")
+    public ResponseEntity<?> addCommentToAd(
+            @PathVariable Long adId,
             @RequestBody @Valid CreateOrUpdateComment createComment,
             BindingResult bindingResult
     ) {
@@ -99,7 +98,7 @@ public class CommentController {
         }
         return ResponseEntity.ok().body(
                 commentMapper.toCommentResponse(
-                        commentService.addCommentToAd(id, commentMapper.toComment(createComment))
+                        commentService.addCommentToAd(adId, commentMapper.toComment(createComment))
                 )
         );
 
@@ -131,14 +130,14 @@ public class CommentController {
             },
             tags = "Комментарии"
     )
-    @PreAuthorize("hasRole('ADMIN') or #user.user.id == @commentService.findById(#commentId).user.id")
+    @PreAuthorize("hasRole('ADMIN') or #user.user.id == @commentService.getCommentById(#commentId).user.id")
     @DeleteMapping("/{adId}/comments/{commentId}")
     public ResponseEntity<?> deleteComment(
             @PathVariable Long adId,
             @PathVariable Long commentId,
             @AuthenticationPrincipal UserPrincipal user
     ) {
-        commentService.deleteComment(adId, commentId);
+        commentService.deleteCommentFromAd(adId, commentId);
         return ResponseEntity.ok().build();
     }
 
@@ -172,7 +171,7 @@ public class CommentController {
             },
             tags = "Комментарии"
     )
-    @PreAuthorize("hasRole('ADMIN') or #user.user.id == @commentService.findById(#commentId).user.id")
+    @PreAuthorize("hasRole('ADMIN') or #user.user.id == @commentService.getCommentById(#commentId).user.id")
     @PatchMapping(path = "/{adId}/comments/{commentId}")
     public ResponseEntity<?> updateComment(
             @PathVariable Long adId,

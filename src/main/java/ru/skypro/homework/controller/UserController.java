@@ -76,7 +76,7 @@ public class UserController {
         if (bindingResult.hasErrors()) {
             return ValidationUtils.createErrorResponse(bindingResult.getAllErrors(), HttpStatus.FORBIDDEN);
         }
-        userService.updatePassword(userPrincipal.getUser(), password);
+        userService.changeUserPassword(userPrincipal.getUser(), password);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
@@ -102,7 +102,7 @@ public class UserController {
             tags = "Пользователи"
     )
     @GetMapping("me")
-    public ResponseEntity<?> getUser(@AuthenticationPrincipal UserPrincipal user) {
+    public ResponseEntity<?> getCurrentUser(@AuthenticationPrincipal UserPrincipal user) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(userMapper.toUserResponse(user.getUser()));
     }
@@ -139,7 +139,7 @@ public class UserController {
             tags = "Пользователи"
     )
     @PatchMapping(path = "me", consumes = "application/json")
-    public ResponseEntity<?> updateUser(
+    public ResponseEntity<?> updateUserDetails(
             @AuthenticationPrincipal UserPrincipal userPrincipal,
             @RequestBody @Valid UpdateUser updateUser,
             BindingResult bindingResult
@@ -147,8 +147,8 @@ public class UserController {
         if (bindingResult.hasErrors()) {
             return ValidationUtils.createErrorResponse(bindingResult.getAllErrors(), HttpStatus.UNAUTHORIZED);
         }
-        User update = userService.update(userPrincipal.getUser(), updateUser);
-        return ResponseEntity.status(HttpStatus.OK).body(updateUserMapper.fromUser(update));
+        User updatedUser  = userService.updateUserDetails(userPrincipal.getUser(), updateUser);
+        return ResponseEntity.status(HttpStatus.OK).body(updateUserMapper.fromUser(updatedUser ));
     }
 
     @Operation(
@@ -181,7 +181,7 @@ public class UserController {
             @AuthenticationPrincipal UserPrincipal user
     ) {
         Image avatar = imageMapper.toImage(image);
-        userService.setAvatar(user.getUser(), avatar);
+        userService.updateUserAvatar(user.getUser(), avatar);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 

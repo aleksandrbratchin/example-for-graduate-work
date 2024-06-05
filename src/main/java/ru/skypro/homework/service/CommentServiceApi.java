@@ -25,7 +25,7 @@ public interface CommentServiceApi {
      * @param commentId комментария
      */
     @Transactional
-    void deleteComment(Long adId, Long commentId);
+    void deleteCommentFromAd(Long adId, Long commentId);
 
     /**
      * Обновление комментария объявления
@@ -46,7 +46,14 @@ public interface CommentServiceApi {
      *
      * @param id идентификатор объявления
      */
-    List<Comment> getComments(Long id);
+    List<Comment> getCommentsForAd(Long id);
 
-    Comment findById(Long id);
+    /**
+     * Получение комментария по id
+     *
+     * @param id идентификатор комментария
+     * @return {@link Comment}
+     */
+    Comment getCommentById(Long id);
+
 }

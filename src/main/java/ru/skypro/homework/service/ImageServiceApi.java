@@ -10,6 +10,6 @@ public interface ImageServiceApi {
      * @param id картинки
      * @return {@link Image}
      */
-    Image findById(Long id);
+    Image getImageById(Long id);
 
 }

@@ -31,7 +31,7 @@ public interface UserServiceApi {
      * @param image новый аватар {@link Image}
      */
     @Transactional
-    void setAvatar(User user, Image image);
+    void updateUserAvatar(User user, Image image);
 
     /**
      * Обновить данные пользователя
@@ -40,7 +40,7 @@ public interface UserServiceApi {
      * @param updateUser данные которые нужно изменить {@link UpdateUser}
      * @return {@link User} c измененными данными
      */
-    User update(User user, UpdateUser updateUser);
+    User updateUserDetails(User user, UpdateUser updateUser);
 
     /**
      * Обновить пароль пользователя
@@ -48,5 +48,5 @@ public interface UserServiceApi {
      * @param user     пользователь которому нужно обновить пароль
      * @param password {@link NewPassword} новый и старый пароли
      */
-    void updatePassword(User user, NewPassword password);
+    void changeUserPassword(User user, NewPassword password);
 }

@@ -29,7 +29,7 @@ public class ImageController {
             }
     )
     public ResponseEntity<byte[]> download(@PathVariable Long id) {
-        Image image = imageService.findById(id);
+        Image image = imageService.getImageById(id);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.parseMediaType(image.getMediaType()));
         headers.setContentLength(image.getFileSize());

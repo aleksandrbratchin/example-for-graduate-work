@@ -25,7 +25,7 @@ public interface AdServiceApi {
      * @return {@link Ad} сохраненное объявление
      */
     @Transactional
-    Ad createAd(Ad ad, Image image);
+    Ad createAdWithImage(Ad ad, Image image);
 
     /**
      * Поиск объявления по идентификатору
@@ -33,15 +33,13 @@ public interface AdServiceApi {
      * @param id идентификатор объявления
      * @return {@link Ad} искомое объявление
      */
-
-    Ad findById(Long id);
+    Ad getAdById(Long id);
 
     /**
      * Удаление объявления по идентификатору
      *
      * @param id идентификатор объявления
      */
-
     void deleteAd(Long id);
 
     /**
@@ -51,8 +49,7 @@ public interface AdServiceApi {
      * @param properties {@link CreateOrUpdateAd}
      * @return {@link Ad} измененное объявление
      */
-
-    Ad updateAd(Long id, CreateOrUpdateAd properties);
+    Ad updateAdDetails(Long id, CreateOrUpdateAd properties);
 
     /**
      * Получение всех объявлений одного пользователя
@@ -60,8 +57,7 @@ public interface AdServiceApi {
      * @param user {@link User}
      * @return List {@link Ad} список объявлений данного пользователя
      */
-
-    List<Ad> getAdsByUser(User user);
+    List<Ad> getUserAds(User user);
 
     /**
      * Обновление картинки объявления
@@ -70,7 +66,15 @@ public interface AdServiceApi {
      * @param image {@link Image} картинка
      * @return {@link Ad} обновленное объявление
      */
-
     @Transactional
-    Ad updateImageAd(Long id, Image image);
+    Ad updateAdImage(Long id, Image image);
+
+
+    /**
+     * Сохранение обьявления
+     *
+     * @param ad {@link Ad} обьявление которое надо сохранить
+     * @return сохраненное объявление
+     */
+    Ad save(Ad ad);
 }
