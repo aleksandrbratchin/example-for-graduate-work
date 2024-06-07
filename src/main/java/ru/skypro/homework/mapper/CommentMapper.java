@@ -3,7 +3,6 @@ package ru.skypro.homework.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.Mappings;
 import org.springframework.beans.factory.annotation.Value;
 import ru.skypro.homework.dto.CreateOrUpdateComment;
 import ru.skypro.homework.dto.response.CommentResponse;
@@ -22,20 +21,19 @@ public abstract class CommentMapper {
     @Value("${download.url}")
     protected String downloadUrl;
 
-    @Mappings({
-            @Mapping(target = "author", source = "user.id"),
-            @Mapping(target = "authorImage",  expression = "java(comment.getUser().getAvatar() == null ? \"\" : downloadUrl + comment.getUser().getAvatar().getId())"),
-            @Mapping(target = "authorFirstName", source = "user.firstName"),
-            @Mapping(target = "createdAt", expression = "java(toEpochMilli(comment.getCreatedAt()))"),
-            @Mapping(target = "pk", source = "id")
-    })
+    @Mapping(target = "author", source = "user.id")
+    @Mapping(
+            target = "authorImage",
+            expression = "java(comment.getUser().getAvatar() == null ? \"\" : downloadUrl + comment.getUser().getAvatar().getId())"
+    )
+    @Mapping(target = "authorFirstName", source = "user.firstName")
+    @Mapping(target = "createdAt", expression = "java(toEpochMilli(comment.getCreatedAt()))")
+    @Mapping(target = "pk", source = "id")
     public abstract CommentResponse toCommentResponse(Comment comment);
 
     public abstract CreateOrUpdateComment toCreateOrUpdateComment(Comment comment);
 
-    @Mappings({
-            @Mapping(target = "id", ignore = true)
-    })
+    @Mapping(target = "id", ignore = true)
     public abstract Comment toComment(CreateOrUpdateComment createOrUpdateComment);
 
     protected List<CommentResponse> toListWithDto(List<Comment> comments) {
