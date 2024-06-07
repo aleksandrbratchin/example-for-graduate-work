@@ -40,3 +40,24 @@ databaseChangeLog:
               - column:
                   name: ad_id
                   valueNumeric: 2
+
+  - changeSet:
+      id: 17
+      author: aleksbratchin
+      context: test
+      changes:
+        - insert:
+            tableName: "comment"
+            columns:
+              - column:
+                  name: created_at
+                  value: '2024-06-07 11:19:47.907'
+              - column:
+                  name: text
+                  value: 'хочу такой'
+              - column:
+                  name: user_id
+                  valueNumeric: 3
+              - column:
+                  name: ad_id
+                  valueNumeric: 1

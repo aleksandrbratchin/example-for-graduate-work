@@ -14,21 +14,27 @@ import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 import ru.skypro.homework.dto.CreateOrUpdateAd;
 
+import static org.hamcrest.Matchers.startsWith;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @Testcontainers
 @SpringBootTest
 @AutoConfigureMockMvc
-public class AdControllerTest {
+class AdControllerTest {
+
+    private static final String USER_JACK = "captain.jack.sparrow@gmail.com";
+    private static final String USER_ELIZABETH = "elizabeth.swann@gmail.com";
+    private static final String ADS_URL = "/ads";
+    private static final String ADS_URL_ID = "/ads/{id}";
+    private static final String ADS_ME_URL = "/ads/me";
+    private static final String ADS_IMAGE_URL = "/ads/{id}/image";
 
     @Autowired
     private MockMvc mockMvc;
@@ -48,80 +54,86 @@ public class AdControllerTest {
 
     @Test
     @SneakyThrows
-    @WithUserDetails("captain.jack.sparrow@gmail.com")
-    void getAllAds() {
-        mockMvc.perform(get("/ads"))
+    @WithUserDetails(USER_JACK)
+    void shouldReturnAllAds() {
+        mockMvc.perform(get(ADS_URL))
                 .andExpect(status().isOk());
     }
 
     @Test
     @SneakyThrows
-    @WithUserDetails("elizabeth.swann@gmail.com")
-    void addAd() {
+    @WithUserDetails(USER_ELIZABETH)
+    void shouldAddAd() {
         MockMultipartFile file = new MockMultipartFile(
                 "image", "image.png", MediaType.IMAGE_PNG_VALUE, "image".getBytes());
 
-        String json = "{ \"title\": \"Hidsdfsdfsdf\", \"price\": 10, \"description\": \"descsdfdsfsdfsdfsdfsd\" }";
+        String json = "{ \"title\": \"TestTitle\", \"price\": 10, \"description\": \"TestDescription\" }";
 
         MockMultipartFile properties = new MockMultipartFile(
                 "properties", "", MediaType.APPLICATION_JSON_VALUE, json.getBytes());
 
-        mockMvc.perform(multipart("/ads")
+        mockMvc.perform(multipart(ADS_URL)
                         .file(file)
                         .file(properties)
                         .contentType(MediaType.MULTIPART_FORM_DATA))
-
                 .andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.price").value(10))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.title").value("Hidsdfsdfsdf"))
-                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON));
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.price").value(10))
+                .andExpect(jsonPath("$.title").value("TestTitle"))
+                .andExpect(jsonPath("$.image").value(startsWith("/image/")))
+                .andExpect(jsonPath("$.pk").exists())
+                .andExpect(jsonPath("$.author").value(5));
     }
 
     @Test
     @SneakyThrows
-    @WithUserDetails("captain.jack.sparrow@gmail.com")
-    void getAdById() {
-        mockMvc.perform(get("/ads/{id}", 1))
+    @WithUserDetails(USER_JACK)
+    void shouldReturnAdById() {
+        mockMvc.perform(get(ADS_URL_ID, 1))
                 .andExpect(status().isOk());
     }
 
     @Test
     @SneakyThrows
-    @WithUserDetails("captain.jack.sparrow@gmail.com")
-    void deleteAd() {
-        mockMvc.perform(delete("/ads/{id}", 1))
+    @WithUserDetails(USER_JACK)
+    void shouldDeleteAdById() {
+        mockMvc.perform(delete(ADS_URL_ID, 1))
                 .andExpect(status().isOk());
     }
 
     @Test
     @SneakyThrows
-    @WithUserDetails("captain.jack.sparrow@gmail.com")
-    void updateAdInfo() {
-        CreateOrUpdateAd ad = new CreateOrUpdateAd("testadeaddde", 100, "testtestadad");
-        mockMvc.perform(patch("/ads/{id}", 1)
+    @WithUserDetails(USER_JACK)
+    void shouldUpdateAdInfo() {
+        CreateOrUpdateAd ad = new CreateOrUpdateAd("UpdatedTitle", 100, "UpdatedDescription");
+
+        mockMvc.perform(patch(ADS_URL_ID, 1)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(ad)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.title").value(ad.getTitle()))
-                .andExpect(jsonPath("$.price").value(ad.getPrice()));
+                .andExpect(jsonPath("$.price").value(ad.getPrice()))
+                .andExpect(jsonPath("$.image").value(startsWith("/image/")))
+                .andExpect(jsonPath("$.pk").exists())
+                .andExpect(jsonPath("$.author").value(1));
     }
 
     @Test
     @SneakyThrows
-    @WithUserDetails("captain.jack.sparrow@gmail.com")
-    void getAdsByAuthUser() {
-        mockMvc.perform(get("/ads/me"))
+    @WithUserDetails(USER_JACK)
+    void shouldReturnAdsByAuthUser() {
+        mockMvc.perform(get(ADS_ME_URL))
                 .andExpect(status().isOk());
     }
 
     @Test
     @SneakyThrows
-    @WithUserDetails("captain.jack.sparrow@gmail.com")
-    void updateImageAds() {
+    @WithUserDetails(USER_JACK)
+    void shouldUpdateAdImage() {
         MockMultipartFile file = new MockMultipartFile(
                 "image", "image.png", MediaType.IMAGE_PNG_VALUE, "image".getBytes());
 
-        mockMvc.perform(multipart("/ads/{id}/image", 1)
+        mockMvc.perform(multipart(ADS_IMAGE_URL, 1)
                         .file(file)
                         .with(request -> {
                             request.setMethod("PATCH");
@@ -131,11 +143,11 @@ public class AdControllerTest {
     }
 
     @Nested
-    class ValidError {
+    class ValidErrorTests {
         @Test
         @SneakyThrows
-        @WithUserDetails("captain.jack.sparrow@gmail.com")
-        void addAd() {
+        @WithUserDetails(USER_JACK)
+        void shouldReturnUnauthorizedForInvalidAddAd() {
             MockMultipartFile file = new MockMultipartFile(
                     "image", "image.png", MediaType.IMAGE_PNG_VALUE, "image".getBytes());
 
@@ -144,7 +156,7 @@ public class AdControllerTest {
             MockMultipartFile properties = new MockMultipartFile(
                     "properties", "", MediaType.APPLICATION_JSON_VALUE, invalidJson.getBytes());
 
-            mockMvc.perform(multipart("/ads")
+            mockMvc.perform(multipart(ADS_URL)
                             .file(file)
                             .file(properties)
                             .contentType(MediaType.MULTIPART_FORM_DATA))
@@ -153,15 +165,15 @@ public class AdControllerTest {
 
         @Test
         @SneakyThrows
-        @WithUserDetails("captain.jack.sparrow@gmail.com")
-        void updateAdInfo() {
+        @WithUserDetails(USER_JACK)
+        void shouldReturnForbiddenForInvalidUpdateAd() {
             CreateOrUpdateAd ad = new CreateOrUpdateAd("", -1, "");
-            mockMvc.perform(patch("/ads/{id}", 2)
+
+            mockMvc.perform(patch(ADS_URL_ID, 2)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(ad)))
                     .andExpect(status().isForbidden());
         }
-
     }
 
 }

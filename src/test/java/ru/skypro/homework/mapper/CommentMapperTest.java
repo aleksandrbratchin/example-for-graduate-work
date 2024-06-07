@@ -23,7 +23,6 @@ class CommentMapperTest {
     private CommentMapper commentMapper;
     private User userTest;
     private Comment commentTest;
-    private LocalDateTime dateTest;
 
     @BeforeEach
     public void setUp() {
@@ -38,7 +37,7 @@ class CommentMapperTest {
         userTest.setId(1L);
         userTest.setUsername("test");
 
-        dateTest = LocalDateTime.of(2024,1,1,1,1);
+        LocalDateTime dateTest = LocalDateTime.of(2024, 1, 1, 1, 1);
 
         commentTest = new Comment();
         commentTest.setId(1L);
