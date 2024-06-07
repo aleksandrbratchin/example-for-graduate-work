@@ -96,6 +96,7 @@ public class AdController {
             }
 
     )
+    @PreAuthorize("isAuthenticated()")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> addAd(
             @RequestPart MultipartFile image,

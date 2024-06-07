@@ -46,3 +46,24 @@ databaseChangeLog:
               - column:
                   name: user_id
                   value: 1
+
+  - changeSet:
+      id: 18
+      author: aleksbratchin
+      context: test
+      changes:
+        - insert:
+            tableName: ads
+            columns:
+              - column:
+                  name: description
+                  value: 'fastShip2'
+              - column:
+                  name: price
+                  value: 6000
+              - column:
+                  name: title
+                  value: 'smashing2'
+              - column:
+                  name: user_id
+                  value: 2

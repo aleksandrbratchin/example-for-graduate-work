@@ -19,6 +19,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 import ru.skypro.homework.dto.CreateOrUpdateAd;
+import ru.skypro.homework.dto.CreateOrUpdateComment;
 
 import static org.hamcrest.Matchers.startsWith;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -31,6 +32,7 @@ class AdControllerTest {
 
     private static final String USER_JACK = "captain.jack.sparrow@gmail.com";
     private static final String USER_ELIZABETH = "elizabeth.swann@gmail.com";
+    private static final String USER_HECTOR = "hector.barbossa@gmail.com";
     private static final String ADS_URL = "/ads";
     private static final String ADS_URL_ID = "/ads/{id}";
     private static final String ADS_ME_URL = "/ads/me";
@@ -54,93 +56,267 @@ class AdControllerTest {
 
     @Test
     @SneakyThrows
-    @WithUserDetails(USER_JACK)
     void shouldReturnAllAds() {
         mockMvc.perform(get(ADS_URL))
                 .andExpect(status().isOk());
     }
 
-    @Test
-    @SneakyThrows
-    @WithUserDetails(USER_ELIZABETH)
-    void shouldAddAd() {
-        MockMultipartFile file = new MockMultipartFile(
-                "image", "image.png", MediaType.IMAGE_PNG_VALUE, "image".getBytes());
+    @Nested
+    class AddAdTests {
+        @Test
+        @SneakyThrows
+        @WithUserDetails(USER_ELIZABETH)
+        void shouldAddAd() {
+            MockMultipartFile file = new MockMultipartFile(
+                    "image", "image.png", MediaType.IMAGE_PNG_VALUE, "image".getBytes());
 
-        String json = "{ \"title\": \"TestTitle\", \"price\": 10, \"description\": \"TestDescription\" }";
+            String json = "{ \"title\": \"TestTitle\", \"price\": 10, \"description\": \"TestDescription\" }";
 
-        MockMultipartFile properties = new MockMultipartFile(
-                "properties", "", MediaType.APPLICATION_JSON_VALUE, json.getBytes());
+            MockMultipartFile properties = new MockMultipartFile(
+                    "properties", "", MediaType.APPLICATION_JSON_VALUE, json.getBytes());
 
-        mockMvc.perform(multipart(ADS_URL)
-                        .file(file)
-                        .file(properties)
-                        .contentType(MediaType.MULTIPART_FORM_DATA))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.price").value(10))
-                .andExpect(jsonPath("$.title").value("TestTitle"))
-                .andExpect(jsonPath("$.image").value(startsWith("/image/")))
-                .andExpect(jsonPath("$.pk").exists())
-                .andExpect(jsonPath("$.author").value(5));
+            mockMvc.perform(multipart(ADS_URL)
+                            .file(file)
+                            .file(properties)
+                            .contentType(MediaType.MULTIPART_FORM_DATA))
+                    .andExpect(status().isOk())
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(jsonPath("$.price").value(10))
+                    .andExpect(jsonPath("$.title").value("TestTitle"))
+                    .andExpect(jsonPath("$.image").value(startsWith("/image/")))
+                    .andExpect(jsonPath("$.pk").exists())
+                    .andExpect(jsonPath("$.author").value(5));
+        }
+
+        @Test
+        @SneakyThrows
+        void shouldReturnUnauthorizedForAddingAd() {
+            MockMultipartFile file = new MockMultipartFile(
+                    "image", "image.png", MediaType.IMAGE_PNG_VALUE, "image".getBytes());
+
+            String json = "{ \"title\": \"TestTitle\", \"price\": 10, \"description\": \"TestDescription\" }";
+
+            MockMultipartFile properties = new MockMultipartFile(
+                    "properties", "", MediaType.APPLICATION_JSON_VALUE, json.getBytes());
+
+            mockMvc.perform(multipart(ADS_URL)
+                            .file(file)
+                            .file(properties)
+                            .contentType(MediaType.MULTIPART_FORM_DATA))
+                    .andExpect(status().isUnauthorized());
+        }
     }
 
-    @Test
-    @SneakyThrows
-    @WithUserDetails(USER_JACK)
-    void shouldReturnAdById() {
-        mockMvc.perform(get(ADS_URL_ID, 1))
-                .andExpect(status().isOk());
+    @Nested
+    class AdById {
+        @Test
+        @SneakyThrows
+        @WithUserDetails(USER_JACK)
+        void shouldReturnAdById() {
+            mockMvc.perform(get(ADS_URL_ID, 1))
+                    .andExpect(status().isOk());
+        }
+
+        @Test
+        @SneakyThrows
+        void shouldReturnUnauthorizedByUnauthorizedUser() {
+            mockMvc.perform(get(ADS_URL_ID, 1))
+                    .andExpect(status().isUnauthorized());
+        }
+
     }
 
-    @Test
-    @SneakyThrows
-    @WithUserDetails(USER_JACK)
-    void shouldDeleteAdById() {
-        mockMvc.perform(delete(ADS_URL_ID, 1))
-                .andExpect(status().isOk());
+
+    @Nested
+    class DeleteCommentTests {
+
+        @Test
+        @SneakyThrows
+        @WithUserDetails(USER_JACK)
+        void shouldDeleteAdByCreator() {
+            mockMvc.perform(delete(ADS_URL_ID, 3))
+                    .andExpect(status().isOk());
+        }
+
+        @Test
+        @SneakyThrows
+        @WithUserDetails(USER_HECTOR)
+        void shouldDeleteAdByAdmin() {
+            mockMvc.perform(delete(ADS_URL_ID, 2))
+                    .andExpect(status().isOk());
+        }
+
+        @Test
+        @SneakyThrows
+        @WithUserDetails(USER_ELIZABETH)
+        void shouldReturnForbiddenForDeletingAdByAnotherUser() {
+            mockMvc.perform(delete(ADS_URL_ID, 1))
+                    .andExpect(status().isForbidden());
+        }
+
+        @Test
+        @SneakyThrows
+        void shouldReturnUnauthorizedDeletingAdByUnauthorizedUser() {
+            mockMvc.perform(delete(ADS_URL_ID, 1))
+                    .andExpect(status().isUnauthorized());
+        }
+
+
     }
 
-    @Test
-    @SneakyThrows
-    @WithUserDetails(USER_JACK)
-    void shouldUpdateAdInfo() {
-        CreateOrUpdateAd ad = new CreateOrUpdateAd("UpdatedTitle", 100, "UpdatedDescription");
+    @Nested
+    class UpdateAdInfoTests {
 
-        mockMvc.perform(patch(ADS_URL_ID, 1)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(ad)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.title").value(ad.getTitle()))
-                .andExpect(jsonPath("$.price").value(ad.getPrice()))
-                .andExpect(jsonPath("$.image").value(startsWith("/image/")))
-                .andExpect(jsonPath("$.pk").exists())
-                .andExpect(jsonPath("$.author").value(1));
+        @Test
+        @SneakyThrows
+        @WithUserDetails(USER_JACK)
+        void shouldUpdateAdInfoByCreator() {
+            CreateOrUpdateAd ad = new CreateOrUpdateAd("UpdatedTitle", 100, "UpdatedDescription");
+
+            mockMvc.perform(patch(ADS_URL_ID, 1)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(ad)))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.title").value(ad.getTitle()))
+                    .andExpect(jsonPath("$.price").value(ad.getPrice()))
+                    .andExpect(jsonPath("$.image").value(startsWith("/image/")))
+                    .andExpect(jsonPath("$.pk").exists())
+                    .andExpect(jsonPath("$.author").value(1));
+        }
+
+
+        @Test
+        @SneakyThrows
+        @WithUserDetails(USER_ELIZABETH)
+        void shouldReturnForbiddenForUpdatingAdInfoByAnotherUser() {
+            CreateOrUpdateAd ad = new CreateOrUpdateAd("UpdatedTitle", 100, "UpdatedDescription");
+
+            mockMvc.perform(patch(ADS_URL_ID, 1)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(ad)))
+                    .andExpect(status().isForbidden());
+        }
+
+        @Test
+        @SneakyThrows
+        @WithUserDetails(USER_HECTOR)
+        void shouldUpdateAdInfoByAdmin() {
+            CreateOrUpdateAd ad = new CreateOrUpdateAd("UpdatedTitle", 100, "UpdatedDescription");
+
+            mockMvc.perform(patch(ADS_URL_ID, 1)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(ad)))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.title").value(ad.getTitle()))
+                    .andExpect(jsonPath("$.price").value(ad.getPrice()))
+                    .andExpect(jsonPath("$.image").value(startsWith("/image/")))
+                    .andExpect(jsonPath("$.pk").exists())
+                    .andExpect(jsonPath("$.author").value(1));
+        }
+
+        @Test
+        @SneakyThrows
+        void shouldReturnUnauthorizedUpdateAdInfoByUnauthorizedUser() {
+            CreateOrUpdateAd ad = new CreateOrUpdateAd("UpdatedTitle", 100, "UpdatedDescription");
+
+            mockMvc.perform(patch(ADS_URL_ID, 1)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(ad)))
+                    .andExpect(status().isUnauthorized());
+        }
+
     }
 
-    @Test
-    @SneakyThrows
-    @WithUserDetails(USER_JACK)
-    void shouldReturnAdsByAuthUser() {
-        mockMvc.perform(get(ADS_ME_URL))
-                .andExpect(status().isOk());
+    @Nested
+    class AdsByAuthUserTests {
+
+        @Test
+        @SneakyThrows
+        @WithUserDetails(USER_JACK)
+        void shouldReturnAdsByAuthUser() {
+            mockMvc.perform(get(ADS_ME_URL))
+                    .andExpect(status().isOk());
+        }
+
+        @Test
+        @SneakyThrows
+        void shouldReturnAdsByUnauthorizedUser() {
+            mockMvc.perform(get(ADS_ME_URL))
+                    .andExpect(status().isUnauthorized());
+        }
+
     }
 
-    @Test
-    @SneakyThrows
-    @WithUserDetails(USER_JACK)
-    void shouldUpdateAdImage() {
-        MockMultipartFile file = new MockMultipartFile(
-                "image", "image.png", MediaType.IMAGE_PNG_VALUE, "image".getBytes());
+    @Nested
+    class UpdateAdImage {
 
-        mockMvc.perform(multipart(ADS_IMAGE_URL, 1)
-                        .file(file)
-                        .with(request -> {
-                            request.setMethod("PATCH");
-                            return request;
-                        }))
-                .andExpect(status().isOk());
+        @Test
+        @SneakyThrows
+        @WithUserDetails(USER_JACK)
+        void shouldUpdateAdImageByCreator() {
+            MockMultipartFile file = new MockMultipartFile(
+                    "image", "image.png", MediaType.IMAGE_PNG_VALUE, "image".getBytes());
+
+            mockMvc.perform(multipart(ADS_IMAGE_URL, 1)
+                            .file(file)
+                            .with(request -> {
+                                request.setMethod("PATCH");
+                                return request;
+                            }))
+                    .andExpect(status().isOk());
+        }
+
+        @Test
+        @SneakyThrows
+        @WithUserDetails(USER_ELIZABETH)
+        void shouldReturnForbiddenForUpdatingAdImageByAnotherUser() {
+            MockMultipartFile file = new MockMultipartFile(
+                    "image", "image.png", MediaType.IMAGE_PNG_VALUE, "image".getBytes());
+
+            mockMvc.perform(multipart(ADS_IMAGE_URL, 1)
+                            .file(file)
+                            .with(request -> {
+                                request.setMethod("PATCH");
+                                return request;
+                            }))
+                    .andExpect(status().isForbidden());
+        }
+
+        @Test
+        @SneakyThrows
+        @WithUserDetails(USER_HECTOR)
+        void shouldUpdateAdImageByAdmin() {
+            MockMultipartFile file = new MockMultipartFile(
+                    "image", "image.png", MediaType.IMAGE_PNG_VALUE, "image".getBytes());
+
+            mockMvc.perform(multipart(ADS_IMAGE_URL, 1)
+                            .file(file)
+                            .with(request -> {
+                                request.setMethod("PATCH");
+                                return request;
+                            }))
+                    .andExpect(status().isOk());
+        }
+
+        @Test
+        @SneakyThrows
+        void shouldReturnUnauthorizedUpdateAdImageByUnauthorizedUser() {
+            MockMultipartFile file = new MockMultipartFile(
+                    "image", "image.png", MediaType.IMAGE_PNG_VALUE, "image".getBytes());
+
+            mockMvc.perform(multipart(ADS_IMAGE_URL, 1)
+                            .file(file)
+                            .with(request -> {
+                                request.setMethod("PATCH");
+                                return request;
+                            }))
+                    .andExpect(status().isUnauthorized());
+        }
+
     }
+
+
+
 
     @Nested
     class ValidErrorTests {
@@ -175,5 +351,7 @@ class AdControllerTest {
                     .andExpect(status().isForbidden());
         }
     }
+
+
 
 }

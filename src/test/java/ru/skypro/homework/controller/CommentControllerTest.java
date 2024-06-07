@@ -51,17 +51,27 @@ class CommentControllerTest {
         registry.add("spring.liquibase.contexts", () -> "prod,test");
     }
 
-    @Test
-    @SneakyThrows
-    @WithUserDetails(USER_JACK)
-    void shouldGetComments() {
-        mockMvc.perform(get(COMMENT_URL, 2))
-                .andExpect(status().isOk());
+    @Nested
+    class GetCommentTests {
+        @Test
+        @SneakyThrows
+        @WithUserDetails(USER_JACK)
+        void shouldGetComments() {
+            mockMvc.perform(get(COMMENT_URL, 2))
+                    .andExpect(status().isOk());
+        }
+
+        @Test
+        @SneakyThrows
+        void shouldReturnUnauthorizedByUnauthorizedUser() {
+            mockMvc.perform(get(COMMENT_URL, 2))
+                    .andExpect(status().isUnauthorized());
+        }
     }
+
 
     @Nested
     class AddCommentTests {
-
         @Test
         @SneakyThrows
         @WithUserDetails(USER_JACK)
@@ -111,6 +121,13 @@ class CommentControllerTest {
             mockMvc.perform(delete(COMMENT_URL + "/{commentId}", 2, 2))
                     .andExpect(status().isOk());
         }
+
+        @Test
+        @SneakyThrows
+        void shouldReturnUnauthorizedDeletingCommentByUnauthorizedUser() {
+            mockMvc.perform(delete(COMMENT_URL + "/{commentId}", 1, 3))
+                    .andExpect(status().isUnauthorized());
+        }
     }
 
     @Nested
@@ -151,6 +168,17 @@ class CommentControllerTest {
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(createOrUpdateComment)))
                     .andExpect(status().isOk());
+        }
+
+        @Test
+        @SneakyThrows
+        void shouldReturnUnauthorizedUpdateCommentByUnauthorizedUser() {
+            CreateOrUpdateComment createOrUpdateComment = new CreateOrUpdateComment("обновленный комментарий админом");
+
+            mockMvc.perform(patch(COMMENT_URL + "/{commentId}", 2, 2)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(createOrUpdateComment)))
+                    .andExpect(status().isUnauthorized());
         }
     }
 
