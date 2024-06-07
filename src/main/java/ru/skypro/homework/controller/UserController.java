@@ -124,16 +124,6 @@ public class UserController {
                             responseCode = "401",
                             description = "Unauthorized",
                             content = @Content(schema = @Schema(hidden = true))
-                    ),
-                    @ApiResponse(
-                            responseCode = "400",
-                            description = "BAD_REQUEST",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(
-                                            type = "string"
-                                    )
-                            )
                     )
             },
             tags = "Пользователи"
