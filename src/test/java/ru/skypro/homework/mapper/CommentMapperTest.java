@@ -25,10 +25,6 @@ class CommentMapperTest {
     private Comment commentTest;
     private LocalDateTime dateTest;
 
-    public void setDateTest(LocalDateTime dateTest) {
-        this.dateTest = dateTest;
-    }
-
     @BeforeEach
     public void setUp() {
         Image avatar = Image.builder()
@@ -42,7 +38,7 @@ class CommentMapperTest {
         userTest.setId(1L);
         userTest.setUsername("test");
 
-        setDateTest(LocalDateTime.now());
+        dateTest = LocalDateTime.of(2024,1,1,1,1);
 
         commentTest = new Comment();
         commentTest.setId(1L);
@@ -57,7 +53,7 @@ class CommentMapperTest {
         exp.setPk(1);
         exp.setText("testtesttest");
         exp.setAuthor(userTest.getId().intValue());
-        exp.setCreatedAt(dateTest.getNano());
+        exp.setCreatedAt(1704060060000L);
 
         CommentResponse aq = commentMapper.toCommentResponse(commentTest);
 
@@ -83,7 +79,7 @@ class CommentMapperTest {
         commentResponseTest.setPk(1);
         commentResponseTest.setText("testtesttest");
         commentResponseTest.setAuthor(userTest.getId().intValue());
-        commentResponseTest.setCreatedAt(dateTest.getNano());
+        commentResponseTest.setCreatedAt(1704060060000L);
         commentResponseTest.setAuthorImage("/image/" + userTest.getAvatar().getId());
         List<CommentResponse> exp = List.of(commentResponseTest);
 
@@ -99,7 +95,7 @@ class CommentMapperTest {
         commentResponseTest.setPk(1);
         commentResponseTest.setText("testtesttest");
         commentResponseTest.setAuthor(userTest.getId().intValue());
-        commentResponseTest.setCreatedAt(dateTest.getNano());
+        commentResponseTest.setCreatedAt(1704060060000L);
         commentResponseTest.setAuthorImage("/image/" + userTest.getAvatar().getId());
         List<Comment> base = List.of(commentTest);
         List<CommentResponse> second = List.of(commentResponseTest);
