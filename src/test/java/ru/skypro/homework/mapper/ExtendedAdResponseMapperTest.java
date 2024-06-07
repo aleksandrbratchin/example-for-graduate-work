@@ -16,14 +16,13 @@ public class ExtendedAdResponseMapperTest {
 
     private final ExtendedAdResponseMapper extendedAdResponseMapper;
 
-
     @Autowired
     public ExtendedAdResponseMapperTest(ExtendedAdResponseMapper extendedAdResponseMapper) {
         this.extendedAdResponseMapper = extendedAdResponseMapper;
     }
 
     @Test
-    void shouldReturnDTO() {
+    void shouldMapAdToExtendedAdResponse() {
 
         Image avatar = Image.builder()
                 .id(1L)
@@ -51,17 +50,18 @@ public class ExtendedAdResponseMapperTest {
         ad.setImage(avatar);
         ad.setUser(user);
 
-        ExtendedAdResponse mapper = extendedAdResponseMapper.toDto(ad);
-        assertThat(mapper).isNotNull();
-        assertThat(mapper.getPk()).isEqualTo(ad.getId());
-        assertThat(mapper.getAuthorFirstName()).isEqualTo(ad.getUser().getFirstName());
-        assertThat(mapper.getAuthorLastName()).isEqualTo(ad.getUser().getLastName());
-        assertThat(mapper.getImage()).isEqualTo("/image/" + avatar.getId());
-        assertThat(mapper.getEmail()).isEqualTo(ad.getUser().getUsername());
-        assertThat(mapper.getPrice()).isEqualTo(ad.getPrice());
-        assertThat(mapper.getPhone()).isEqualTo(ad.getUser().getPhone());
-        assertThat(mapper.getTitle()).isEqualTo(ad.getTitle());
-        assertThat(mapper.getDescription()).isEqualTo(ad.getDescription());
+        ExtendedAdResponse extendedAdResponse = extendedAdResponseMapper.toDto(ad);
+
+        assertThat(extendedAdResponse).isNotNull();
+        assertThat(extendedAdResponse.getPk()).isEqualTo(ad.getId());
+        assertThat(extendedAdResponse.getAuthorFirstName()).isEqualTo(ad.getUser().getFirstName());
+        assertThat(extendedAdResponse.getAuthorLastName()).isEqualTo(ad.getUser().getLastName());
+        assertThat(extendedAdResponse.getImage()).isEqualTo("/image/" + avatar.getId());
+        assertThat(extendedAdResponse.getEmail()).isEqualTo(ad.getUser().getUsername());
+        assertThat(extendedAdResponse.getPrice()).isEqualTo(ad.getPrice());
+        assertThat(extendedAdResponse.getPhone()).isEqualTo(ad.getUser().getPhone());
+        assertThat(extendedAdResponse.getTitle()).isEqualTo(ad.getTitle());
+        assertThat(extendedAdResponse.getDescription()).isEqualTo(ad.getDescription());
     }
 
 }

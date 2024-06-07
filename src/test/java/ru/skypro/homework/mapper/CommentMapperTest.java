@@ -21,98 +21,91 @@ class CommentMapperTest {
 
     @Autowired
     private CommentMapper commentMapper;
-    private User userTest;
-    private Comment commentTest;
-    private LocalDateTime dateTest;
-
-    private Image avatar;
-
-    public void setDateTest(LocalDateTime dateTest) {
-        this.dateTest = dateTest;
-    }
+    private User testUser;
+    private Comment testComment;
 
     @BeforeEach
     public void setUp() {
-        avatar = Image.builder()
+        Image avatar = Image.builder()
                 .id(1L)
                 .fileSize(1024)
                 .mediaType("image/png")
                 .data(new byte[]{1, 2, 3, 4})
                 .build();
-        userTest = new User();
-        userTest.setAvatar(avatar);
-        userTest.setId(1L);
-        userTest.setUsername("test");
+        testUser = new User();
+        testUser.setAvatar(avatar);
+        testUser.setId(1L);
+        testUser.setUsername("test");
 
-        setDateTest(LocalDateTime.now());
+        LocalDateTime testDate = LocalDateTime.of(2024, 1, 1, 1, 1);
 
-        commentTest = new Comment();
-        commentTest.setId(1L);
-        commentTest.setText("testtesttest");
-        commentTest.setUser(userTest);
-        commentTest.setCreatedAt(dateTest);
+        testComment = new Comment();
+        testComment.setId(1L);
+        testComment.setText("testtesttest");
+        testComment.setUser(testUser);
+        testComment.setCreatedAt(testDate);
     }
 
     @Test
-    void equalityCommentAndCommentResponse() {
-        CommentResponse exp = new CommentResponse();
-        exp.setPk(1);
-        exp.setText("testtesttest");
-        exp.setAuthor(userTest.getId().intValue());
-        exp.setCreatedAt(dateTest.getNano());
+    void testMappingCommentToCommentResponse() {
+        CommentResponse expected = new CommentResponse();
+        expected.setPk(1);
+        expected.setText("testtesttest");
+        expected.setAuthor(testUser.getId().intValue());
+        expected.setCreatedAt(1704060060000L);
 
-        CommentResponse aq = commentMapper.toCommentResponse(commentTest);
+        CommentResponse actual = commentMapper.toCommentResponse(testComment);
 
-        assertThat(aq.getPk()).isEqualTo(exp.getPk());
-        assertThat(aq.getText()).isEqualTo(exp.getText());
-        assertThat(aq.getAuthor()).isEqualTo(exp.getAuthor());
-        assertThat(aq.getCreatedAt()).isEqualTo(exp.getCreatedAt());
+        assertThat(actual.getPk()).isEqualTo(expected.getPk());
+        assertThat(actual.getText()).isEqualTo(expected.getText());
+        assertThat(actual.getAuthor()).isEqualTo(expected.getAuthor());
+        assertThat(actual.getCreatedAt()).isEqualTo(expected.getCreatedAt());
     }
 
     @Test
-    void equalityCommentAndCreateOrUpdateComment() {
-        CreateOrUpdateComment exp = new CreateOrUpdateComment("testtesttest");
+    void testMappingCommentToCreateOrUpdateComment() {
+        CreateOrUpdateComment expected = new CreateOrUpdateComment("testtesttest");
 
-        CreateOrUpdateComment aq = commentMapper.toCreateOrUpdateComment(commentTest);
+        CreateOrUpdateComment actual = commentMapper.toCreateOrUpdateComment(testComment);
 
-        assertThat(aq.getText()).isEqualTo(exp.getText());
+        assertThat(actual.getText()).isEqualTo(expected.getText());
     }
 
     @Test
-    void toListWithDto() {
-        List<Comment> base = List.of(commentTest);
+    void testMappingListWithDto() {
+        List<Comment> base = List.of(testComment);
         CommentResponse commentResponseTest = new CommentResponse();
         commentResponseTest.setPk(1);
         commentResponseTest.setText("testtesttest");
-        commentResponseTest.setAuthor(userTest.getId().intValue());
-        commentResponseTest.setCreatedAt(dateTest.getNano());
-        commentResponseTest.setAuthorImage("/image/" + userTest.getAvatar().getId());
-        List<CommentResponse> exp = List.of(commentResponseTest);
+        commentResponseTest.setAuthor(testUser.getId().intValue());
+        commentResponseTest.setCreatedAt(1704060060000L);
+        commentResponseTest.setAuthorImage("/image/" + testUser.getAvatar().getId());
+        List<CommentResponse> expected = List.of(commentResponseTest);
 
-        List<CommentResponse> aq = commentMapper.toListWithDto(base);
+        List<CommentResponse> actual = commentMapper.toListWithDto(base);
 
-        assertThat(aq.size()).isEqualTo(exp.size());
-        assertThat(aq).isEqualTo(exp);
+        assertThat(actual.size()).isEqualTo(expected.size());
+        assertThat(actual).isEqualTo(expected);
     }
 
     @Test
-    void equalityOfCommentsResponse() {
+    void testMappingCommentsResponse() {
         CommentResponse commentResponseTest = new CommentResponse();
         commentResponseTest.setPk(1);
         commentResponseTest.setText("testtesttest");
-        commentResponseTest.setAuthor(userTest.getId().intValue());
-        commentResponseTest.setCreatedAt(dateTest.getNano());
-        commentResponseTest.setAuthorImage("/image/" + userTest.getAvatar().getId());
-        List<Comment> base = List.of(commentTest);
+        commentResponseTest.setAuthor(testUser.getId().intValue());
+        commentResponseTest.setCreatedAt(1704060060000L);
+        commentResponseTest.setAuthorImage("/image/" + testUser.getAvatar().getId());
+        List<Comment> base = List.of(testComment);
         List<CommentResponse> second = List.of(commentResponseTest);
-        int countExp = 1;
-        CommentsResponse exp = new CommentsResponse();
-        exp.setResults(second);
-        exp.setCount(second.size());
+        int countExpected = 1;
+        CommentsResponse expected = new CommentsResponse();
+        expected.setResults(second);
+        expected.setCount(second.size());
 
-        CommentsResponse commentsResponseDTO = commentMapper.toCommentsResponse(base);
+        CommentsResponse actual = commentMapper.toCommentsResponse(base);
 
-        assertThat(base.size()).isEqualTo(countExp);
-        assertThat(commentsResponseDTO).isEqualTo(exp);
+        assertThat(base.size()).isEqualTo(countExpected);
+        assertThat(actual).isEqualTo(expected);
     }
 }

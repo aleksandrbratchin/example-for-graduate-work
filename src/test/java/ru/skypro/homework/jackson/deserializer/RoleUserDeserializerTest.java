@@ -3,6 +3,7 @@ package ru.skypro.homework.jackson.deserializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import ru.skypro.homework.dto.Role;
 
@@ -23,6 +24,7 @@ public class RoleUserDeserializerTest {
     }
 
     @Test
+    @DisplayName("Deserialize USER role")
     public void testDeserializeUser() throws IOException {
         String json = "\"USER\"";
         Role role = objectMapper.readValue(json, Role.class);
@@ -30,6 +32,7 @@ public class RoleUserDeserializerTest {
     }
 
     @Test
+    @DisplayName("Deserialize ADMIN role")
     public void testDeserializeAdmin() throws IOException {
         String json = "\"ADMIN\"";
         Role role = objectMapper.readValue(json, Role.class);
@@ -37,6 +40,7 @@ public class RoleUserDeserializerTest {
     }
 
     @Test
+    @DisplayName("Deserialize invalid role returns null")
     public void testDeserializeInvalidRole() throws IOException {
         String json = "\"INVALID_ROLE\"";
         Role role = objectMapper.readValue(json, Role.class);

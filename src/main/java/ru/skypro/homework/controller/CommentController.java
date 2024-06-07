@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,9 +17,9 @@ import ru.skypro.homework.config.security.UserPrincipal;
 import ru.skypro.homework.dto.CreateOrUpdateComment;
 import ru.skypro.homework.dto.response.CommentResponse;
 import ru.skypro.homework.dto.response.CommentsResponse;
-import ru.skypro.homework.service.impl.CommentService;
-
-import java.util.stream.Collectors;
+import ru.skypro.homework.mapper.CommentMapper;
+import ru.skypro.homework.service.CommentServiceApi;
+import ru.skypro.homework.utils.ValidationUtils;
 
 @Slf4j
 @CrossOrigin(value = "http://localhost:3000")
@@ -29,7 +28,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CommentController {
 
-    private final CommentService commentService;
+    private final CommentServiceApi commentService;
+    private final CommentMapper commentMapper;
 
     @Operation(
             summary = "Получение комментариев объявления",
@@ -39,7 +39,8 @@ public class CommentController {
                             description = "OK",
                             content = @Content(
                                     mediaType = "application/json",
-                                    schema = @Schema(implementation = CommentsResponse.class
+                                    schema = @Schema(
+                                            implementation = CommentsResponse.class
                                     )
                             )
                     ),
@@ -53,16 +54,12 @@ public class CommentController {
                             description = "Not found",
                             content = @Content(schema = @Schema(hidden = true))
                     ),
-
             },
             tags = "Комментарии"
     )
-
-    @GetMapping("/{id}/comments")
-    public ResponseEntity<?> getComments(
-            @PathVariable Long id
-    ) {
-        return ResponseEntity.ok().body(commentService.getComments(id));
+    @GetMapping("/{adId}/comments")
+    public ResponseEntity<?> getCommentsForAd(@PathVariable Long adId) {
+        return ResponseEntity.ok().body(commentMapper.toCommentsResponse(commentService.getCommentsForAd(adId)));
     }
 
     @Operation(
@@ -87,21 +84,23 @@ public class CommentController {
                             description = "Not found",
                             content = @Content(schema = @Schema(hidden = true))
                     ),
-
             },
             tags = "Комментарии"
     )
-    @PostMapping(value = "/{id}/comments")
-    public ResponseEntity<?> addComment(
-            @PathVariable Long id,
-            @RequestBody @Valid CreateOrUpdateComment properties,
+    @PostMapping(value = "/{adId}/comments")
+    public ResponseEntity<?> addCommentToAd(
+            @PathVariable Long adId,
+            @RequestBody @Valid CreateOrUpdateComment createComment,
             BindingResult bindingResult
     ) {
         if (bindingResult.hasErrors()) {
-            String errorMessage = bindingResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.joining(", "));
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorMessage);
+            return ValidationUtils.createErrorResponse(bindingResult.getAllErrors(), HttpStatus.UNAUTHORIZED);
         }
-        return ResponseEntity.ok().body(commentService.addCommentToAd(id, properties));
+        return ResponseEntity.ok().body(
+                commentMapper.toCommentResponse(
+                        commentService.addCommentToAd(adId, commentMapper.toComment(createComment))
+                )
+        );
 
     }
 
@@ -128,18 +127,17 @@ public class CommentController {
                             description = "Forbidden",
                             content = @Content(schema = @Schema(hidden = true))
                     )
-
             },
             tags = "Комментарии"
     )
-    @PreAuthorize("hasRole('ADMIN') or #user.user.id == @adService.findById(#adId).user.id")
+    @PreAuthorize("hasRole('ADMIN') or #user.user.id == @commentService.getCommentById(#commentId).user.id")
     @DeleteMapping("/{adId}/comments/{commentId}")
     public ResponseEntity<?> deleteComment(
             @PathVariable Long adId,
             @PathVariable Long commentId,
             @AuthenticationPrincipal UserPrincipal user
     ) {
-        commentService.deleteComment(adId, commentId);
+        commentService.deleteCommentFromAd(adId, commentId);
         return ResponseEntity.ok().build();
     }
 
@@ -170,11 +168,10 @@ public class CommentController {
                             description = "Forbidden",
                             content = @Content(schema = @Schema(hidden = true))
                     )
-
             },
             tags = "Комментарии"
     )
-    @PreAuthorize("hasRole('ADMIN') or #user.user.id == @adService.findById(#adId).user.id")
+    @PreAuthorize("hasRole('ADMIN') or #user.user.id == @commentService.getCommentById(#commentId).user.id")
     @PatchMapping(path = "/{adId}/comments/{commentId}")
     public ResponseEntity<?> updateComment(
             @PathVariable Long adId,
@@ -183,11 +180,13 @@ public class CommentController {
             @RequestBody @Valid CreateOrUpdateComment createOrUpdateComment,
             BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            String errorMessage = bindingResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.joining(", "));
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorMessage);
+            return ValidationUtils.createErrorResponse(bindingResult.getAllErrors(), HttpStatus.FORBIDDEN);
         }
-        return ResponseEntity.ok().body(commentService.updateComment(adId, commentId, createOrUpdateComment));
+        return ResponseEntity.ok().body(
+                commentMapper.toCommentResponse(commentService.updateComment(adId, commentId, createOrUpdateComment))
+        );
     }
+
 }
 
 

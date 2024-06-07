@@ -48,10 +48,15 @@ class UserControllerTest {
     }
 
     @Nested
-    class UserIsAuthorized {
+    class AuthorizedUserTests {
+
+        private static final String USER_JACK = "captain.jack.sparrow@gmail.com";
+        private static final String USER_ELIZABETH = "elizabeth.swann@gmail.com";
+        private static final String USER_JAMES = "james.norrington@gmail.com";
+
         @Test
         @SneakyThrows
-        @WithUserDetails("captain.jack.sparrow@gmail.com")
+        @WithUserDetails(value = USER_JACK, userDetailsServiceBeanName = "customUserDetailsService")
         void getRegister() {
             mockMvc.perform(get("/users/me"))
                     .andExpect(status().isOk())
@@ -67,8 +72,8 @@ class UserControllerTest {
 
         @Test
         @SneakyThrows
-        @WithUserDetails("elizabeth.swann@gmail.com")
-        void testSetPassword() {
+        @WithUserDetails(value = USER_ELIZABETH, userDetailsServiceBeanName = "customUserDetailsService")
+        void shouldChangePasswordSuccessfully() {
             NewPassword newPassword = new NewPassword("GovernorDaughter", "MsrTurner");
             mockMvc.perform(post("/users/set_password")
                             .contentType(MediaType.APPLICATION_JSON)
@@ -78,8 +83,8 @@ class UserControllerTest {
 
         @Test
         @SneakyThrows
-        @WithUserDetails("elizabeth.swann@gmail.com")
-        void testSetIncorrectPassword() {
+        @WithUserDetails(value = USER_ELIZABETH, userDetailsServiceBeanName = "customUserDetailsService")
+        void shouldFailToChangePasswordWithIncorrectCurrentPassword() {
             NewPassword newPassword = new NewPassword("Daughter", "MsrTurner");
             mockMvc.perform(post("/users/set_password")
                             .contentType(MediaType.APPLICATION_JSON)
@@ -89,8 +94,8 @@ class UserControllerTest {
 
         @Test
         @SneakyThrows
-        @WithUserDetails("james.norrington@gmail.com")
-        void testUpdateUser() {
+        @WithUserDetails(value = USER_JAMES, userDetailsServiceBeanName = "customUserDetailsService")
+        void shouldUpdateUserDetails() {
             UpdateUser updateUser = UpdateUser.builder()
                     .firstName("James1")
                     .lastName("Norrington1")
@@ -105,12 +110,15 @@ class UserControllerTest {
                     .andExpect(jsonPath("$.lastName").value("Norrington1"))
                     .andExpect(jsonPath("$.phone").value("+7 (154) 4895761"));
         }
-
         @Test
         @SneakyThrows
-        @WithUserDetails("captain.jack.sparrow@gmail.com")
-        void testUpdateUserImage() {
-            MockMultipartFile imageFile = new MockMultipartFile("image", "avatar.png", MediaType.IMAGE_PNG_VALUE, "avatar".getBytes());
+        @WithUserDetails(value = USER_JACK, userDetailsServiceBeanName = "customUserDetailsService")
+        void shouldUpdateUserAvatar() {
+            MockMultipartFile imageFile = new MockMultipartFile(
+                    "image",
+                    "avatar.png", MediaType.IMAGE_PNG_VALUE,
+                    "avatar".getBytes()
+            );
 
             mockMvc.perform(multipart("/users/me/image")
                             .file(imageFile)
@@ -122,11 +130,11 @@ class UserControllerTest {
         }
 
         @Nested
-        class ValidError {
+        class InvalidInputTests  {
             @Test
             @SneakyThrows
-            @WithUserDetails("elizabeth.swann@gmail.com")
-            void testSetPassword() {
+            @WithUserDetails(value = USER_ELIZABETH, userDetailsServiceBeanName = "customUserDetailsService")
+            void shouldFailToChangePasswordWithShortNewPassword() {
                 NewPassword newPassword = new NewPassword("GovernorDaughters145236", "er");
                 mockMvc.perform(post("/users/set_password")
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -136,10 +144,9 @@ class UserControllerTest {
 
             @Test
             @SneakyThrows
-            @WithUserDetails("james.norrington@gmail.com")
-            void testUpdateUser() {
-                UpdateUser updateUser = UpdateUser.builder()
-                        .build();
+            @WithUserDetails(value = USER_JAMES, userDetailsServiceBeanName = "customUserDetailsService")
+            void shouldFailToUpdateUserDetailsWithoutData() {
+                UpdateUser updateUser = UpdateUser.builder().build();
 
                 mockMvc.perform(patch("/users/me")
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -151,17 +158,17 @@ class UserControllerTest {
     }
 
     @Nested
-    class UserIsUnauthorized {
+    class UnauthorizedUserTests  {
         @Test
         @SneakyThrows
-        void getRegister() {
+        void shouldReturnUnauthorizedWhenGettingUserDetails() {
             mockMvc.perform(get("/users/me"))
                     .andExpect(status().isUnauthorized());
         }
 
         @Test
         @SneakyThrows
-        void testSetPassword() {
+        void shouldReturnUnauthorizedWhenChangingPassword() {
             NewPassword newPassword = new NewPassword("GovernorDaughter", "MsrTurner");
             mockMvc.perform(post("/users/set_password")
                             .contentType(MediaType.APPLICATION_JSON)
@@ -171,7 +178,7 @@ class UserControllerTest {
 
         @Test
         @SneakyThrows
-        void testUpdateUser() {
+        void shouldReturnUnauthorizedWhenUpdatingUserDetails() {
             UpdateUser updateUser = UpdateUser.builder()
                     .firstName("James1")
                     .lastName("Norrington1")
@@ -186,8 +193,12 @@ class UserControllerTest {
 
         @Test
         @SneakyThrows
-        void testUpdateUserImage() {
-            MockMultipartFile imageFile = new MockMultipartFile("image", "avatar.png", MediaType.IMAGE_PNG_VALUE, "avatar".getBytes());
+        void shouldReturnUnauthorizedWhenUpdatingUserAvatar() {
+            MockMultipartFile imageFile = new MockMultipartFile(
+                    "image",
+                    "avatar.png", MediaType.IMAGE_PNG_VALUE,
+                    "avatar".getBytes()
+            );
 
             mockMvc.perform(multipart("/users/me/image")
                             .file(imageFile)

@@ -1,90 +1,88 @@
 package ru.skypro.homework.service.impl;
 
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.homework.dto.CreateOrUpdateAd;
-import ru.skypro.homework.dto.response.AdResponse;
-import ru.skypro.homework.dto.response.AdsResponse;
-import ru.skypro.homework.dto.response.ExtendedAdResponse;
 import ru.skypro.homework.exception.AdNotFoundException;
-import ru.skypro.homework.mapper.*;
 import ru.skypro.homework.model.Ad;
 import ru.skypro.homework.model.Image;
 import ru.skypro.homework.model.User;
 import ru.skypro.homework.repository.AdRepository;
+import ru.skypro.homework.service.AdServiceApi;
 
 import java.util.List;
 
+@Log4j2
 @Service
-@Transactional
-public class AdService {
+@RequiredArgsConstructor
+public class AdService implements AdServiceApi {
 
-    private final AdMapper adMapper;
-    private final AdsMapper adsMapper;
-    private final CreateOrUpdateAdMapper createOrUpdateAdMapper;
-    private final ExtendedAdResponseMapper extendedAdResponseMapper;
     private final AdRepository adRepository;
-    private final ImageMapper imageMapper;
 
-    @Autowired
-    public AdService(AdMapper adMapper, AdsMapper adsMapper, CreateOrUpdateAdMapper createOrUpdateAdMapper, ExtendedAdResponseMapper extendedAdResponseMapper, AdRepository adRepository, ImageMapper imageMapper) {
-        this.adMapper = adMapper;
-        this.adsMapper = adsMapper;
-        this.createOrUpdateAdMapper = createOrUpdateAdMapper;
-        this.extendedAdResponseMapper = extendedAdResponseMapper;
-        this.adRepository = adRepository;
-        this.imageMapper = imageMapper;
+    @Override
+    public List<Ad> getAllAds() {
+        log.info("Получение всех объявлений");
+        return adRepository.findAll();
     }
 
-    public AdsResponse getAllAds() {
-        List<Ad> result = adRepository.findAll();
-        return adsMapper.toAdsResponse(result);
+    @Override
+    @Transactional
+    public Ad createAdWithImage(Ad ad, Image image) {
+        log.info("Сохранение объявления: {}", ad.getTitle() + ", " + ad.getPrice() + ", " + ", " + ad.getDescription());
+        ad.setImage(image);
+        return adRepository.save(ad);
     }
 
-    public AdResponse createAd(CreateOrUpdateAd properties, MultipartFile image) {
-        Ad ad = createOrUpdateAdMapper.toAd(properties);
-        Image image1 = imageMapper.toImage(image);
-        ad.setImage(image1);
-        Ad save = adRepository.save(ad);
-        return adMapper.mappingToDto(save);
+    @Override
+    public Ad getAdById(Long id) {
+        log.info("Поиск объявления по номеру: {}", id);
+        return adRepository.findById(id).orElseThrow(() -> {
+            log.error("Объявление номером: {}", id + " не найдено");
+            return new AdNotFoundException("Такого объявления не найдено");
+        });
     }
 
-    public ExtendedAdResponse getAdById(Long id) {
-        Ad ad = adRepository.findById(id).orElseThrow(() -> new AdNotFoundException("Такого объявления не найдено"));
-        return extendedAdResponseMapper.toDto(ad);
-    }
-
-    public Ad findById(Long id) {
-        return adRepository.findById(id).orElseThrow(() -> new AdNotFoundException("Такого объявления не найдено"));
-    }
-
+    @Override
     public void deleteAd(Long id) {
-        adRepository.findById(id).orElseThrow(() -> new AdNotFoundException("Такого объявления не найдено"));
+        if (adRepository.findById(id).isEmpty()) {
+            log.error("Объявление с номером: {}", id + " не найдено");
+            throw new AdNotFoundException("Такого объявления не найдено");
+        }
+        log.info("Удаление объявления по номеру: {}", id);
         adRepository.deleteById(id);
     }
 
-    public AdResponse updateAd(Long id, CreateOrUpdateAd properties) {
-        Ad ad = adRepository.findById(id).orElseThrow(() -> new AdNotFoundException("Такого объявления не найдено"));
+    @Override
+    public Ad updateAdDetails(Long id, CreateOrUpdateAd properties) {
+        log.info("Обновление объявления: {}", id);
+        Ad ad = getAdById(id);
         ad.setTitle(properties.getTitle());
         ad.setPrice(properties.getPrice());
         ad.setDescription(properties.getDescription());
-        Ad save = adRepository.save(ad);
-        return adMapper.mappingToDto(save);
+        return adRepository.save(ad);
     }
 
-    public AdsResponse getAdsByUser(User user) {
-        List<Ad> result = adRepository.findByUser(user);
-        return adsMapper.toAdsResponse(result);
+    @Override
+    public List<Ad> getUserAds(User user) {
+        log.info("Поиск всех объявлений: {}", user.getUsername());
+        return adRepository.findByUser(user);
     }
 
-    public AdResponse updateImageAd(Long id, MultipartFile image) {
-        Ad ad = adRepository.findById(id).orElseThrow(() -> new AdNotFoundException("Такого объявления не найдено"));
-        Image image1 = imageMapper.toImage(image);
-        ad.setImage(image1);
-        Ad save = adRepository.save(ad);
-        return adMapper.mappingToDto(save);
+    @Override
+    @Transactional
+    public Ad updateAdImage(Long id, Image image) {
+        log.info("Обновление объявления по номеру: {}", id);
+        Ad ad = getAdById(id);
+        ad.setImage(image);
+        return adRepository.save(ad);
+    }
+
+    @Override
+    public Ad save(Ad ad) {
+        log.info("Сохранение объявления: {}", ad.getTitle() + ", " + ad.getPrice() + ", " + ad.getDescription());
+        return adRepository.save(ad);
     }
 
 }

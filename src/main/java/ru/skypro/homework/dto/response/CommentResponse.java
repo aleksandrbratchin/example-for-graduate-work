@@ -24,7 +24,7 @@ public class CommentResponse {
      * дата и время создания комментария в миллисекундах с 00:00:00 01.01.1970
      */
     @Schema(description = "дата и время создания комментария в миллисекундах с 00:00:00 01.01.1970")
-    private Integer createdAt;
+    private Long createdAt;
     /**
      * id комментария
      */

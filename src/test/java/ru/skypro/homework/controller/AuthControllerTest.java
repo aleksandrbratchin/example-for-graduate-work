@@ -31,6 +31,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class AuthControllerTest {
 
+    private static final String USER_JACK = "captain.jack.sparrow@gmail.com";
+    private static final String USER_DAVY = "davy.jones@gmail.com";
+    private static final String REGISTER_URL = "/register";
+    private static final String LOGIN_URL = "/login";
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -49,21 +54,22 @@ class AuthControllerTest {
 
     @Nested
     class RegisterTest {
+
         @Test
         @SneakyThrows
-        void register_RegisterNewUser() {
+        void shouldRegisterNewUser() {
             Register register = Register.builder()
                     .role(Role.ADMIN)
                     .phone("+7 (666) 6666666")
                     .firstName("Davy")
                     .lastName("Jones")
                     .password("Locker123")
-                    .username("davy.jones@gmail.com")
+                    .username(USER_DAVY)
                     .build();
             String jsonRegister = objectMapper.writeValueAsString(register);
 
             mockMvc.perform(
-                            post("/register")
+                            post(REGISTER_URL)
                                     .content(jsonRegister)
                                     .contentType(MediaType.APPLICATION_JSON)
                     )
@@ -72,19 +78,19 @@ class AuthControllerTest {
 
         @Test
         @SneakyThrows
-        void register_UserAlreadyExists() {
+        void shouldReturnBadRequestForExistingUser() {
             Register register = Register.builder()
                     .role(Role.ADMIN)
                     .phone("+7 (812) 1234567")
                     .firstName("Jack")
                     .lastName("Sparrow")
                     .password("BlackPearl123")
-                    .username("captain.jack.sparrow@gmail.com")
+                    .username(USER_JACK)
                     .build();
             String jsonRegister = objectMapper.writeValueAsString(register);
 
             mockMvc.perform(
-                            post("/register")
+                            post(REGISTER_URL)
                                     .content(jsonRegister)
                                     .contentType(MediaType.APPLICATION_JSON)
                     )
@@ -93,12 +99,12 @@ class AuthControllerTest {
 
         @Test
         @SneakyThrows
-        void register_ValidError() {
+        void shouldReturnValidationErrorsForInvalidRegister() {
             Register register = Register.builder().build();
             String jsonRegister = objectMapper.writeValueAsString(register);
 
             MvcResult mvcResult = mockMvc.perform(
-                            post("/register")
+                            post(REGISTER_URL)
                                     .content(jsonRegister)
                                     .contentType(MediaType.APPLICATION_JSON)
                     )
@@ -119,15 +125,15 @@ class AuthControllerTest {
 
         @Test
         @SneakyThrows
-        void login() {
+        void shouldLoginSuccessfully() {
             Login login = Login.builder()
                     .password("BlackPearl123")
-                    .username("captain.jack.sparrow@gmail.com")
+                    .username(USER_JACK)
                     .build();
             String jsonLogin = objectMapper.writeValueAsString(login);
 
             mockMvc.perform(
-                            post("/login")
+                            post(LOGIN_URL)
                                     .content(jsonLogin)
                                     .contentType(MediaType.APPLICATION_JSON)
                     )
@@ -136,15 +142,15 @@ class AuthControllerTest {
 
         @Test
         @SneakyThrows
-        void login_IncorrectPassword() {
+        void shouldReturnUnauthorizedForIncorrectPassword() {
             Login login = Login.builder()
                     .password("WickedWench")
-                    .username("captain.jack.sparrow@gmail.com")
+                    .username(USER_JACK)
                     .build();
             String jsonLogin = objectMapper.writeValueAsString(login);
 
             mockMvc.perform(
-                            post("/login")
+                            post(LOGIN_URL)
                                     .content(jsonLogin)
                                     .contentType(MediaType.APPLICATION_JSON)
                     )
@@ -153,7 +159,7 @@ class AuthControllerTest {
 
         @Test
         @SneakyThrows
-        void login_IncorrectUser() {
+        void shouldReturnUnauthorizedForIncorrectUser() {
             Login login = Login.builder()
                     .password("password")
                     .username("incorrect@gmail.com")
@@ -161,7 +167,7 @@ class AuthControllerTest {
             String jsonLogin = objectMapper.writeValueAsString(login);
 
             mockMvc.perform(
-                            post("/login")
+                            post(LOGIN_URL)
                                     .content(jsonLogin)
                                     .contentType(MediaType.APPLICATION_JSON)
                     )
@@ -170,12 +176,12 @@ class AuthControllerTest {
 
         @Test
         @SneakyThrows
-        void getRegister_validError() {
+        void shouldReturnValidationErrorsForInvalidLogin() {
             Login login = Login.builder().build();
             String jsonLogin = objectMapper.writeValueAsString(login);
 
             MvcResult mvcResult = mockMvc.perform(
-                            post("/login")
+                            post(LOGIN_URL)
                                     .content(jsonLogin)
                                     .contentType(MediaType.APPLICATION_JSON)
                     )
@@ -186,5 +192,4 @@ class AuthControllerTest {
             assertThat(response.getContentAsString()).contains("Пароль не может быть пустым");
         }
     }
-
 }

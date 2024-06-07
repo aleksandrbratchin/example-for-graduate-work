@@ -26,7 +26,7 @@ public class AdsMapperTest {
     }
 
     @Test
-    void shouldReturnAdsResponse() {
+    void shouldMapAdListToAdsResponse() {
         User user = User.builder()
                 .id(3L)
                 .username("test")
@@ -59,16 +59,12 @@ public class AdsMapperTest {
         adResponse.setImage("/image/" + image.getId());
 
         List<Ad> adList = List.of(ad);
-        List<AdResponse> adResponseList = new ArrayList<>(List.of(adResponse));
+        List<AdResponse> expectedAdResponseList = new ArrayList<>(List.of(adResponse));
+        int expectedCount = expectedAdResponseList.size();
 
-        int exam = 1;
+        AdsResponse adsResponse = adsMapper.toAdsResponse(adList);
 
-        AdsResponse adsResponse = new AdsResponse();
-        adsResponse.setResults(adResponseList);
-        adsResponse.setCount(adResponseList.size());
-
-        AdsResponse adsResponse1 = adsMapper.toAdsResponse(adList);
-        assertThat(adList.size()).isEqualTo(exam);
-        assertThat(adsResponse1).isEqualTo(adsResponse);
+        assertThat(adList.size()).isEqualTo(expectedCount);
+        assertThat(adsResponse).isEqualTo(adsResponse);
     }
 }

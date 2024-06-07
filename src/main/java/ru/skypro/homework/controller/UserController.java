@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -24,9 +23,8 @@ import ru.skypro.homework.mapper.UpdateUserMapper;
 import ru.skypro.homework.mapper.UserMapper;
 import ru.skypro.homework.model.Image;
 import ru.skypro.homework.model.User;
-import ru.skypro.homework.service.impl.UserService;
-
-import java.util.stream.Collectors;
+import ru.skypro.homework.service.UserServiceApi;
+import ru.skypro.homework.utils.ValidationUtils;
 
 @Slf4j
 @CrossOrigin(value = "http://localhost:3000")
@@ -35,7 +33,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserController {
 
-    private final UserService userService;
+    private final UserServiceApi userService;
 
     private final ImageMapper imageMapper;
 
@@ -76,14 +74,9 @@ public class UserController {
             BindingResult bindingResult
     ) {
         if (bindingResult.hasErrors()) {
-            String errorMessage = bindingResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.joining(", "));
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorMessage);
+            return ValidationUtils.createErrorResponse(bindingResult.getAllErrors(), HttpStatus.FORBIDDEN);
         }
-        try {
-            userService.updatePassword(userPrincipal, password);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
+        userService.changeUserPassword(userPrincipal.getUser(), password);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
@@ -109,12 +102,9 @@ public class UserController {
             tags = "Пользователи"
     )
     @GetMapping("me")
-    public ResponseEntity<?> getUser(
-            @AuthenticationPrincipal UserPrincipal user
-    ) {
-        return ResponseEntity.status(HttpStatus.OK).body(
-                userMapper.toUserResponse(user.getUser())
-        );
+    public ResponseEntity<?> getCurrentUser(@AuthenticationPrincipal UserPrincipal user) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(userMapper.toUserResponse(user.getUser()));
     }
 
     @Operation(
@@ -134,36 +124,21 @@ public class UserController {
                             responseCode = "401",
                             description = "Unauthorized",
                             content = @Content(schema = @Schema(hidden = true))
-                    ),
-                    @ApiResponse(
-                            responseCode = "400",
-                            description = "BAD_REQUEST",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(
-                                            type = "string"
-                                    )
-                            )
                     )
             },
             tags = "Пользователи"
     )
     @PatchMapping(path = "me", consumes = "application/json")
-    public ResponseEntity<?> updateUser(
+    public ResponseEntity<?> updateUserDetails(
             @AuthenticationPrincipal UserPrincipal userPrincipal,
             @RequestBody @Valid UpdateUser updateUser,
             BindingResult bindingResult
     ) {
-        try {
-            if (bindingResult.hasErrors()) {
-                String errorMessage = bindingResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.joining(", "));
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorMessage);
-            }
-            User update = userService.update(userPrincipal.getUser(), updateUser);
-            return ResponseEntity.status(HttpStatus.OK).body(updateUserMapper.fromUser(update));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        if (bindingResult.hasErrors()) {
+            return ValidationUtils.createErrorResponse(bindingResult.getAllErrors(), HttpStatus.UNAUTHORIZED);
         }
+        User updatedUser  = userService.updateUserDetails(userPrincipal.getUser(), updateUser);
+        return ResponseEntity.status(HttpStatus.OK).body(updateUserMapper.fromUser(updatedUser ));
     }
 
     @Operation(
@@ -195,13 +170,9 @@ public class UserController {
             @RequestPart("image") MultipartFile image,
             @AuthenticationPrincipal UserPrincipal user
     ) {
-        try {
-            Image avatar = imageMapper.toImage(image);
-            userService.setAvatar(user.getUser(), avatar);
-            return ResponseEntity.status(HttpStatus.OK).build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
+        Image avatar = imageMapper.toImage(image);
+        userService.updateUserAvatar(user.getUser(), avatar);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
 }

@@ -1,5 +1,6 @@
 package ru.skypro.homework.mapper;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -15,11 +16,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 class AdMapperTest {
 
     @Autowired
-    private  AdMapper adMapper;
+    private AdMapper adMapper;
 
     @Test
-    public void testAdToAdResponse() {
-        // Создание объекта Image
+    @DisplayName("Test mapping Ad to AdResponse")
+    public void testAdToAdResponseMapping() {
+        // Создание объектов Image и User
         Image avatar = Image.builder()
                 .id(1L)
                 .fileSize(1024)
@@ -27,7 +29,6 @@ class AdMapperTest {
                 .data(new byte[]{1, 2, 3, 4})
                 .build();
 
-        // Создание объекта User
         User user = User.builder()
                 .id(2L)
                 .username("testuser")

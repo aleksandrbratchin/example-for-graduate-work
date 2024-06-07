@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -17,9 +16,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import ru.skypro.homework.dto.Login;
 import ru.skypro.homework.dto.Register;
-import ru.skypro.homework.service.AuthService;
-
-import java.util.stream.Collectors;
+import ru.skypro.homework.service.AuthServiceApi;
+import ru.skypro.homework.utils.ValidationUtils;
 
 @Slf4j
 @CrossOrigin(value = "http://localhost:3000")
@@ -27,7 +25,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final AuthService authService;
+    private final AuthServiceApi authServiceApi;
 
     @Operation(
             summary = "Авторизация пользователя",
@@ -56,10 +54,9 @@ public class AuthController {
             BindingResult bindingResult
     ) {
         if (bindingResult.hasErrors()) {
-            String errorMessage = bindingResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.joining(", "));
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorMessage);
+            return ValidationUtils.createErrorResponse(bindingResult.getAllErrors(), HttpStatus.UNAUTHORIZED);
         }
-        if (authService.login(login.getUsername(), login.getPassword())) {
+        if (authServiceApi.login(login.getUsername(), login.getPassword())) {
             return ResponseEntity.ok().build();
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -93,10 +90,9 @@ public class AuthController {
             BindingResult bindingResult
     ) {
         if (bindingResult.hasErrors()) {
-            String errorMessage = bindingResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.joining(", "));
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
+            return ValidationUtils.createErrorResponse(bindingResult.getAllErrors(), HttpStatus.BAD_REQUEST);
         }
-        if (authService.register(register)) {
+        if (authServiceApi.register(register)) {
             return ResponseEntity.status(HttpStatus.CREATED).build();
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();

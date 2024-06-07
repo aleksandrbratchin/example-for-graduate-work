@@ -4,7 +4,6 @@ import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import ru.skypro.homework.dto.Role;
 import ru.skypro.homework.model.User;
 
 import java.util.Collection;
@@ -31,7 +30,7 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.<GrantedAuthority>singletonList(new SimpleGrantedAuthority("ROLE_" + Role.USER.name()));
+        return Collections.<GrantedAuthority>singletonList(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()));
     }
 
     @Override
