@@ -51,7 +51,7 @@ class UserControllerTest {
     class UserIsAuthorized {
         @Test
         @SneakyThrows
-        @WithUserDetails("captain.jack.sparrow@gmail.com")
+        @WithUserDetails(value = "captain.jack.sparrow@gmail.com", userDetailsServiceBeanName = "customUserDetailsService")
         void getRegister() {
             mockMvc.perform(get("/users/me"))
                     .andExpect(status().isOk())
@@ -67,7 +67,7 @@ class UserControllerTest {
 
         @Test
         @SneakyThrows
-        @WithUserDetails("elizabeth.swann@gmail.com")
+        @WithUserDetails(value = "elizabeth.swann@gmail.com", userDetailsServiceBeanName = "customUserDetailsService")
         void testSetPassword() {
             NewPassword newPassword = new NewPassword("GovernorDaughter", "MsrTurner");
             mockMvc.perform(post("/users/set_password")
@@ -78,7 +78,7 @@ class UserControllerTest {
 
         @Test
         @SneakyThrows
-        @WithUserDetails("elizabeth.swann@gmail.com")
+        @WithUserDetails(value = "elizabeth.swann@gmail.com", userDetailsServiceBeanName = "customUserDetailsService")
         void testSetIncorrectPassword() {
             NewPassword newPassword = new NewPassword("Daughter", "MsrTurner");
             mockMvc.perform(post("/users/set_password")
@@ -89,7 +89,7 @@ class UserControllerTest {
 
         @Test
         @SneakyThrows
-        @WithUserDetails("james.norrington@gmail.com")
+        @WithUserDetails(value = "james.norrington@gmail.com", userDetailsServiceBeanName = "customUserDetailsService")
         void testUpdateUser() {
             UpdateUser updateUser = UpdateUser.builder()
                     .firstName("James1")
@@ -108,7 +108,7 @@ class UserControllerTest {
 
         @Test
         @SneakyThrows
-        @WithUserDetails("captain.jack.sparrow@gmail.com")
+        @WithUserDetails(value = "captain.jack.sparrow@gmail.com", userDetailsServiceBeanName = "customUserDetailsService")
         void testUpdateUserImage() {
             MockMultipartFile imageFile = new MockMultipartFile(
                     "image",
@@ -129,7 +129,7 @@ class UserControllerTest {
         class ValidError {
             @Test
             @SneakyThrows
-            @WithUserDetails("elizabeth.swann@gmail.com")
+            @WithUserDetails(value = "elizabeth.swann@gmail.com", userDetailsServiceBeanName = "customUserDetailsService")
             void testSetPassword() {
                 NewPassword newPassword = new NewPassword("GovernorDaughters145236", "er");
                 mockMvc.perform(post("/users/set_password")
@@ -140,7 +140,7 @@ class UserControllerTest {
 
             @Test
             @SneakyThrows
-            @WithUserDetails("james.norrington@gmail.com")
+            @WithUserDetails(value = "james.norrington@gmail.com", userDetailsServiceBeanName = "customUserDetailsService")
             void testUpdateUser() {
                 UpdateUser updateUser = UpdateUser.builder()
                         .build();

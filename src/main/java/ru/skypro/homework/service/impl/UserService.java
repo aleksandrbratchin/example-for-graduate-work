@@ -1,8 +1,10 @@
 package ru.skypro.homework.service.impl;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -16,13 +18,14 @@ import ru.skypro.homework.repository.UserRepository;
 @Service
 @Log4j2
 @RequiredArgsConstructor
+@CacheConfig(cacheNames = {"userCache"})
 public class UserService implements ru.skypro.homework.service.UserServiceApi {
 
     private final UserRepository userRepository;
 
     private final PasswordEncoder encoder;
 
-    @Override
+    @Cacheable(key = "#username")
     public User findByUsername(String username) {
         log.info("Поиск пользователя по имени пользователя: {}", username);
         return userRepository.findByUsername(username).orElseThrow(
@@ -36,20 +39,20 @@ public class UserService implements ru.skypro.homework.service.UserServiceApi {
     }
 
     @Override
+    @CachePut(key = "#user.username")
     public User save(User user) {
         log.info("Сохранение пользователя: {}", user.getUsername());
         return userRepository.save(user);
     }
 
     @Override
-    @Transactional
     public void updateUserAvatar(User user, Image image) {
         log.info("Обновление аватара для пользователя: {}", user.getUsername());
         if (user.getAvatar() != null) {
             image.setId(user.getAvatar().getId());
         }
         user.setAvatar(image);
-        userRepository.save(user);
+        save(user);
     }
 
     @Override
@@ -58,7 +61,7 @@ public class UserService implements ru.skypro.homework.service.UserServiceApi {
         user.setPhone(updateUser.getPhone());
         user.setFirstName(updateUser.getFirstName());
         user.setLastName(updateUser.getLastName());
-        return userRepository.save(user);
+        return save(user);
     }
 
     @Override
@@ -69,7 +72,7 @@ public class UserService implements ru.skypro.homework.service.UserServiceApi {
             throw new IncorrectCurrentPasswordException("Текущий пароль неверен");
         }
         user.setPassword(encoder.encode(password.getNewPassword()));
-        userRepository.save(user);
+        save(user);
     }
 
 }
