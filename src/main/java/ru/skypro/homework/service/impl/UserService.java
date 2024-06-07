@@ -1,8 +1,10 @@
 package ru.skypro.homework.service.impl;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -41,12 +43,14 @@ public class UserService implements UserServiceApi {
 
     @Override
     @CachePut(key = "#user.username")
+    @Transactional
     public User save(User user) {
         log.info("Сохранение пользователя: {}", user.getUsername());
         return userRepository.save(user);
     }
 
     @Override
+    @CacheEvict(key = "#user.username")
     public void updateUserAvatar(User user, Image image) {
         log.info("Обновление аватара для пользователя: {}", user.getUsername());
         if (user.getAvatar() != null) {
@@ -57,6 +61,7 @@ public class UserService implements UserServiceApi {
     }
 
     @Override
+    @CachePut(key = "#user.username")
     public User updateUserDetails(User user, UpdateUser updateUser) {
         log.info("Обновление данных для пользователя: {}", user.getUsername());
         user.setPhone(updateUser.getPhone());
@@ -66,6 +71,7 @@ public class UserService implements UserServiceApi {
     }
 
     @Override
+    @CacheEvict(key = "#user.username")
     public void changeUserPassword(User user, NewPassword password) {
         log.info("Изменение пароля для пользователя: {}", user.getUsername());
         if (!encoder.matches(password.getCurrentPassword(), user.getPassword())) {
