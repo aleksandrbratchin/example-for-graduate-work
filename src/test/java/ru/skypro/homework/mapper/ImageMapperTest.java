@@ -20,7 +20,7 @@ class ImageMapperTest {
 
     @Test
     @SneakyThrows
-    public void testToImage() {
+    public void testConvertsMultipartFileToImage() {
         byte[] fileContent = {1, 2, 3, 4};
         MockMultipartFile multipartFile = new MockMultipartFile(
                 "file",
@@ -39,7 +39,7 @@ class ImageMapperTest {
     }
 
     @Test
-    public void testToImageWithNullFile() {
+    public void testConvertsNullMultipartFileToNullImage() {
         Image image = imageMapper.toImage(null);
 
         assertThat(image).isNull();

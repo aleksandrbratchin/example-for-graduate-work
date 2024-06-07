@@ -19,24 +19,23 @@ public class CreateOrUpdateAdMapperTest {
     }
 
     @Test
-    void shouldReturnAd() {
-        Ad ad = new Ad();
-        ad.setId(3L);
-        ad.setPrice(100);
-        ad.setTitle("test");
-        ad.setDescription("test");
+    void shouldMapCreateOrUpdateAdToAd() {
+        Ad originalAd = new Ad();
+        originalAd.setId(3L);
+        originalAd.setPrice(100);
+        originalAd.setTitle("test");
+        originalAd.setDescription("test");
 
-        CreateOrUpdateAd createOrUpdateAd = new CreateOrUpdateAd();
-        createOrUpdateAd.setPrice(100);
-        createOrUpdateAd.setTitle("test");
-        createOrUpdateAd.setDescription("test");
+        CreateOrUpdateAd createOrUpdateAdDto = new CreateOrUpdateAd();
+        createOrUpdateAdDto.setPrice(100);
+        createOrUpdateAdDto.setTitle("test");
+        createOrUpdateAdDto.setDescription("test");
 
-        Ad test = createOrUpdateAdMapper.toAd(createOrUpdateAd);
+        Ad mappedAd = createOrUpdateAdMapper.toAd(createOrUpdateAdDto);
 
-        assertThat(test).isNotNull();
-        assertThat(test.getPrice()).isEqualTo(createOrUpdateAd.getPrice());
-        assertThat(test.getTitle()).isEqualTo(createOrUpdateAd.getTitle());
-        assertThat(test.getDescription()).isEqualTo(createOrUpdateAd.getDescription());
-
+        assertThat(mappedAd).isNotNull();
+        assertThat(mappedAd.getPrice()).isEqualTo(createOrUpdateAdDto.getPrice());
+        assertThat(mappedAd.getTitle()).isEqualTo(createOrUpdateAdDto.getTitle());
+        assertThat(mappedAd.getDescription()).isEqualTo(createOrUpdateAdDto.getDescription());
     }
 }

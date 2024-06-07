@@ -1,6 +1,5 @@
 package ru.skypro.homework.dto.user;
 
-
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
@@ -15,11 +14,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class RegisterDtoTest {
 
-    private final Validator validator = Validation.buildDefaultValidatorFactory()
-            .getValidator();
+    private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
     @Test
-    public void whenAllAcceptable() {
+    public void whenAllFieldsValid_thenReturnNoViolations() {
         Register registerDto = Register.builder()
                 .username("login@a.r")
                 .password("Password")
@@ -38,45 +36,39 @@ class RegisterDtoTest {
     class Invalid {
 
         @Test
-        public void allNull() {
+        public void whenAllFieldsNull_thenReturnViolations() {
             Register registerDto = new Register();
 
             Set<ConstraintViolation<Register>> violations = validator.validate(registerDto);
 
             assertThat(violations.size()).isEqualTo(6);
-            assertThat(violations).anyMatch(
-                    testObjectConstraintViolation ->
-                            testObjectConstraintViolation.getPropertyPath().toString().equals("username") &&
-                                    testObjectConstraintViolation.getMessage().contains("пуст") &&
-                                    testObjectConstraintViolation.getMessage().toLowerCase().contains("логин")
+            assertThat(violations).anyMatch(violation ->
+                    violation.getPropertyPath().toString().equals("username") &&
+                            violation.getMessage().contains("пуст") &&
+                            violation.getMessage().toLowerCase().contains("логин")
             );
-            assertThat(violations).anyMatch(
-                    testObjectConstraintViolation ->
-                            testObjectConstraintViolation.getPropertyPath().toString().equals("password") &&
-                                    testObjectConstraintViolation.getMessage().contains("пуст") &&
-                                    testObjectConstraintViolation.getMessage().toLowerCase().contains("пароль")
+            assertThat(violations).anyMatch(violation ->
+                    violation.getPropertyPath().toString().equals("password") &&
+                            violation.getMessage().contains("пуст") &&
+                            violation.getMessage().toLowerCase().contains("пароль")
             );
-            assertThat(violations).anyMatch(
-                    testObjectConstraintViolation ->
-                            testObjectConstraintViolation.getPropertyPath().toString().equals("firstName") &&
-                                    testObjectConstraintViolation.getMessage().contains("пуст") &&
-                                    testObjectConstraintViolation.getMessage().toLowerCase().contains("имя")
+            assertThat(violations).anyMatch(violation ->
+                    violation.getPropertyPath().toString().equals("firstName") &&
+                            violation.getMessage().contains("пуст") &&
+                            violation.getMessage().toLowerCase().contains("имя")
             );
-            assertThat(violations).anyMatch(
-                    testObjectConstraintViolation ->
-                            testObjectConstraintViolation.getPropertyPath().toString().equals("lastName") &&
-                                    testObjectConstraintViolation.getMessage().contains("пуст") &&
-                                    testObjectConstraintViolation.getMessage().toLowerCase().contains("фамилия")
+            assertThat(violations).anyMatch(violation ->
+                    violation.getPropertyPath().toString().equals("lastName") &&
+                            violation.getMessage().contains("пуст") &&
+                            violation.getMessage().toLowerCase().contains("фамилия")
             );
-            assertThat(violations).anyMatch(
-                    testObjectConstraintViolation ->
-                            testObjectConstraintViolation.getPropertyPath().toString().equals("phone") &&
-                                    testObjectConstraintViolation.getMessage().toLowerCase().contains("телефон")
+            assertThat(violations).anyMatch(violation ->
+                    violation.getPropertyPath().toString().equals("phone") &&
+                            violation.getMessage().toLowerCase().contains("телефон")
             );
-            assertThat(violations).anyMatch(
-                    testObjectConstraintViolation ->
-                            testObjectConstraintViolation.getPropertyPath().toString().equals("role") &&
-                                    testObjectConstraintViolation.getMessage().contains("Неверная роль")
+            assertThat(violations).anyMatch(violation ->
+                    violation.getPropertyPath().toString().equals("role") &&
+                            violation.getMessage().contains("Неверная роль")
             );
         }
 

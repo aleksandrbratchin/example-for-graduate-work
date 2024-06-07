@@ -22,11 +22,11 @@ public class UpdateUserMapperTest {
                 .phone("+7 (123) 456-78-99")
                 .build();
 
-        UpdateUser updateUser = updateUserMapper.fromUser(user);
+        UpdateUser updateUserDto = updateUserMapper.fromUser(user);
 
-        assertThat(updateUser).isNotNull();
-        assertThat(updateUser.getFirstName()).isEqualTo(user.getFirstName());
-        assertThat(updateUser.getLastName()).isEqualTo(user.getLastName());
-        assertThat(updateUser.getPhone()).isEqualTo(user.getPhone());
+        assertThat(updateUserDto).isNotNull();
+        assertThat(updateUserDto.getFirstName()).isEqualTo(user.getFirstName());
+        assertThat(updateUserDto.getLastName()).isEqualTo(user.getLastName());
+        assertThat(updateUserDto.getPhone()).isEqualTo(user.getPhone());
     }
 }

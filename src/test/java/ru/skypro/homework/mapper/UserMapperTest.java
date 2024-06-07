@@ -18,7 +18,7 @@ class UserMapperTest {
     private UserMapper userMapper;
 
     @Test
-    public void testToUserResponse() {
+    public void testMappingToUserResponse() {
         Image avatar = Image.builder()
                 .id(1L)
                 .fileSize(1024)
@@ -49,7 +49,7 @@ class UserMapperTest {
     }
 
     @Test
-    void testFromRegister() {
+    void testMappingFromRegister() {
         Register register = Register.builder()
                 .username("jack.sparrow@gmail.com")
                 .password("piratepassword")
