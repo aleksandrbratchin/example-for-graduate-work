@@ -55,7 +55,7 @@ public class AdController {
                     )
             }
     )
-    @GetMapping()
+    @GetMapping
     public ResponseEntity<?> getAllAds() {
         return ResponseEntity.ok().body(adsMapper.toAdsResponse(adService.getAllAds()));
     }
