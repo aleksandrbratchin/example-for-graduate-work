@@ -14,12 +14,13 @@ import ru.skypro.homework.exception.IncorrectCurrentPasswordException;
 import ru.skypro.homework.model.Image;
 import ru.skypro.homework.model.User;
 import ru.skypro.homework.repository.UserRepository;
+import ru.skypro.homework.service.UserServiceApi;
 
 @Service
 @Log4j2
 @RequiredArgsConstructor
 @CacheConfig(cacheNames = {"userCache"})
-public class UserService implements ru.skypro.homework.service.UserServiceApi {
+public class UserService implements UserServiceApi {
 
     private final UserRepository userRepository;
 

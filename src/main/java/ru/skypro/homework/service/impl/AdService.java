@@ -30,7 +30,10 @@ public class AdService implements AdServiceApi {
     @Override
     @Transactional
     public Ad createAdWithImage(Ad ad, Image image) {
-        log.info("Сохранение объявления: {}", ad.getTitle() + ", " + ad.getPrice() + ", " + ", " + ad.getDescription());
+        log.info(
+                "Сохранение объявления: {}",
+                ad.getTitle() + ", " + ad.getPrice() + ", " + ", " + ad.getDescription()
+        );
         ad.setImage(image);
         return adRepository.save(ad);
     }
@@ -81,7 +84,10 @@ public class AdService implements AdServiceApi {
 
     @Override
     public Ad save(Ad ad) {
-        log.info("Сохранение объявления: {}", ad.getTitle() + ", " + ad.getPrice() + ", " + ad.getDescription());
+        log.info(
+                "Сохранение объявления: {}",
+                ad.getTitle() + ", " + ad.getPrice() + ", " + ad.getDescription()
+        );
         return adRepository.save(ad);
     }
 
