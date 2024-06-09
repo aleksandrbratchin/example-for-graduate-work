@@ -51,13 +51,14 @@ public class UserService implements UserServiceApi {
 
     @Override
     @CacheEvict(key = "#user.username")
+    @Transactional
     public void updateUserAvatar(User user, Image image) {
         log.info("Обновление аватара для пользователя: {}", user.getUsername());
         if (user.getAvatar() != null) {
             image.setId(user.getAvatar().getId());
         }
         user.setAvatar(image);
-        save(user);
+        userRepository.save(user);
     }
 
     @Override
@@ -67,7 +68,7 @@ public class UserService implements UserServiceApi {
         user.setPhone(updateUser.getPhone());
         user.setFirstName(updateUser.getFirstName());
         user.setLastName(updateUser.getLastName());
-        return save(user);
+        return userRepository.save(user);
     }
 
     @Override
@@ -79,7 +80,7 @@ public class UserService implements UserServiceApi {
             throw new IncorrectCurrentPasswordException("Текущий пароль неверен");
         }
         user.setPassword(encoder.encode(password.getNewPassword()));
-        save(user);
+        userRepository.save(user);
     }
 
 }
