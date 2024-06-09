@@ -14,7 +14,7 @@ public abstract class ExtendedAdResponseMapper {
     @Mapping(target = "pk", source = "id")
     @Mapping(target = "authorFirstName", source = "user.firstName")
     @Mapping(target = "authorLastName", source = "user.lastName")
-    @Mapping(target = "image", expression = "java(ad.getImage() == null ? \"\" : downloadUrl + ad.getImage().getId())")
+    @Mapping(target = "image", expression = "java(ad.getImage() == null ? null : downloadUrl + ad.getImage().getId())")
     @Mapping(target = "email", source = "user.username")
     @Mapping(target = "phone", source = "user.phone")
     public abstract ExtendedAdResponse toDto(Ad ad);
