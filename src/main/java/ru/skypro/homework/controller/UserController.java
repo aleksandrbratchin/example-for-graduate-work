@@ -7,20 +7,24 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import ru.skypro.homework.config.security.UserPrincipal;
 import ru.skypro.homework.dto.NewPassword;
 import ru.skypro.homework.dto.UpdateUser;
 import ru.skypro.homework.dto.response.UserResponse;
-
-import java.util.stream.Collectors;
+import ru.skypro.homework.mapper.ImageMapper;
+import ru.skypro.homework.mapper.UpdateUserMapper;
+import ru.skypro.homework.mapper.UserMapper;
+import ru.skypro.homework.model.Image;
+import ru.skypro.homework.model.User;
+import ru.skypro.homework.service.UserServiceApi;
+import ru.skypro.homework.utils.ValidationUtils;
 
 @Slf4j
 @CrossOrigin(value = "http://localhost:3000")
@@ -28,6 +32,14 @@ import java.util.stream.Collectors;
 @RequestMapping("users")
 @RequiredArgsConstructor
 public class UserController {
+
+    private final UserServiceApi userService;
+
+    private final ImageMapper imageMapper;
+
+    private final UserMapper userMapper;
+
+    private final UpdateUserMapper updateUserMapper;
 
     @Operation(
             summary = "Обновление пароля",
@@ -40,37 +52,31 @@ public class UserController {
                     @ApiResponse(
                             responseCode = "401",
                             description = "Unauthorized",
-                            content = @Content(schema = @Schema(hidden = true))
-                    ),
-                    @ApiResponse(
-                            responseCode = "403",
-                            description = "Forbidden",
-                            content = @Content(schema = @Schema(hidden = true))
-                    ),
-                    @ApiResponse(
-                            responseCode = "400",
-                            description = "BAD_REQUEST",
                             content = @Content(
                                     mediaType = "application/json",
                                     schema = @Schema(
                                             type = "string"
                                     )
                             )
+                    ),
+                    @ApiResponse(
+                            responseCode = "403",
+                            description = "Forbidden",
+                            content = @Content(schema = @Schema(hidden = true))
                     )
             },
             tags = "Пользователи"
     )
-    //@PreAuthorize("hasAnyRole('USER')") //401?
     @PostMapping(path = "set_password", consumes = "application/json")
     public ResponseEntity<?> setPassword(
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
             @RequestBody @Valid NewPassword password,
-            //@AuthenticationPrincipal UserDetails user,
             BindingResult bindingResult
     ) {
         if (bindingResult.hasErrors()) {
-            String errorMessage = bindingResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.joining(", "));
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
+            return ValidationUtils.createErrorResponse(bindingResult.getAllErrors(), HttpStatus.FORBIDDEN);
         }
+        userService.changeUserPassword(userPrincipal.getUser(), password);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
@@ -96,10 +102,9 @@ public class UserController {
             tags = "Пользователи"
     )
     @GetMapping("me")
-    public ResponseEntity<?> getUser(
-            @AuthenticationPrincipal UserDetails user
-    ) {
-        return ResponseEntity.status(HttpStatus.OK).body(user);
+    public ResponseEntity<?> getCurrentUser(@AuthenticationPrincipal UserPrincipal user) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(userMapper.toUserResponse(user.getUser()));
     }
 
     @Operation(
@@ -119,30 +124,21 @@ public class UserController {
                             responseCode = "401",
                             description = "Unauthorized",
                             content = @Content(schema = @Schema(hidden = true))
-                    ),
-                    @ApiResponse(
-                            responseCode = "400",
-                            description = "BAD_REQUEST",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(
-                                            type = "string"
-                                    )
-                            )
                     )
             },
             tags = "Пользователи"
     )
     @PatchMapping(path = "me", consumes = "application/json")
-    public ResponseEntity<?> updateUser(
+    public ResponseEntity<?> updateUserDetails(
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
             @RequestBody @Valid UpdateUser updateUser,
             BindingResult bindingResult
     ) {
         if (bindingResult.hasErrors()) {
-            String errorMessage = bindingResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.joining(", "));
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
+            return ValidationUtils.createErrorResponse(bindingResult.getAllErrors(), HttpStatus.UNAUTHORIZED);
         }
-        return ResponseEntity.status(HttpStatus.OK).body(new UpdateUser());
+        User updatedUser  = userService.updateUserDetails(userPrincipal.getUser(), updateUser);
+        return ResponseEntity.status(HttpStatus.OK).body(updateUserMapper.fromUser(updatedUser ));
     }
 
     @Operation(
@@ -153,17 +149,6 @@ public class UserController {
                     content = @Content(
                             mediaType = "multipart/form-data",
                             schema = @Schema(implementation = MultipartFile.class)
-/*                            schema = @Schema(
-                                    implementation = Object.class,
-                                    properties = {
-                                            @SchemaProperty(
-                                                    schema = @Schema(
-                                                            type = "string",
-                                                            format = "binary"
-                                                    )
-                                            )
-                                    }
-                            )*/
                     )
             ),
             responses = {
@@ -182,9 +167,12 @@ public class UserController {
     )
     @PatchMapping(path = "me/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> updateUserImage(
-            @RequestBody MultipartFile image
+            @RequestPart("image") MultipartFile image,
+            @AuthenticationPrincipal UserPrincipal user
     ) {
-        return ResponseEntity.status(HttpStatus.OK).body(new UpdateUser());
+        Image avatar = imageMapper.toImage(image);
+        userService.updateUserAvatar(user.getUser(), avatar);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
 }

@@ -10,17 +10,12 @@ public class UserResponse {
      * id пользователя
      */
     @Schema(description = "id пользователя")
-    private Integer id;
+    private Long id;
     /**
      * логин пользователя
      */
     @Schema(description = "логин пользователя")
-    private String username;
-    /**
-     * пароль пользователя
-     */
-    @Schema(description = "пароль пользователя")
-    private String password;
+    private String email;
     /**
      * имя пользователя
      */
