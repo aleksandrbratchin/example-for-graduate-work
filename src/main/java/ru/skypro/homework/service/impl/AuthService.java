@@ -6,7 +6,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -31,8 +30,7 @@ public class AuthService implements AuthServiceApi {
     public boolean login(String userName, String password) {
         try {
             Authentication authenticationToken = new UsernamePasswordAuthenticationToken(userName, password);
-            Authentication authentication = authenticationManager.authenticate(authenticationToken);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+            authenticationManager.authenticate(authenticationToken);
             return true;
         } catch (AuthenticationException e) {
             log.error("Не удалось войти в систему для пользователя: {}", userName, e);
